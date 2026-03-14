@@ -1,0 +1,31 @@
+/*--------------------------------------------------------------
+  13. Iconbox
+----------------------------------------------------------------*/
+.cs_iconbox.cs_style_1 {
+  max-width: 420px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  .cs_iconbox_icon {
+    width: 90px;
+    height: 90px;
+    padding: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .cs_iconbox_subtitle {
+    margin-top: auto;
+  }
+
+  img {
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover {
+    .cs_iconbox_icon {
+      background-color: var(--heading-color);
+    }
+  }
+}

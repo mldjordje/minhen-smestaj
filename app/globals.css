@@ -563,6 +563,35 @@ textarea {
   gap: 14px;
 }
 
+.site-template-shell {
+  background: #fefbf6;
+}
+
+.site-template-shell .cs_site_brand img {
+  max-height: 58px;
+  width: auto;
+}
+
+.site-template-shell .cs_nav_list a {
+  text-decoration: none;
+}
+
+.site-template-shell .cs_card_subtitle,
+.site-template-shell .cs_light,
+.site-template-shell p {
+  font-family: inherit;
+}
+
+.site-template-shell .legacy-hero-note {
+  max-width: 780px;
+  margin: 24px auto 0;
+}
+
+.site-template-shell .cs_card_thumbnail img {
+  width: 100%;
+  display: block;
+}
+
 @media (max-width: 1080px) {
   .hero-section,
   .ops-grid,

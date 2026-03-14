@@ -1,0 +1,14 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_85_572" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="80" height="80">
+<path d="M0 7.62939e-06H80V80H0V7.62939e-06Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_85_572)">
+<path d="M9.89355 32.9163V15.2589C9.89355 12.1719 12.3965 9.66938 15.484 9.66938H64.5161C67.6036 9.66938 70.1065 12.1719 70.1065 15.2589V32.9163" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M74.752 65.889H5.24812C3.64406 65.889 2.34375 64.5887 2.34375 62.9848V45.175C2.34375 43.5711 3.64406 42.2708 5.24812 42.2708H74.752C76.3561 42.2708 77.6562 43.5711 77.6562 45.175V62.9848C77.6562 64.5887 76.3561 65.889 74.752 65.889Z" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M73.7518 42.2708V38.5812C73.7518 35.4526 71.2151 32.9162 68.0859 32.9162H11.915C8.78574 32.9162 6.24902 35.4526 6.24902 38.5812V42.2708" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M33.1704 32.9163C34.7689 32.9163 36.0646 31.6206 36.0646 30.0224V26.4555C36.0646 24.8574 34.7689 23.5617 33.1704 23.5617H20.5848C18.9862 23.5617 17.6904 24.8574 17.6904 26.4555V30.0224C17.6904 31.6206 18.9862 32.9163 20.5848 32.9163" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M59.4155 32.9163C61.014 32.9163 62.3098 31.6206 62.3098 30.0224V26.4555C62.3098 24.8574 61.014 23.5617 59.4155 23.5617H46.8299C45.2315 23.5617 43.9355 24.8574 43.9355 26.4555V30.0224C43.9355 31.6206 45.2315 32.9163 46.8299 32.9163" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.33203 65.889V70.3306" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M72.668 65.889V70.3306" stroke="#C5A56F" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

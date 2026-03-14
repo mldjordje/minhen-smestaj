@@ -1,0 +1,742 @@
+/*--------------------------------------------------------------
+  04. General
+----------------------------------------------------------------*/
+
+/*=====================================  
+  Classess for Fonts Size  
+=======================================*/
+
+.cs_fs_12 {
+  font-size: 12px;
+}
+
+.cs_fs_14 {
+  font-size: 14px;
+}
+
+.cs_fs_16 {
+  font-size: 16px;
+  line-height: 1.25em;
+}
+
+.cs_fs_18 {
+  font-size: 18px;
+}
+
+.cs_fs_20 {
+  font-size: 20px;
+  line-height: 1.5em;
+
+  @media (max-width:575px) {
+    font-size: 18px;
+  }
+}
+
+.cs_fs_24 {
+  font-size: 24px;
+  line-height: 1em;
+
+  @media (max-width:575px) {
+    font-size: 20px;
+  }
+}
+
+.cs_fs_32 {
+  font-size: 32px;
+  line-height: 1.25em;
+
+  @media (max-width:991px) {
+    font-size: 28px;
+  }
+}
+
+.cs_fs_40 {
+  font-size: 40px;
+  line-height: 1.32em;
+
+  @media (max-width:1199px) {
+    font-size: 36px;
+  }
+
+  @media (max-width:991px) {
+    font-size: 30px;
+  }
+}
+
+.cs_fs_48 {
+  font-size: 48px;
+  line-height: 1.333em;
+
+  @media (max-width:1399px) {
+    font-size: 40px;
+  }
+
+  @media (max-width:1199px) {
+    font-size: 36px;
+  }
+
+  @media (max-width:575px) {
+    font-size: 32px;
+  }
+}
+
+.cs_fs_64 {
+  font-size: 64px;
+  line-height: 1.328em;
+
+  @media (max-width:1550px) {
+    font-size: 60px;
+  }
+
+  @media (max-width:991px) {
+    font-size: 52px;
+  }
+
+  @media (max-width:767px) {
+    font-size: 50px;
+  }
+
+  @media (max-width:400px) {
+    font-size: 36px;
+  }
+}
+
+.cs_fs_180 {
+  font-size: 180px;
+  line-height: 1em;
+
+  @media (max-width:1399px) {
+    font-size: 140px;
+  }
+
+  @media (max-width:1199px) {
+    font-size: 110px;
+  }
+
+  @media (max-width:991px) {
+    font-size: 86px;
+  }
+
+  @media (max-width:767px) {
+    font-size: 64px;
+  }
+
+  @media (max-width:500px) {
+    font-size: 52px;
+  }
+}
+
+.cs_fs_160 {
+  font-size: 180px;
+  line-height: 1em;
+
+  @media (max-width:1399px) {
+    font-size: 120px;
+  }
+
+  @media (max-width:1199px) {
+    font-size: 90px;
+  }
+
+  @media (max-width:991px) {
+    font-size: 70px;
+  }
+
+  @media (max-width:767px) {
+    font-size: 46px;
+  }
+
+  @media (max-width:500px) {
+    font-size: 40px;
+  }
+}
+
+/*=====================================  
+  Classess for Fonts Weight
+=======================================*/
+.cs_light {
+  font-weight: 300;
+}
+
+.cs_normal {
+  font-weight: 400;
+}
+
+.cs_medium {
+  font-weight: 500;
+}
+
+.cs_semibold {
+  font-weight: 600;
+}
+
+.cs_bold {
+  font-weight: 700;
+}
+
+.cs_extrabold {
+  font-weight: 800;
+}
+
+.cs_black {
+  font-weight: 900;
+}
+
+/*=====================================  
+  Classess for Fonts Color
+=======================================*/
+.cs_accent_color {
+  color: var(--accent-color);
+}
+
+.cs_heading_color {
+  color: var(--heading-color);
+}
+
+.cs_body_color {
+  color: var(--body-color);
+}
+
+.cs_border_color {
+  color: var(--border-color);
+}
+
+.cs_white_color {
+  color: var(--white-color);
+}
+
+.cs_gray_color {
+  color: var(--gray-color);
+}
+
+.cs_black_color {
+  color: var(--black-color);
+}
+
+.cs_cream_color {
+  color: var(--cream-color);
+}
+
+/*=====================================  
+  Classess for Fonts Family 
+=======================================*/
+.cs_heading_font {
+  font-family: var(--heading-font);
+}
+
+.cs_body_font {
+  font-family: var(--body-font);
+}
+
+.cs_ternary_font {
+  font-family: var(--ternary-font);
+}
+
+/*=============================================  
+  Classess for Background Size & Colors
+===============================================*/
+.cs_accent_bg {
+  background-color: var(--accent-color);
+}
+
+.cs_heading_bg {
+  background-color: var(--heading-color);
+}
+
+.cs_body_bg {
+  background-color: var(--body-color);
+}
+
+.cs_border_bg {
+  background-color: var(--border-color);
+}
+
+.cs_white_bg {
+  background-color: var(--white-color);
+}
+
+.cs_black_bg {
+  background-color: var(--black-color);
+}
+
+.cs_cream_bg {
+  background-color: var(--cream-color);
+}
+
+.cs_bg_filed {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.cs_bg_fixed {
+  background-attachment: fixed;
+}
+
+/*=============================================  
+  Classess for Button Components
+===============================================*/
+.cs_btn.cs_style_1 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  border: 0;
+  outline: 0;
+  padding: 23px 40px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: var(--accent-color);
+    border-radius: inherit;
+    transform: scale(0, 1);
+    transform-origin: top right;
+    transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  &.cs_heading_hover {
+    &::before {
+      background-color: var(--heading-color);
+    }
+  }
+
+  &.cs_white_hover {
+    &::before {
+      background-color: var(--white-color);
+    }
+  }
+
+  >* {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    color: var(--white-color);
+
+    &::before {
+      transform: scale(1, 1);
+      transform-origin: bottom left;
+    }
+
+    &.cs_white_hover {
+      color: var(--heading-color);
+    }
+  }
+
+  @media (max-width:991px) {
+    padding: 17px 40px;
+  }
+}
+
+.cs_text_btn {
+  position: relative;
+
+  &::before {
+    content: "";
+    width: 100%;
+    height: 1px;
+    transform: scale(1, 1);
+    transform-origin: top left;
+    background-color: currentColor;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    color: var(--accent-color);
+
+    &::before {
+      transform: scale(0, 1);
+      transform-origin: top right;
+    }
+  }
+}
+
+.cs_player_btn.cs_style_1 {
+  width: 190px;
+  height: 190px;
+  border: 1px solid var(--white-color);
+
+  &::before,
+  &::after {
+    content: "";
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    border: 1px solid var(--white-color);
+    border-radius: inherit;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse-border 3s linear infinite;
+  }
+
+  &::after {
+    animation-delay: 1.5s;
+  }
+
+  .cs_player_btn_icon {
+    border-left: 40px solid var(--white-color);
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    transform: translateX(8px);
+  }
+
+  &:hover {
+
+    &::before,
+    &::after {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (max-width:1199px) {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+.cs_social_btns.cs_style_1 {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+
+  a {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 28px;
+    color: var(--heading-color);
+    background-color: var(--white-color);
+
+    &:hover {
+      color: var(--white-color);
+      background-color: var(--accent-color);
+    }
+  }
+
+  @media (max-width:767px) {
+    gap: 15px;
+
+    a {
+      width: 42px;
+      height: 42px;
+      font-size: 20px;
+    }
+  }
+}
+
+/*=============================================  
+  Classess for Border Radius
+===============================================*/
+.cs_radius_5 {
+  border-radius: 5px;
+}
+
+.cs_radius_10 {
+  border-radius: 10px;
+}
+
+.cs_radius_15 {
+  border-radius: 15px;
+}
+
+.cs_radius_20 {
+  border-radius: 20px;
+}
+
+.cs_radius_30 {
+  border-radius: 30px;
+}
+
+.cs_radius_50 {
+  border-radius: 50px;
+}
+
+.cs_radius_100 {
+  border-radius: 50%;
+}
+
+/*=============================================  
+  Classess for Utility Components
+===============================================*/
+.cs_mp_0 {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cs_center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs_center_column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs_section_heading.cs_style_1 {
+  .cs_section_title {
+    span {
+      display: inline-block;
+    }
+  }
+
+  .cs_section_subtitle {
+    letter-spacing: 6px;
+  }
+
+  &.cs_type_1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+  }
+
+  .cs_section_heading_left {
+    max-width: 45%;
+  }
+
+  .cs_section_heading_right {
+    max-width: 45%;
+  }
+
+  @media (max-width:991px) {
+    &.cs_type_1 {
+      flex-direction: column;
+      align-items: center !important;
+      justify-content: center;
+      text-align: center;
+    }
+
+    img {
+      display: none;
+    }
+
+    .cs_section_subtitle {
+      letter-spacing: 4px;
+    }
+
+    .cs_section_heading_left,
+    .cs_section_heading_right {
+      max-width: 100%;
+    }
+  }
+}
+
+.cs_zoom {
+  img {
+    transition: all 0.4s ease;
+  }
+
+  &:hover {
+    img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.lg-thumb.lg-group {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lg-outer .lg-thumb-item {
+  border: 2px solid transparent;
+
+  &.active,
+  &:hover {
+    border-color: var(--accent-color);
+  }
+}
+
+.cs_horizontal_line {
+  width: 100%;
+  height: 1px;
+}
+
+.cs_overlay.cs_style_1 {
+  width: 100%;
+  height: 51%;
+  opacity: 0.75;
+  background: linear-gradient(180deg, #343935 0%, rgba(52, 57, 53, 0.00) 100%);
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.cs_overlay.cs_style_2 {
+  width: 100%;
+  height: 44%;
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  @media (max-width:991px) {
+    height: 20%;
+  }
+}
+
+.cs_overlay.cs_style_3 {
+  width: 100%;
+  height: 41%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.cs_width_left_50_vw {
+  height: 100%;
+  width: 50vw;
+  margin-left: calc(101.8% - 50vw);
+
+  @media (max-width: 1199px) {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+.cs_width_right_50_vw {
+  width: calc(50vw - 1.8%);
+
+  @media (max-width: 1199px) {
+    width: 100%;
+  }
+}
+
+.cs_pr_100 {
+  padding-right: 100px;
+
+  @media (max-width: 1399px) {
+    padding-right: 55px;
+  }
+
+  @media (max-width: 1199px) {
+    padding-right: 0px;
+  }
+}
+
+.cs_pl_100 {
+  padding-left: 100px;
+
+  @media (max-width: 1399px) {
+    padding-left: 55px;
+  }
+
+  @media (max-width: 1199px) {
+    padding-left: 0px;
+  }
+}
+
+.cs_custom_pointer_wrap {
+  position: relative;
+
+  .cs_mouse_point {
+    position: absolute;
+    z-index: 1;
+  }
+
+  .cs_mouse_point.cs_style_1 {
+    height: 120px;
+    width: 120px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -58%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform ease 0.3s, opacity ease 0.3s;
+  }
+
+  &:hover {
+    .cs_mouse_point.cs_style_1 {
+      opacity: 1;
+      transform: translate(-50%, -58%) scale(1);
+
+      @media (max-width: 991px) {
+        transform: translate(-50%, -58%) scale(0.6);
+      }
+    }
+  }
+}
+
+/*=============================================  
+  Bootstrap Classess 
+===============================================*/
+@media (min-width:1400px) {
+  .container {
+    max-width: 1520px;
+  }
+}
+
+.cs_gap_y_50 {
+  gap: 50px 0;
+}
+
+.cs_gap_y_45 {
+  gap: 45px 0;
+}
+
+.cs_gap_y_40 {
+  gap: 40px 0;
+}
+
+.cs_gap_y_30 {
+  gap: 30px 0;
+}
+
+.cs_gap_y_60 {
+  gap: 60px 0;
+}
+
+.cs_row_gap_20 {
+  margin-left: -10px;
+  margin-right: -10px;
+
+  >* {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/*===========================================================  
+  All Common Animations
+=============================================================*/
+@keyframes pulse-border {
+  100% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0;
+  }
+}
+
+/*===========================================================  
+  Responsive For Common Component & Hide Elements
+=============================================================*/
+@media (max-width:1199px) {
+  .cs_faq_shape_1 {
+    display: none;
+  }
+}
+
+@media (max-width:991px) {
+  br {
+    display: none;
+  }
+}
