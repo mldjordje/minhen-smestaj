@@ -13,12 +13,12 @@ export default function RoomsPage() {
             <ol className="breadcrumb cs_mb_30">
               <li className="breadcrumb-item">
                 <Link aria-label="Back to home page link" href="/">
-                  Home
+                  Početna
                 </Link>
               </li>
-              <li className="breadcrumb-item active">Rooms</li>
+              <li className="breadcrumb-item active">Sobe</li>
             </ol>
-            <h2 className="cs_fs_180 cs_white_color text-center mb-0">ROOMS</h2>
+            <h2 className="cs_fs_180 cs_white_color text-center mb-0">SMEŠTAJ</h2>
           </div>
         </div>
       </section>
@@ -28,12 +28,12 @@ export default function RoomsPage() {
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              ROOMS & SUITES
+              SOBE I SMEŠTAJ
             </p>
             <h2 className="cs_section_title cs_fs_64 mb-0">
-              Comfortable Rooms
+              Jednokrevetne, dvokrevetne
               <br />
-              Just For You
+              i sobe za više osoba
             </h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
@@ -47,7 +47,7 @@ export default function RoomsPage() {
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              PROPERTY GALLERY
+              GALERIJA SMEŠTAJA
             </p>
             <h2 className="cs_section_title cs_fs_64 mb-0">
               Više fotografija objekta i soba

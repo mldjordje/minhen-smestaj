@@ -572,6 +572,30 @@ textarea {
   width: auto;
 }
 
+.site-template-shell .site-text-brand {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+}
+
+.site-template-shell .site-text-brand span {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.site-template-shell .site-text-brand small {
+  font-size: 0.8rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.site-template-shell .site-text-brand-light {
+  color: #fff;
+}
+
 .site-template-shell .cs_nav_list a {
   text-decoration: none;
 }
@@ -590,6 +614,12 @@ textarea {
 .site-template-shell .cs_card_thumbnail img {
   width: 100%;
   display: block;
+}
+
+.site-template-shell .cs_iconbox_icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 @media (max-width: 1080px) {

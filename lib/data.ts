@@ -13,7 +13,7 @@ export const rooms: Room[] = [
     image: "/images/legacy/cache_2481988833.jpg",
     amenities: ["Wi-Fi", "Radni sto", "Kupatilo", "Mirna zona"],
     shortDescription:
-      "Kompaktna soba za jednog gosta, prakticna za radnike i kratke poslovne boravke."
+      "Kompaktna soba za jednog gosta, praktična za posao, projekat ili kraći boravak u Minhenu."
   },
   {
     id: "rm-204",
@@ -25,9 +25,9 @@ export const rooms: Room[] = [
     beds: "1 double bed",
     status: "occupied",
     image: "/images/legacy/cache_2481988840.jpg",
-    amenities: ["Wi-Fi", "Private bathroom", "TV", "Wardrobe"],
+    amenities: ["Wi-Fi", "Kupatilo", "TV", "Ormar"],
     shortDescription:
-      "Komforna dvokrevetna soba sa privatnim kupatilom i klasicnim rasporedom."
+      "Komforna dvokrevetna soba sa privatnim kupatilom i prijatnim rasporedom za duži ili kraći boravak."
   },
   {
     id: "rm-305",
@@ -39,9 +39,9 @@ export const rooms: Room[] = [
     beds: "1 double + bunk bed",
     status: "cleaning",
     image: "/images/legacy/cache_2481988838.jpg",
-    amenities: ["Wi-Fi", "Private bathroom", "Family layout", "Parking"],
+    amenities: ["Wi-Fi", "Kupatilo", "Više kreveta", "Parking"],
     shortDescription:
-      "Veca soba pogodna za porodice ili manje grupe koje dolaze na duzi boravak."
+      "Veća soba pogodna za porodice, radnike i manje grupe koje dolaze na duži boravak."
   }
 ];
 
@@ -138,31 +138,31 @@ export const legacyGallery = [
   {
     image: "/images/legacy/jagdschloessl-5.jpg",
     title: "Spoljasnjost objekta",
-    description: "Originalna nocna fotografija preuzeta sa starog sajta."
+    description: "Mirna lokacija i objekat u Eichenriedu, nedaleko od Minhena."
   },
   {
     image: "/images/legacy/jagdschloessl-1.jpg",
     title: "Ulaz i dvoriste",
-    description: "Prilaz objektu i ulazna zona."
+    description: "Prilaz objektu i prostor za goste."
   },
   {
     image: "/images/legacy/jagdschloessl-2.jpg",
     title: "Restoranski deo",
-    description: "Ambijent zajednickog prostora."
+    description: "Zajednički prostor i prijatna atmosfera."
   },
   {
     image: "/images/legacy/cache_2481988840.jpg",
-    title: "Doppelzimmer",
-    description: "Dvokrevetna soba sa francuskim krevetom."
+    title: "Dvokrevetna soba",
+    description: "Udobna soba za parove, radnike ili goste na projektu."
   },
   {
     image: "/images/legacy/cache_2481988838.jpg",
-    title: "Family room",
-    description: "Soba sa dodatnim krevetima za vise gostiju."
+    title: "Soba za više osoba",
+    description: "Pogodna za više gostiju i duže boravke."
   },
   {
     image: "/images/legacy/cache_2481988834.jpg",
     title: "Kupatilo",
-    description: "Jedno od privatnih kupatila u sobama."
+    description: "Uredno i funkcionalno kupatilo u sklopu smeštaja."
   }
 ];

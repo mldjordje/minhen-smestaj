@@ -25,8 +25,9 @@ export function PublicSiteHeader() {
         <div className="container">
           <div className="cs_main_header_in">
             <div className="cs_main_header_left">
-              <Link aria-label="Home page link" className="cs_site_brand" href="/">
-                <img src="/hotel-template/assets/img/logo.svg" alt="Logo" />
+              <Link aria-label="Home page link" className="cs_site_brand site-text-brand" href="/">
+                <span>Jagdschlössl</span>
+                <small>Eichenried</small>
               </Link>
             </div>
             <div className="cs_main_header_center">
@@ -35,18 +36,21 @@ export function PublicSiteHeader() {
                   <div className="cs_nav_links_wrap">
                     <ul className="cs_nav_list cs_mp_0">
                       <li>
-                        <Link href="/">Pocetna</Link>
+                        <Link href="/">Početna</Link>
                       </li>
                       <li>
-                        <Link href="/rooms">Smestaj</Link>
+                        <Link href="/#o-smestaju">O smeštaju</Link>
+                      </li>
+                      <li>
+                        <Link href="/rooms">Sobe</Link>
                       </li>
                     </ul>
                     <ul className="cs_nav_list cs_mp_0">
                       <li>
-                        <Link href="/admin/owner">Owner admin</Link>
+                        <Link href="/#lokacija">Lokacija</Link>
                       </li>
                       <li>
-                        <Link href="/admin/staff">Staff admin</Link>
+                        <Link href="/#rezervacija">Rezervacija</Link>
                       </li>
                       <li className="cs_language_select">
                         <div className="cs_language_switcher">
@@ -77,37 +81,42 @@ export function PublicSiteFooter() {
         <div className="cs_height_100 cs_height_lg_70" />
         <div className="row gy-5">
           <div className="col-lg-5">
-            <Link aria-label="Home page link" className="cs_site_brand cs_mb_29" href="/">
-              <img src="/hotel-template/assets/img/logo-2.svg" alt="Logo" />
+            <Link
+              aria-label="Home page link"
+              className="cs_site_brand site-text-brand site-text-brand-light cs_mb_29"
+              href="/"
+            >
+              <span>Jagdschlössl</span>
+              <small>Eichenried</small>
             </Link>
             <p className="mb-0 cs_light">
-              Minhen Smestaj koristi hotel template za javni deo sajta, dok admin
-              ostaje operativan za vlasnike i osoblje.
+              Udoban i pristupačan smeštaj u blizini Minhena za goste iz Srbije,
+              Bosne, Hrvatske, Crne Gore i regiona.
             </p>
           </div>
           <div className="col-lg-3 col-md-6">
             <h3 className="cs_fs_24 cs_white_color cs_mb_24">Navigacija</h3>
             <ul className="cs_footer_menu cs_mp_0">
               <li>
-                <Link href="/">Pocetna</Link>
+                <Link href="/">Početna</Link>
               </li>
               <li>
-                <Link href="/rooms">Smestaj</Link>
+                <Link href="/#o-smestaju">O smeštaju</Link>
               </li>
               <li>
-                <Link href="/admin/owner">Owner admin</Link>
+                <Link href="/rooms">Sobe</Link>
               </li>
               <li>
-                <Link href="/admin/staff">Staff admin</Link>
+                <Link href="/#rezervacija">Rezervacija</Link>
               </li>
             </ul>
           </div>
           <div className="col-lg-4 col-md-6">
             <h3 className="cs_fs_24 cs_white_color cs_mb_24">Kontakt</h3>
             <ul className="cs_footer_contact cs_mp_0">
-              <li>Eichenried, Minhen</li>
-              <li>info@minhen-smestaj.de</li>
-              <li>+49 89 000 000</li>
+              <li>Eichenried, blizu Minhena</li>
+              <li>Viber / WhatsApp: +49 1772078868</li>
+              <li>Pošaljite poruku za slobodne termine</li>
             </ul>
           </div>
         </div>
@@ -129,7 +138,7 @@ export function PublicRoomsGrid() {
           <div className="cs_card_thumbnail cs_mb_20 position-relative overflow-hidden">
             <img src={room.image} alt={room.name} />
             <span className="cs_white_color cs_medium text-uppercase position-absolute">
-              {room.status}
+              Rezervacija
             </span>
           </div>
           <div className="cs_card_info p-0">
@@ -146,16 +155,18 @@ export function PublicRoomsGrid() {
               <div className="cs_card_price">
                 <span className="cs_fs_16 cs_heading_color">od</span>
                 <span className="cs_fs_40 cs_accent_color cs_normal cs_heading_font">
-                  {room.pricePerNight} EUR/noc
+                  {room.pricePerNight} EUR/noć
                 </span>
               </div>
-              <Link
+              <a
                 aria-label="Hotel booking button"
                 className="cs_btn cs_style_1 cs_accent_color cs_fs_20 cs_medium"
-                href="/admin/owner"
+                href="https://wa.me/491772078868"
+                target="_blank"
+                rel="noreferrer"
               >
-                <span>REZERVISI</span>
-              </Link>
+                <span>POŠALJI UPIT</span>
+              </a>
             </div>
           </div>
         </div>
