@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getRoomChannelMappingsData, getRoomsData } from "@/lib/admin-data";
+import { getRoomDisplayName } from "@/lib/rooms";
 
 export default async function OwnerBookingSyncGuidePage() {
   const [rooms, mappings] = await Promise.all([
@@ -92,7 +93,7 @@ export default async function OwnerBookingSyncGuidePage() {
             return (
               <div key={room.id} className="table-row">
                 <div>
-                  <strong>{room.name}</strong>
+                  <strong>{getRoomDisplayName(room)}</strong>
                   <span>{room.neighborhood}</span>
                 </div>
                 <div>{mapping?.externalRoomName || "Nije povezano"}</div>

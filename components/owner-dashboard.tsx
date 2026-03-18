@@ -5,10 +5,11 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { AdminRoomCalendar } from "@/components/admin-room-calendar";
 import type { AdminBookingSyncSummary } from "@/lib/admin-data";
+import { getRoomDisplayName } from "@/lib/rooms";
 import { Booking, Inquiry, Room, RoomBlock, RoomChannelMapping } from "@/lib/types";
 
 const initialForm = {
-  name: "",
+  roomNumber: "",
   neighborhood: "",
   pricePerNight: "",
   capacity: "",
@@ -111,7 +112,11 @@ export function OwnerDashboard({
     Object.fromEntries(
       initialInquiries.map((inquiry) => {
         const matchingRoom =
-          initialRooms.find((room) => room.name === inquiry.requestedRoomType) ?? initialRooms[0];
+          initialRooms.find(
+            (room) =>
+              room.name === inquiry.requestedRoomType ||
+              getRoomDisplayName(room) === inquiry.requestedRoomType
+          ) ?? initialRooms[0];
 
         return [inquiry.id, matchingRoom?.id ?? ""];
       })
@@ -480,7 +485,7 @@ export function OwnerDashboard({
                 return (
                   <div key={booking.id} className="table-row">
                     <div>
-                      <strong>{room?.name ?? booking.roomId}</strong>
+                      <strong>{room ? getRoomDisplayName(room) : booking.roomId}</strong>
                       <span>{booking.guestName}</span>
                     </div>
                     <div>{booking.source}</div>
@@ -528,7 +533,7 @@ export function OwnerDashboard({
                     >
                       {localRooms.map((room) => (
                         <option key={room.id} value={room.id}>
-                          {room.name}
+                          {getRoomDisplayName(room)}
                         </option>
                       ))}
                     </select>
@@ -589,7 +594,7 @@ export function OwnerDashboard({
               <article key={room.id} className="booking-mapping-card">
                 <div className="booking-mapping-card__header">
                   <div>
-                    <strong>{room.name}</strong>
+                    <strong>{getRoomDisplayName(room)}</strong>
                     <span>{room.neighborhood}</span>
                   </div>
                   <span className={`status-pill ${visualState.badgeClassName}`}>
@@ -660,131 +665,137 @@ export function OwnerDashboard({
       </section>
 
       <div className="dashboard-split-grid">
-      <section className="dashboard-panel" id="rooms">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Sobe</p>
-            <h2>Dodaj novu sobu</h2>
+        <section className="dashboard-panel" id="rooms">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Sobe</p>
+              <h2>Dodaj novu sobu</h2>
+            </div>
+            <span className="inline-note">
+              Forma cuva sobu kroz admin API i podrzava upload slike.
+            </span>
           </div>
-          <span className="inline-note">Forma cuva sobu kroz admin API i podrzava upload slike.</span>
-        </div>
-        <form className="admin-form" onSubmit={handleSubmit}>
-          <input
-            name="name"
-            placeholder="Naziv sobe"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="neighborhood"
-            placeholder="Lokacija u Minhenu"
-            value={form.neighborhood}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="pricePerNight"
-            placeholder="Cena po noci"
-            type="number"
-            value={form.pricePerNight}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="capacity"
-            placeholder="Kapacitet"
-            type="number"
-            value={form.capacity}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="beds"
-            placeholder="Tip kreveta"
-            value={form.beds}
-            onChange={handleChange}
-            required
-          />
-          <textarea
-            name="shortDescription"
-            placeholder="Kratak opis smestaja"
-            value={form.shortDescription}
-            onChange={handleChange}
-            rows={4}
-            required
-          />
-          <label className="admin-file-field">
-            <span>Slika sobe (opciono)</span>
+          <form className="admin-form" onSubmit={handleSubmit}>
             <input
-              accept="image/png,image/jpeg,image/webp"
-              onChange={handleFileChange}
-              type="file"
+              name="roomNumber"
+              onChange={handleChange}
+              placeholder="Broj sobe"
+              required
+              value={form.roomNumber}
             />
-          </label>
-          <p
-            className={`inline-note ${uploadState.status === "error" ? "inline-note-error" : ""}`}
-          >
-            {uploadState.message}
-            {uploadState.url ? (
-              <>
-                {" "}
-                <a href={uploadState.url} rel="noreferrer" target="_blank">
-                  Otvori upload
-                </a>
-              </>
-            ) : null}
-          </p>
-          <button type="submit" className="primary-button">
-            {roomActionState.status === "submitting" || uploadState.status === "uploading"
-              ? "Cuvanje u toku..."
-              : "Sacuvaj sobu"}
-          </button>
-          <p
-            className={`inline-note ${roomActionState.status === "error" ? "inline-note-error" : ""}`}
-          >
-            {roomActionState.message}
-          </p>
-        </form>
-      </section>
+            <input
+              name="neighborhood"
+              placeholder="Lokacija u Minhenu"
+              value={form.neighborhood}
+              onChange={handleChange}
+              required
+            />
+            <input
+              name="pricePerNight"
+              placeholder="Cena po noci"
+              type="number"
+              value={form.pricePerNight}
+              onChange={handleChange}
+              required
+            />
+            <input
+              name="capacity"
+              placeholder="Kapacitet"
+              type="number"
+              value={form.capacity}
+              onChange={handleChange}
+              required
+            />
+            <input
+              name="beds"
+              placeholder="Tip kreveta"
+              value={form.beds}
+              onChange={handleChange}
+              required
+            />
+            <textarea
+              name="shortDescription"
+              placeholder="Kratak opis smestaja"
+              value={form.shortDescription}
+              onChange={handleChange}
+              rows={4}
+              required
+            />
+            <label className="admin-file-field">
+              <span>Slika sobe (opciono)</span>
+              <input
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleFileChange}
+                type="file"
+              />
+            </label>
+            <p
+              className={`inline-note ${uploadState.status === "error" ? "inline-note-error" : ""}`}
+            >
+              {uploadState.message}
+              {uploadState.url ? (
+                <>
+                  {" "}
+                  <a href={uploadState.url} rel="noreferrer" target="_blank">
+                    Otvori upload
+                  </a>
+                </>
+              ) : null}
+            </p>
+            <button type="submit" className="primary-button">
+              {roomActionState.status === "submitting" || uploadState.status === "uploading"
+                ? "Cuvanje u toku..."
+                : "Sacuvaj sobu"}
+            </button>
+            <p
+              className={`inline-note ${roomActionState.status === "error" ? "inline-note-error" : ""}`}
+            >
+              {roomActionState.message}
+            </p>
+          </form>
+        </section>
 
-      <section className="dashboard-panel" id="inventory">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Inventar</p>
-            <h2>Aktivne jedinice</h2>
+        <section className="dashboard-panel" id="inventory">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Inventar</p>
+              <h2>Aktivne jedinice</h2>
+            </div>
           </div>
-        </div>
-        {localRooms.length === 0 ? (
-          <div className="admin-empty-state">
-            <strong>Jos nema soba u bazi</strong>
-            <p>Dodaj prvu sobu kroz owner admin da bi se pojavila i u kalendaru i u inventaru.</p>
-          </div>
-        ) : (
-          <div className="table-like">
-            {localRooms.map((room) => {
-              const mapping = localMappings.find((item) => item.roomId === room.id);
+          {localRooms.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Jos nema soba u bazi</strong>
+              <p>Dodaj prvu sobu kroz owner admin da bi se pojavila i u kalendaru i u inventaru.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {localRooms.map((room) => {
+                const mapping = localMappings.find((item) => item.roomId === room.id);
 
-              return (
-                <div key={room.id} className="table-row">
-                  <div>
-                    <strong>{room.name}</strong>
-                    <span>{room.neighborhood}</span>
+                return (
+                  <div key={room.id} className="table-row">
+                    <div>
+                      <strong>{getRoomDisplayName(room)}</strong>
+                      <span>{room.neighborhood}</span>
+                    </div>
+                    <div>{room.capacity} gosta</div>
+                    <div>{room.pricePerNight} EUR</div>
+                    <div className="admin-inline-actions">
+                      <span className={`status-pill status-${room.status}`}>{room.status}</span>
+                      <span
+                        className={`status-pill ${
+                          mapping?.syncEnabled ? "status-mapped" : "status-unmapped"
+                        }`}
+                      >
+                        {mapping?.syncEnabled ? "Booking.com" : "bez sync-a"}
+                      </span>
+                    </div>
                   </div>
-                  <div>{room.capacity} gosta</div>
-                  <div>{room.pricePerNight} EUR</div>
-                  <div className="admin-inline-actions">
-                    <span className={`status-pill status-${room.status}`}>{room.status}</span>
-                    <span className={`status-pill ${mapping?.syncEnabled ? "status-mapped" : "status-unmapped"}`}>
-                      {mapping?.syncEnabled ? "Booking.com" : "bez sync-a"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
 
       <section className="dashboard-panel" id="integrations">

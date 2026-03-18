@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-css-tags, @next/next/no-img-element */
 import Link from "next/link";
 import { legacyGallery } from "@/lib/data";
+import { getRoomDisplayName } from "@/lib/rooms";
 import type { LandingGalleryImage } from "@/lib/site-gallery";
 import { Room } from "@/lib/types";
 
@@ -143,7 +144,7 @@ export function PublicRoomsGrid({ rooms }: PublicRoomsGridProps) {
         >
           <Link href={`/rooms/${room.slug}`}>
             <div className="cs_card_thumbnail cs_mb_20 position-relative overflow-hidden">
-              <img src={room.image} alt={room.name} />
+              <img src={room.image} alt={getRoomDisplayName(room)} />
               <span className="cs_white_color cs_medium text-uppercase position-absolute">
                 Rezervacija
               </span>
@@ -151,7 +152,7 @@ export function PublicRoomsGrid({ rooms }: PublicRoomsGridProps) {
           </Link>
           <div className="cs_card_info p-0">
             <h3 className="cs_card_title cs_fs_48 cs_mb_15">
-              <Link href={`/rooms/${room.slug}`}>{room.name}</Link>
+              <Link href={`/rooms/${room.slug}`}>{getRoomDisplayName(room)}</Link>
             </h3>
             <p className="cs_card_subtitle cs_mb_24">{room.shortDescription}</p>
             <div className="cs_horizontal_line cs_border_bg cs_mb_32 cs_mb_lg_24" />

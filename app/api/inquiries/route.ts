@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getRoomsData } from "@/lib/admin-data";
+import { getRoomDisplayName } from "@/lib/rooms";
 
 function createInquiryId() {
   return `inq-${Date.now()}`;
@@ -63,7 +64,7 @@ export async function POST(request: Request) {
           ${createInquiryId()},
           ${payload.guestName},
           ${payload.phone},
-          ${selectedRoom.name},
+          ${getRoomDisplayName(selectedRoom)},
           ${payload.checkIn},
           ${payload.checkOut},
           ${Number(payload.guests || 1)},

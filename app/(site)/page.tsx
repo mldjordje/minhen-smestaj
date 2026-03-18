@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { getBookingsData, getRoomsData } from "@/lib/admin-data";
+import { PublicBookingForm } from "@/components/public-booking-form";
+import { getBookingsData, getRoomBlocksData, getRoomsData } from "@/lib/admin-data";
 import { getLandingGallery } from "@/lib/site-gallery";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
 
@@ -25,50 +26,57 @@ const heroHighlights = [
 
 const accommodationFeatures = [
   "jednokrevetne i dvokrevetne sobe",
-  "sobe za više osoba",
+  "sobe za vise osoba",
   "opremljene kuhinje",
   "besplatan Wi-Fi internet",
   "parking za automobile i kombije",
-  "mirno okruženje za odmor",
-  "opremljeno mašinama za pranje i sušenje"
+  "mirno okruzenje za odmor",
+  "opremljeno masinama za pranje i susenje"
 ];
 
 const guestTypes = [
   "majstori i radnici na projektima",
-  "vozači i terenski radnici",
-  "firme koje šalju svoje zaposlene",
+  "vozaci i terenski radnici",
+  "firme koje salju svoje zaposlene",
   "ljudi iz regiona koji dolaze u Minhen zbog posla",
   "putnici koji prolaze kroz Minhen"
 ];
 
 const locationBenefits = [
   "brza povezanost sa Minhenom",
-  "blizina aerodroma München",
+  "blizina aerodroma Munchen",
   "jednostavan dolazak automobilom",
-  "mirno okruženje daleko od gradske gužve"
+  "mirno okruzenje daleko od gradske guzve"
 ];
 
 const whyChooseUs = [
   {
     icon: "/hotel-template/assets/img/icons/quality.svg",
-    title: "Čist i uredan smeštaj",
-    text: "Sobe i zajednički prostori održavaju se uredno i funkcionalno za kraći i duži boravak."
+    title: "Cist i uredan smestaj",
+    text: "Sobe i zajednicki prostori odrzavaju se uredno i funkcionalno za kraci i duzi boravak."
   },
   {
     icon: "/hotel-template/assets/img/icons/card.svg",
-    title: "Povoljne cene za duži boravak",
-    text: "Dobar izbor za goste i firme kojima je potreban pristupačan smeštaj blizu Minhena."
+    title: "Povoljne cene za duzi boravak",
+    text: "Dobar izbor za goste i firme kojima je potreban pristupacan smestaj blizu Minhena."
   },
   {
     icon: "/hotel-template/assets/img/icons/location.svg",
     title: "Blizina Minhena",
-    text: "Odlična povezanost sa Minhenom i aerodromom, uz mirno okruženje za odmor."
+    text: "Odlicna povezanost sa Minhenom i aerodromom, uz mirno okruzenje za odmor."
   }
 ];
 
+const bookingHighlights = [
+  "izbor sobe i kalendar dostupnosti u istoj formi",
+  "svaka soba ima svoju zasebnu stranicu sa detaljima",
+  "najbrzi kontakt ostaje WhatsApp ili direktan upit sa sajta"
+];
+
 export default async function HomePage() {
-  const [bookings, rooms, landingGallery] = await Promise.all([
+  const [bookings, roomBlocks, rooms, landingGallery] = await Promise.all([
     getBookingsData(),
+    getRoomBlocksData(),
     getRoomsData(),
     getLandingGallery()
   ]);
@@ -83,15 +91,15 @@ export default async function HomePage() {
         <div className="container position-relative z-2">
           <div className="cs_hero_content text-center">
             <h1 className="cs_hero_title cs_fs_180 cs_white_color cs_mb_28">
-              Dobrodošli u
+              Dobrodosli u
               <span className="cs_accent_color cs_ternary_font cs_hover_layer_2">
                 {" "}
-                Jagdschlössl
+                Jagdschlossl
               </span>
               Eichenried
             </h1>
             <p className="cs_fs_20 cs_light cs_white_color mb-0 legacy-hero-note">
-              Udoban i pristupačan smeštaj u blizini Minhena za sve goste iz Srbije,
+              Udoban i pristupacan smestaj u blizini Minhena za goste iz Srbije,
               Bosne, Hrvatske, Crne Gore i regiona.
             </p>
             <div className="cs_form cs_style_1 cs_fs_16 cs_white_bg position-relative text-start">
@@ -111,10 +119,10 @@ export default async function HomePage() {
                 <a
                   className="cs_btn cs_style_1 cs_heading_bg cs_white_color cs_fs_20 cs_medium"
                   href="https://wa.me/491772078868"
-                  target="_blank"
                   rel="noreferrer"
+                  target="_blank"
                 >
-                  <span>POŠALJI PORUKU</span>
+                  <span>POSALJI PORUKU</span>
                 </a>
               </div>
             </div>
@@ -130,16 +138,16 @@ export default async function HomePage() {
               <img src="/hotel-template/assets/img/flower.svg" alt="Flower shape" />
             </span>
             <h2 className="cs_card_title cs_fs_64 position-relative z-1 mb-0">
-              Smeštaj u Minhenu koji se oseća kao
-              <span className="cs_accent_color cs_ternary_font"> domaći</span>
+              Smestaj u Minhenu koji se oseca kao
+              <span className="cs_accent_color cs_ternary_font"> domaci</span>
             </h2>
             <div className="cs_card_thumbnail">
               <img src={landingGallery.detailImage} alt="Fotografija prostora za smestaj" />
             </div>
             <p className="cs_card_subtitle cs_fs_20 cs_light">
-              Bilo da dolazite u Minhen zbog posla, projekta ili odmora, kod nas ćete
-              pronaći mirno mesto za boravak, prijatnu atmosferu i sve što vam je
-              potrebno tokom boravka u Nemačkoj.
+              Bilo da dolazite u Minhen zbog posla, projekta ili odmora, kod nas cete
+              pronaci mirno mesto za boravak, prijatnu atmosferu i sve sto vam je
+              potrebno tokom boravka u Nemackoj.
             </p>
             <div className="row g-4 text-start w-100 mt-5">
               {heroHighlights.map((item) => (
@@ -172,7 +180,7 @@ export default async function HomePage() {
             </div>
             <div className="cs_section_heading_right">
               <p className="cs_fs_20 cs_light mb-0">
-                Dodate fotografije smo rasporedili tako da na pocetnoj odmah pokazu ambijent
+                Dodate fotografije su rasporedjene tako da na pocetnoj odmah pokazu ambijent
                 soba i kvalitet prostora.
               </p>
             </div>
@@ -181,9 +189,9 @@ export default async function HomePage() {
           <div className="home-showcase-grid">
             <article className="home-showcase-card home-showcase-card--large">
               <img
+                alt={landingGallery.showcaseImages[0].alt}
                 className="home-showcase-card__image"
                 src={landingGallery.showcaseImages[0].src}
-                alt={landingGallery.showcaseImages[0].alt}
               />
               <div className="home-showcase-card__overlay">
                 <p className="home-showcase-card__eyebrow">Sobe</p>
@@ -195,7 +203,7 @@ export default async function HomePage() {
             <div className="home-showcase-stack">
               {landingGallery.showcaseImages.slice(1).map((item) => (
                 <article key={item.src} className="home-showcase-card">
-                  <img className="home-showcase-card__image" src={item.src} alt={item.alt} />
+                  <img alt={item.alt} className="home-showcase-card__image" src={item.src} />
                   <div className="home-showcase-card__overlay">
                     <p className="home-showcase-card__eyebrow">Ambijent</p>
                     <h3>{item.title}</h3>
@@ -215,7 +223,7 @@ export default async function HomePage() {
           <div className="cs_section_heading cs_style_1 cs_type_1">
             <div className="cs_section_heading_left">
               <p className="cs_section_subtitle cs_fs_24 cs_accent_color text-uppercase cs_mb_16">
-                O SMEŠTAJU
+                O SMESTAJU
               </p>
               <h2 className="cs_section_title cs_fs_64 cs_white_color mb-0">
                 Gostima su na raspolaganju
@@ -223,8 +231,8 @@ export default async function HomePage() {
             </div>
             <div className="cs_section_heading_right">
               <p className="cs_fs_20 cs_white_color cs_light">
-                Jagdschlössl Eichenried je mesto gde se mnogi naši ljudi iz regiona rado
-                vraćaju kada dolaze u Minhen.
+                Jagdschlossl Eichenried je mesto gde se mnogi nasi ljudi iz regiona rado
+                vracaju kada dolaze u Minhen.
               </p>
             </div>
           </div>
@@ -233,9 +241,9 @@ export default async function HomePage() {
             {accommodationFeatures.map((item, index) => (
               <div key={item} className="col-lg-4 col-md-6">
                 <div className="cs_card cs_style_3" data-aos="fade-up" data-aos-delay={index * 100}>
-                  <h3 className="cs_fs_40 cs_mb_20">✔ {item}</h3>
+                  <h3 className="cs_fs_40 cs_mb_20">* {item}</h3>
                   <p className="mb-0 cs_white_color cs_light">
-                    Praktična pogodnost za goste koji dolaze na kraći ili duži boravak.
+                    Prakticna pogodnost za goste koji dolaze na kraci ili duzi boravak.
                   </p>
                 </div>
               </div>
@@ -252,7 +260,7 @@ export default async function HomePage() {
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
               IDEALNO ZA BORAVAK U MINHENU
             </p>
-            <h2 className="cs_section_title cs_fs_64 mb-0">Kod nas često borave</h2>
+            <h2 className="cs_section_title cs_fs_64 mb-0">Kod nas cesto borave</h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
           <div className="row g-4">
@@ -269,7 +277,7 @@ export default async function HomePage() {
                   <h3 className="cs_iconbox_title cs_fs_40 cs_mb_24 cs_mb_lg_16">{item}</h3>
                   <p className="cs_iconbox_subtitle mb-0">
                     Nudimo fleksibilne opcije boravka i prijatnu atmosferu gde se gosti
-                    osećaju kao kod kuće.
+                    osecaju kao kod kuce.
                   </p>
                 </div>
               </div>
@@ -288,19 +296,19 @@ export default async function HomePage() {
                 <div className="cs_section_heading_left">
                   <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">LOKACIJA</p>
                   <h2 className="cs_section_title cs_fs_64 mb-0">
-                    Odlična lokacija blizu Minhena
+                    Odlicna lokacija blizu Minhena
                   </h2>
                 </div>
               </div>
               <div className="cs_height_40 cs_height_lg_24" />
               <p className="cs_fs_20 cs_light">
-                Jagdschlössl Eichenried se nalazi u mirnom mestu Eichenried, nedaleko od
-                Minhena. Idealno za goste koji žele da budu blizu Minhena, ali da imaju
+                Jagdschlossl Eichenried se nalazi u mirnom mestu Eichenried, nedaleko od
+                Minhena. Idealno za goste koji zele da budu blizu Minhena, ali da imaju
                 mir za odmor.
               </p>
               <ul className="cs_features_list cs_fs_48 cs_heading_font cs_mp_0">
                 {locationBenefits.map((item) => (
-                  <li key={item}>✔ {item}</li>
+                  <li key={item}>* {item}</li>
                 ))}
               </ul>
             </div>
@@ -310,10 +318,10 @@ export default async function HomePage() {
                   <img src={landingGallery.locationImage} alt="Fotografija smestaja" />
                 </div>
                 <div className="cs_card_info cs_white_bg">
-                  <h3 className="cs_card_title cs_fs_32 cs_mb_2">Mirno okruženje za odmor</h3>
+                  <h3 className="cs_card_title cs_fs_32 cs_mb_2">Mirno okruzenje za odmor</h3>
                   <p className="mb-0">
-                    Brza povezanost sa Minhenom i blizina aerodroma München čine ovaj
-                    smeštaj praktičnim izborom za posao, projekat i tranzitni boravak.
+                    Brza povezanost sa Minhenom i blizina aerodroma Munchen cine ovaj
+                    smestaj prakticnim izborom za posao, projekat i tranzitni boravak.
                   </p>
                 </div>
               </div>
@@ -328,9 +336,9 @@ export default async function HomePage() {
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              ZAŠTO IZABRATI NAS
+              ZASTO IZABRATI NAS
             </p>
-            <h2 className="cs_section_title cs_fs_64 mb-0">Čist, miran i pristupačan boravak</h2>
+            <h2 className="cs_section_title cs_fs_64 mb-0">Cist, miran i pristupacan boravak</h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
           <div className="row g-4">
@@ -360,15 +368,15 @@ export default async function HomePage() {
           <div className="cs_section_heading cs_style_1 cs_type_1">
             <div className="cs_section_heading_left">
               <p className="cs_section_subtitle cs_fs_24 cs_accent_color text-uppercase cs_mb_16">
-                SOBE I SMEŠTAJ
+                SOBE I SMESTAJ
               </p>
               <h2 className="cs_section_title cs_fs_64 cs_white_color mb-0">
-                Pregled raspoloživih tipova soba
+                Pregled raspolozivih tipova soba
               </h2>
             </div>
             <div className="cs_section_heading_right">
               <p className="cs_fs_20 cs_white_color cs_light">
-                Smeštaj je pogodan za pojedince, parove, radnike, firme i grupe.
+                Smestaj je pogodan za pojedince, parove, radnike, firme i grupe.
               </p>
               <Link className="cs_text_btn cs_white_color cs_medium text-capitalize" href="/rooms">
                 pogledaj sve sobe
@@ -384,43 +392,48 @@ export default async function HomePage() {
       <section className="cs_cream_bg" id="rezervacija">
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
-          <div className="cs_section_heading cs_style_1 text-center">
-            <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              REZERVACIJA
-            </p>
-            <h2 className="cs_section_title cs_fs_64 mb-0">
-              Ako tražite smeštaj u Minhenu ili okolini, ovde ste na pravom mestu
-            </h2>
-          </div>
-          <div className="cs_height_70 cs_height_lg_45" />
-          <div className="row g-4">
-            <div className="col-lg-6">
-              <div className="cs_card cs_style_3">
-                <h3 className="cs_fs_40 cs_mb_20">📞 Kontakt</h3>
-                <p className="mb-4 cs_white_color cs_light">
-                  Viber / WhatsApp: +49 1772078868
-                </p>
-                <a
-                  className="cs_btn cs_style_1 cs_white_color cs_fs_20 cs_medium"
-                  href="https://wa.me/491772078868"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <span>WHATSAPP UPIT</span>
-                </a>
+          <div className="landing-booking-layout">
+            <div className="landing-booking-copy">
+              <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">REZERVACIJA</p>
+              <h2 className="cs_section_title cs_fs_64 mb-0">
+                Izaberi sobu, proveri kalendar i posalji upit bez dodatnih koraka
+              </h2>
+              <p className="landing-booking-copy__text">
+                Landing sada odmah prikazuje dostupnost izabrane sobe, tako da gost na telefonu
+                moze brzo da vidi termine i da otvori zasebnu stranicu te sobe ako zeli vise detalja.
+              </p>
+              <div className="landing-booking-points">
+                {bookingHighlights.map((item) => (
+                  <div key={item} className="landing-booking-point">
+                    <strong>{item}</strong>
+                  </div>
+                ))}
+              </div>
+              <div className="landing-booking-contact-card">
+                <span className="landing-booking-contact-card__label">Brzi kontakt</span>
+                <strong>Viber / WhatsApp: +49 1772078868</strong>
+                <div className="cta-row">
+                  <a
+                    className="primary-button"
+                    href="https://wa.me/491772078868"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    WhatsApp upit
+                  </a>
+                  <Link className="secondary-button" href="/rooms">
+                    Pogledaj sve sobe
+                  </Link>
+                </div>
               </div>
             </div>
-            <div className="col-lg-6">
-              <div className="cs_card cs_style_3">
-                <h3 className="cs_fs_40 cs_mb_20">Više informacija</h3>
-                <p className="mb-4 cs_white_color cs_light">
-                  Pošaljite nam poruku ili nas pozovite za informacije o slobodnim terminima.
-                </p>
-                <Link className="cs_btn cs_style_1 cs_white_color cs_fs_20 cs_medium" href="/rooms">
-                  <span>POGLEDAJ SOBE</span>
-                </Link>
-              </div>
-            </div>
+            <PublicBookingForm
+              bookings={bookings}
+              roomBlocks={roomBlocks}
+              rooms={rooms}
+              subtitle="Na telefonu ili desktopu mozes odmah da vidis sledecih 14 dana za izabranu sobu."
+              title="Direktan booking upit"
+            />
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
@@ -430,9 +443,7 @@ export default async function HomePage() {
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
-            <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              GALERIJA
-            </p>
+            <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">GALERIJA</p>
             <h2 className="cs_section_title cs_fs_64 mb-0">Fotografije objekta i soba</h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />

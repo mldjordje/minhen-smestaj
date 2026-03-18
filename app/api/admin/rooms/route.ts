@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { createRoomIdentity } from "@/lib/rooms";
 import { Room } from "@/lib/types";
 
 type CreateRoomPayload = {
@@ -10,18 +11,9 @@ type CreateRoomPayload = {
   name?: string;
   neighborhood?: string;
   pricePerNight?: number;
+  roomNumber?: string;
   shortDescription?: string;
 };
-
-function slugifyRoomName(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .replace(/-{2,}/g, "-");
-}
 
 function createRoomId() {
   return `room-${Date.now()}`;
@@ -61,7 +53,7 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as CreateRoomPayload;
 
     if (
-      !payload.name ||
+      !payload.roomNumber ||
       !payload.neighborhood ||
       !payload.beds ||
       !payload.shortDescription ||
@@ -71,18 +63,19 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          message: "Popunite naziv, lokaciju, cenu, kapacitet, krevete i opis sobe."
+          message: "Popunite broj sobe, lokaciju, cenu, kapacitet, krevete i opis sobe."
         },
         { status: 400 }
       );
     }
 
     const roomId = createRoomId();
-    const slug = await createUniqueSlug(slugifyRoomName(payload.name));
+    const roomIdentity = createRoomIdentity(payload.roomNumber);
+    const slug = await createUniqueSlug(roomIdentity.slug);
     const room: Room = {
       id: roomId,
       slug,
-      name: payload.name.trim(),
+      name: roomIdentity.name,
       neighborhood: payload.neighborhood.trim(),
       pricePerNight: Number(payload.pricePerNight),
       capacity: Number(payload.capacity),

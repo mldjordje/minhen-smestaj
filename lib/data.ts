@@ -11,8 +11,8 @@ import {
 export const rooms: Room[] = [
   {
     id: "rm-101",
-    name: "Einzelzimmer Classic",
-    slug: "einzelzimmer-classic",
+    name: "Soba 1",
+    slug: "soba-1",
     neighborhood: "Eichenried",
     pricePerNight: 69,
     capacity: 1,
@@ -21,12 +21,12 @@ export const rooms: Room[] = [
     image: "/images/legacy/cache_2481988833.jpg",
     amenities: ["Wi-Fi", "Radni sto", "Kupatilo", "Mirna zona"],
     shortDescription:
-      "Kompaktna soba za jednog gosta, praktična za posao, projekat ili kraći boravak u Minhenu."
+      "Kompaktna soba za jednog gosta, prakticna za posao, projekat ili kraci boravak u Minhenu."
   },
   {
     id: "rm-204",
-    name: "Doppelzimmer Comfort",
-    slug: "doppelzimmer-comfort",
+    name: "Soba 2",
+    slug: "soba-2",
     neighborhood: "Eichenried",
     pricePerNight: 99,
     capacity: 2,
@@ -35,21 +35,35 @@ export const rooms: Room[] = [
     image: "/images/legacy/cache_2481988840.jpg",
     amenities: ["Wi-Fi", "Kupatilo", "TV", "Ormar"],
     shortDescription:
-      "Komforna dvokrevetna soba sa privatnim kupatilom i prijatnim rasporedom za duži ili kraći boravak."
+      "Komforna soba za dve osobe sa privatnim kupatilom i prijatnim rasporedom za duzi ili kraci boravak."
   },
   {
     id: "rm-305",
-    name: "Mehrbettzimmer Family",
-    slug: "mehrbettzimmer-family",
+    name: "Soba 3",
+    slug: "soba-3",
     neighborhood: "Eichenried",
     pricePerNight: 129,
     capacity: 4,
     beds: "1 double + bunk bed",
     status: "cleaning",
     image: "/images/legacy/cache_2481988838.jpg",
-    amenities: ["Wi-Fi", "Kupatilo", "Više kreveta", "Parking"],
+    amenities: ["Wi-Fi", "Kupatilo", "Vise kreveta", "Parking"],
     shortDescription:
-      "Veća soba pogodna za porodice, radnike i manje grupe koje dolaze na duži boravak."
+      "Veca soba pogodna za porodice, radnike i manje grupe koje dolaze na duzi boravak."
+  },
+  {
+    id: "rm-406",
+    name: "Soba 4",
+    slug: "soba-4",
+    neighborhood: "Eichenried",
+    pricePerNight: 89,
+    capacity: 2,
+    beds: "2 single bed",
+    status: "available",
+    image: "/images/client-gallery/gallery-07.webp",
+    amenities: ["Wi-Fi", "Kupatilo", "Ormar", "Parking"],
+    shortDescription:
+      "Test soba za proveru novog booking flow-a, sa zasebnom stranicom i javnim kalendarom dostupnosti."
   }
 ];
 
@@ -83,6 +97,16 @@ export const bookings: Booking[] = [
     checkOut: "2026-03-20",
     status: "confirmed",
     guests: 1
+  },
+  {
+    id: "bk-784",
+    guestName: "Test Gost",
+    roomId: "rm-406",
+    source: "Direktno",
+    checkIn: "2026-03-21",
+    checkOut: "2026-03-24",
+    status: "confirmed",
+    guests: 2
   }
 ];
 
@@ -93,6 +117,15 @@ export const roomBlocks: RoomBlock[] = [
     checkIn: "2026-03-22",
     checkOut: "2026-03-24",
     reason: "Generalno sredjivanje sobe",
+    createdBy: "owner",
+    status: "blocked"
+  },
+  {
+    id: "blk-102",
+    roomId: "rm-406",
+    checkIn: "2026-03-27",
+    checkOut: "2026-03-29",
+    reason: "Test blokada za proveru javnog kalendara",
     createdBy: "owner",
     status: "blocked"
   }
@@ -130,7 +163,7 @@ export const inquiries: Inquiry[] = [
     id: "inq-101",
     guestName: "Milos Petrovic",
     phone: "+381 63 111 222",
-    requestedRoomType: "Dvokrevetna soba",
+    requestedRoomType: "Soba 2",
     checkIn: "2026-03-18",
     checkOut: "2026-03-25",
     guests: 2,
@@ -141,7 +174,7 @@ export const inquiries: Inquiry[] = [
     id: "inq-102",
     guestName: "Nikola Markovic",
     phone: "+387 61 555 444",
-    requestedRoomType: "Jednokrevetna soba",
+    requestedRoomType: "Soba 1",
     checkIn: "2026-03-20",
     checkOut: "2026-03-28",
     guests: 1,
@@ -218,21 +251,21 @@ export const legacyGallery = [
   {
     image: "/images/legacy/jagdschloessl-2.jpg",
     title: "Restoranski deo",
-    description: "Zajednički prostor i prijatna atmosfera."
+    description: "Zajednicki prostor i prijatna atmosfera."
   },
   {
     image: "/images/legacy/cache_2481988840.jpg",
-    title: "Dvokrevetna soba",
+    title: "Soba 2",
     description: "Udobna soba za parove, radnike ili goste na projektu."
   },
   {
     image: "/images/legacy/cache_2481988838.jpg",
-    title: "Soba za više osoba",
-    description: "Pogodna za više gostiju i duže boravke."
+    title: "Soba 3",
+    description: "Pogodna za vise gostiju i duze boravke."
   },
   {
     image: "/images/legacy/cache_2481988834.jpg",
     title: "Kupatilo",
-    description: "Uredno i funkcionalno kupatilo u sklopu smeštaja."
+    description: "Uredno i funkcionalno kupatilo u sklopu smestaja."
   }
 ];

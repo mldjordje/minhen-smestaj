@@ -1,11 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Room } from "@/lib/types";
+import { RoomAvailabilityCalendar } from "@/components/room-availability-calendar";
+import { getRoomDisplayName } from "@/lib/rooms";
+import { Booking, Room, RoomBlock } from "@/lib/types";
 
 type PublicBookingFormProps = {
+  bookings?: Booking[];
   defaultRoomSlug?: string;
+  roomBlocks?: RoomBlock[];
   rooms: Room[];
+  showAvailabilityPreview?: boolean;
+  subtitle?: string;
   title?: string;
 };
 
@@ -15,8 +22,12 @@ type SubmitState = {
 };
 
 export function PublicBookingForm({
+  bookings = [],
   defaultRoomSlug,
+  roomBlocks = [],
   rooms,
+  showAvailabilityPreview = true,
+  subtitle = "Odaberite sobu, proverite slobodne termine i posaljite upit u jednom koraku.",
   title = "Posaljite upit za rezervaciju"
 }: PublicBookingFormProps) {
   const [formState, setFormState] = useState({
@@ -32,6 +43,7 @@ export function PublicBookingForm({
     status: "idle",
     message: "Odaberite sobu i datume, a mi vam potvrdu saljemo sto pre."
   });
+  const selectedRoom = rooms.find((room) => room.slug === formState.roomSlug) ?? rooms[0] ?? null;
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -92,6 +104,7 @@ export function PublicBookingForm({
       <div className="public-booking-card__header">
         <p className="public-booking-card__eyebrow">Direktan upit</p>
         <h3>{title}</h3>
+        <p className="public-booking-card__intro">{subtitle}</p>
       </div>
       <form className="public-booking-form" onSubmit={handleSubmit}>
         <input
@@ -122,7 +135,7 @@ export function PublicBookingForm({
           <select name="roomSlug" onChange={handleChange} required value={formState.roomSlug}>
             {rooms.map((room) => (
               <option key={room.id} value={room.slug}>
-                {room.name}
+                {getRoomDisplayName(room)}
               </option>
             ))}
           </select>
@@ -135,6 +148,32 @@ export function PublicBookingForm({
             value={formState.guests}
           />
         </div>
+        {showAvailabilityPreview && selectedRoom ? (
+          <div className="public-booking-form__availability">
+            <div className="public-booking-form__availability-head">
+              <div>
+                <span className="public-booking-form__availability-label">
+                  Dostupnost izabrane sobe
+                </span>
+                <strong>{getRoomDisplayName(selectedRoom)}</strong>
+              </div>
+              <Link className="text-link" href={`/rooms/${selectedRoom.slug}`}>
+                Otvori stranicu sobe
+              </Link>
+            </div>
+            <div className="public-booking-form__availability-meta">
+              <span>{selectedRoom.capacity} gosta</span>
+              <span>{selectedRoom.beds}</span>
+              <span>{selectedRoom.pricePerNight} EUR / noc</span>
+            </div>
+            <RoomAvailabilityCalendar
+              bookings={bookings}
+              days={14}
+              room={selectedRoom}
+              roomBlocks={roomBlocks}
+            />
+          </div>
+        ) : null}
         <textarea
           name="message"
           onChange={handleChange}

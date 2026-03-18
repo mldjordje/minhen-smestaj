@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { getRoomsData } from "@/lib/admin-data";
+import { getBookingsData, getRoomBlocksData, getRoomsData } from "@/lib/admin-data";
 import { PublicBookingForm } from "@/components/public-booking-form";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
 
 export default async function RoomsPage() {
-  const rooms = await getRoomsData();
+  const [bookings, roomBlocks, rooms] = await Promise.all([
+    getBookingsData(),
+    getRoomBlocksData(),
+    getRoomsData()
+  ]);
 
   return (
     <>
@@ -62,7 +66,12 @@ export default async function RoomsPage() {
                 Za svaku sobu postoji i zasebna stranica sa njenim kalendarom dostupnosti.
               </p>
             </div>
-            <PublicBookingForm rooms={rooms} />
+            <PublicBookingForm
+              bookings={bookings}
+              roomBlocks={roomBlocks}
+              rooms={rooms}
+              subtitle="Izaberi sobu i odmah proveri dostupnost pre slanja upita."
+            />
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />

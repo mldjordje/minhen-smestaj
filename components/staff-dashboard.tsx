@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { AdminRoomCalendar } from "@/components/admin-room-calendar";
+import { getRoomDisplayName } from "@/lib/rooms";
 import { Booking, CleaningTask, Room, RoomBlock, TeamMember } from "@/lib/types";
 
 function getRoomName(roomId: string, rooms: Room[]) {
-  return rooms.find((room) => room.id === roomId)?.name ?? roomId;
+  const room = rooms.find((item) => item.id === roomId);
+
+  return room ? getRoomDisplayName(room) : roomId;
 }
 
 type StaffDashboardProps = {

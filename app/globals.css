@@ -773,7 +773,7 @@ textarea {
 .room-booking-layout,
 .room-detail-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+  grid-template-columns: 1fr;
   gap: 28px;
   align-items: start;
 }
@@ -796,6 +796,12 @@ textarea {
 .public-booking-card__header h3 {
   margin: 0;
   font-size: clamp(1.6rem, 1.2rem + 1vw, 2.2rem);
+}
+
+.public-booking-card__intro {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .public-booking-card__eyebrow {
@@ -826,8 +832,49 @@ textarea {
 
 .public-booking-form__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
+}
+
+.public-booking-form__availability {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 249, 241, 0.9);
+  border: 1px solid var(--line);
+}
+
+.public-booking-form__availability-head {
+  display: grid;
+  gap: 10px;
+}
+
+.public-booking-form__availability-head strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.25rem;
+}
+
+.public-booking-form__availability-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.public-booking-form__availability-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.public-booking-form__availability-meta span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(56, 83, 68, 0.08);
+  color: var(--ink);
+  font-size: 0.88rem;
 }
 
 .public-booking-form__status {
@@ -949,12 +996,14 @@ textarea {
 .room-availability {
   display: grid;
   gap: 18px;
+  overflow-x: auto;
 }
 
 .room-availability__grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 12px;
+  min-width: 760px;
 }
 
 .room-availability__cell {
@@ -1201,7 +1250,7 @@ textarea {
 
 .room-detail-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
   margin-top: 22px;
 }
@@ -1234,7 +1283,7 @@ textarea {
 
 .room-detail-related {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -1450,6 +1499,80 @@ textarea {
   color: #f3cb8f !important;
 }
 
+.landing-booking-layout {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+
+.landing-booking-copy {
+  display: grid;
+  gap: 18px;
+}
+
+.landing-booking-copy__text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.landing-booking-points {
+  display: grid;
+  gap: 12px;
+}
+
+.landing-booking-point,
+.landing-booking-contact-card {
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 250, 244, 0.86);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.landing-booking-point strong {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.landing-booking-contact-card {
+  display: grid;
+  gap: 10px;
+}
+
+.landing-booking-contact-card__label {
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 761px) {
+  .public-booking-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1081px) {
+  .room-booking-layout,
+  .room-detail-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+  }
+
+  .room-detail-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .room-detail-related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .landing-booking-layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+}
+
 .site-template-shell .cs_site_brand img {
   max-height: 58px;
   width: auto;
@@ -1537,7 +1660,6 @@ textarea {
   }
 
   .interactive-room-calendar__grid,
-  .room-availability__grid,
   .room-detail-gallery__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1589,8 +1711,7 @@ textarea {
   .public-booking-form__grid,
   .interactive-room-calendar__grid,
   .room-detail-copy__header,
-  .room-detail-gallery__grid,
-  .room-availability__grid {
+  .room-detail-gallery__grid {
     grid-template-columns: 1fr;
     flex-direction: column;
   }

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PublicBookingForm } from "@/components/public-booking-form";
 import { RoomAvailabilityCalendar } from "@/components/room-availability-calendar";
 import { getBookingsData, getRoomBlocksData, getRoomBySlug, getRoomsData } from "@/lib/admin-data";
+import { getRoomDisplayName } from "@/lib/rooms";
 
 type RoomDetailPageProps = {
   params: Promise<{
@@ -32,6 +33,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
     notFound();
   }
 
+  const roomDisplayName = getRoomDisplayName(room);
   const relatedRooms = rooms.filter((item) => item.id !== room.id).slice(0, 2);
 
   return (
@@ -51,9 +53,9 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
               <li className="breadcrumb-item">
                 <Link href="/rooms">Sobe</Link>
               </li>
-              <li className="breadcrumb-item active">{room.name}</li>
+              <li className="breadcrumb-item active">{roomDisplayName}</li>
             </ol>
-            <h1 className="cs_fs_64 cs_white_color text-center mb-0">{room.name}</h1>
+            <h1 className="cs_fs_64 cs_white_color text-center mb-0">{roomDisplayName}</h1>
           </div>
         </div>
       </section>
@@ -65,12 +67,12 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
             <div className="room-detail-main">
               <div className="room-detail-gallery">
                 <div className="room-detail-gallery__hero">
-                  <img src={room.image} alt={room.name} />
+                  <img src={room.image} alt={roomDisplayName} />
                 </div>
                 <div className="room-detail-gallery__grid">
                   {[room.image, "/images/2.PNG", "/images/3.PNG"].map((image) => (
                     <div key={`${room.id}-${image}`} className="room-detail-gallery__thumb">
-                      <img src={image} alt={room.name} />
+                      <img src={image} alt={roomDisplayName} />
                     </div>
                   ))}
                 </div>
@@ -82,7 +84,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
                     <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
                       {room.neighborhood}
                     </p>
-                    <h2 className="cs_section_title cs_fs_64 mb-0">{room.name}</h2>
+                    <h2 className="cs_section_title cs_fs_64 mb-0">{roomDisplayName}</h2>
                   </div>
                   <div className="room-detail-price">
                     <span>od</span>
@@ -127,9 +129,13 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
 
             <aside className="room-detail-sidebar">
               <PublicBookingForm
+                bookings={bookings}
                 defaultRoomSlug={room.slug}
+                roomBlocks={roomBlocks}
                 rooms={rooms}
-                title={`Posaljite upit bas za ${room.name}`}
+                showAvailabilityPreview={false}
+                title={`Posaljite upit bas za ${roomDisplayName}`}
+                subtitle="Ova soba vec ima prikazan kalendar ispod, pa ovde ostaje brz upit za rezervaciju."
               />
             </aside>
           </div>
@@ -152,9 +158,9 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
           <div className="room-detail-related">
             {relatedRooms.map((relatedRoom) => (
               <Link key={relatedRoom.id} className="room-detail-related__card" href={`/rooms/${relatedRoom.slug}`}>
-                <img src={relatedRoom.image} alt={relatedRoom.name} />
+                <img src={relatedRoom.image} alt={getRoomDisplayName(relatedRoom)} />
                 <div>
-                  <strong>{relatedRoom.name}</strong>
+                  <strong>{getRoomDisplayName(relatedRoom)}</strong>
                   <span>{relatedRoom.capacity} gosta</span>
                 </div>
               </Link>

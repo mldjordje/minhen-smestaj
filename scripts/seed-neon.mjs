@@ -3,8 +3,8 @@ import postgres from "postgres";
 const rooms = [
   {
     id: "rm-101",
-    slug: "einzelzimmer-classic",
-    name: "Einzelzimmer Classic",
+    slug: "soba-1",
+    name: "Soba 1",
     neighborhood: "Eichenried",
     pricePerNight: 69,
     capacity: 1,
@@ -16,21 +16,21 @@ const rooms = [
   },
   {
     id: "rm-204",
-    slug: "doppelzimmer-comfort",
-    name: "Doppelzimmer Comfort",
+    slug: "soba-2",
+    name: "Soba 2",
     neighborhood: "Eichenried",
     pricePerNight: 99,
     capacity: 2,
     beds: "1 double bed",
     status: "occupied",
     image: "/images/legacy/cache_2481988840.jpg",
-    shortDescription: "Komforna dvokrevetna soba sa privatnim kupatilom za duzi boravak.",
+    shortDescription: "Komforna soba za dve osobe sa privatnim kupatilom za duzi boravak.",
     amenities: ["Wi-Fi", "Kupatilo", "TV", "Ormar"]
   },
   {
     id: "rm-305",
-    slug: "mehrbettzimmer-family",
-    name: "Mehrbettzimmer Family",
+    slug: "soba-3",
+    name: "Soba 3",
     neighborhood: "Eichenried",
     pricePerNight: 129,
     capacity: 4,
@@ -39,6 +39,19 @@ const rooms = [
     image: "/images/legacy/cache_2481988838.jpg",
     shortDescription: "Veca soba pogodna za porodice, radnike i manje grupe.",
     amenities: ["Wi-Fi", "Kupatilo", "Vise kreveta", "Parking"]
+  },
+  {
+    id: "rm-406",
+    slug: "soba-4",
+    name: "Soba 4",
+    neighborhood: "Eichenried",
+    pricePerNight: 89,
+    capacity: 2,
+    beds: "2 single bed",
+    status: "available",
+    image: "/images/client-gallery/gallery-07.webp",
+    shortDescription: "Test soba za proveru novog booking flow-a i javnog kalendara dostupnosti.",
+    amenities: ["Wi-Fi", "Kupatilo", "Ormar", "Parking"]
   }
 ];
 
@@ -72,6 +85,16 @@ const reservations = [
     checkOut: "2026-03-20",
     status: "confirmed",
     guests: 1
+  },
+  {
+    id: "bk-784",
+    guestName: "Test Gost",
+    roomId: "rm-406",
+    source: "Direktno",
+    checkIn: "2026-03-21",
+    checkOut: "2026-03-24",
+    status: "confirmed",
+    guests: 2
   }
 ];
 
@@ -84,6 +107,15 @@ const roomBlocks = [
     reason: "Generalno sredjivanje sobe",
     createdBy: "owner",
     status: "blocked"
+  },
+  {
+    id: "blk-102",
+    roomId: "rm-406",
+    checkIn: "2026-03-27",
+    checkOut: "2026-03-29",
+    reason: "Test blokada za proveru javnog kalendara",
+    createdBy: "owner",
+    status: "blocked"
   }
 ];
 
@@ -92,7 +124,7 @@ const inquiries = [
     id: "inq-101",
     guestName: "Milos Petrovic",
     phone: "+381 63 111 222",
-    requestedRoomType: "Dvokrevetna soba",
+    requestedRoomType: "Soba 2",
     checkIn: "2026-03-18",
     checkOut: "2026-03-25",
     guests: 2,
@@ -103,7 +135,7 @@ const inquiries = [
     id: "inq-102",
     guestName: "Nikola Markovic",
     phone: "+387 61 555 444",
-    requestedRoomType: "Jednokrevetna soba",
+    requestedRoomType: "Soba 1",
     checkIn: "2026-03-20",
     checkOut: "2026-03-28",
     guests: 1,

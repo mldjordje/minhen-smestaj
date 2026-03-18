@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addDays, getCalendarCellStatus } from "@/lib/availability";
+import { getRoomDisplayName } from "@/lib/rooms";
 import { Booking, Room, RoomBlock } from "@/lib/types";
 
 type CalendarEntryDraft = {
@@ -206,7 +207,7 @@ export function AdminRoomCalendar({
             <article key={room.id} className="interactive-room-calendar__card">
               <div className="interactive-room-calendar__card-head">
                 <div>
-                  <strong>{room.name}</strong>
+                  <strong>{getRoomDisplayName(room)}</strong>
                   <span>{room.neighborhood}</span>
                 </div>
                 <span className="status-pill status-available">

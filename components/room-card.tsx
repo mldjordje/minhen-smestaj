@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getRoomDisplayName } from "@/lib/rooms";
 import { Room } from "@/lib/types";
 
 type RoomCardProps = {
@@ -11,7 +12,7 @@ export function RoomCard({ room }: RoomCardProps) {
       <div className="room-image-wrap">
         <Image
           src={room.image}
-          alt={room.name}
+          alt={getRoomDisplayName(room)}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           className="room-image"
@@ -22,7 +23,7 @@ export function RoomCard({ room }: RoomCardProps) {
         <div className="room-card-header">
           <div>
             <p className="eyebrow">{room.neighborhood}</p>
-            <h3>{room.name}</h3>
+            <h3>{getRoomDisplayName(room)}</h3>
           </div>
           <strong>{room.pricePerNight} EUR / noc</strong>
         </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import { addDays, getCalendarCellStatus } from "@/lib/availability";
 import { Booking, Room, RoomBlock } from "@/lib/types";
 
