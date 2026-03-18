@@ -1,9 +1,10 @@
 import { addDays, getCalendarCellStatus } from "@/lib/availability";
-import { Booking, Room } from "@/lib/types";
+import { Booking, Room, RoomBlock } from "@/lib/types";
 
 type RoomAvailabilityCalendarProps = {
   bookings: Booking[];
   days?: number;
+  roomBlocks?: RoomBlock[];
   room: Room;
 };
 
@@ -19,11 +20,13 @@ const weekdayFormatter = new Intl.DateTimeFormat("sr-RS", {
 export function RoomAvailabilityCalendar({
   bookings,
   days = 21,
+  roomBlocks = [],
   room
 }: RoomAvailabilityCalendarProps) {
   const startDate = new Date();
   const calendarDays = Array.from({ length: days }, (_, index) => addDays(startDate, index));
   const roomBookings = bookings.filter((booking) => booking.roomId === room.id);
+  const activeRoomBlocks = roomBlocks.filter((block) => block.roomId === room.id);
 
   return (
     <div className="room-availability">
@@ -32,10 +35,11 @@ export function RoomAvailabilityCalendar({
         <span className="calendar-legend__item is-occupied">Zauzeto</span>
         <span className="calendar-legend__item is-arrival">Dolazak</span>
         <span className="calendar-legend__item is-departure">Odlazak</span>
+        <span className="calendar-legend__item is-blocked">Blokirano</span>
       </div>
       <div className="room-availability__grid">
         {calendarDays.map((day) => {
-          const cell = getCalendarCellStatus(room, day, roomBookings);
+          const cell = getCalendarCellStatus(room, day, roomBookings, activeRoomBlocks);
 
           return (
             <div

@@ -3,9 +3,9 @@ import { getBookingSyncSummary, getRoomChannelMappingsData, getRoomsData } from 
 
 export async function GET() {
   const [summary, rooms, mappings] = await Promise.all([
-    getBookingSyncSummary(),
-    getRoomsData(),
-    getRoomChannelMappingsData()
+    getBookingSyncSummary({ allowDemoFallback: false }),
+    getRoomsData({ allowDemoFallback: false }),
+    getRoomChannelMappingsData({ allowDemoFallback: false })
   ]);
   const activeMappings = mappings.filter((mapping) => mapping.syncEnabled);
 

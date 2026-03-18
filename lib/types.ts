@@ -26,6 +26,16 @@ export type RoomChannelMapping = {
   lastSyncedAt?: string | null;
 };
 
+export type RoomBlock = {
+  id: string;
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  reason: string;
+  createdBy: string;
+  status: "blocked" | "maintenance";
+};
+
 export type Booking = {
   id: string;
   guestName: string;

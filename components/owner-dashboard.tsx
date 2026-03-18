@@ -3,9 +3,9 @@
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
-import { bookingSyncSummary } from "@/lib/data";
-import { addDays, getCalendarCellStatus } from "@/lib/availability";
-import { Booking, Inquiry, Room, RoomChannelMapping } from "@/lib/types";
+import { AdminRoomCalendar } from "@/components/admin-room-calendar";
+import type { AdminBookingSyncSummary } from "@/lib/admin-data";
+import { Booking, Inquiry, Room, RoomBlock, RoomChannelMapping } from "@/lib/types";
 
 const initialForm = {
   name: "",
@@ -40,18 +40,11 @@ type MappingDraft = {
   syncEnabled: boolean;
 };
 
-const dayLabelFormatter = new Intl.DateTimeFormat("sr-RS", {
-  day: "2-digit",
-  month: "2-digit"
-});
-
-const weekdayFormatter = new Intl.DateTimeFormat("sr-RS", {
-  weekday: "short"
-});
-
 type OwnerDashboardProps = {
   bookings: Booking[];
   inquiries: Inquiry[];
+  integrationSummary: AdminBookingSyncSummary;
+  roomBlocks: RoomBlock[];
   roomChannelMappings: RoomChannelMapping[];
   rooms: Room[];
 };
@@ -99,12 +92,15 @@ function getMappingVisualState(draft: MappingDraft) {
 export function OwnerDashboard({
   bookings: initialBookings,
   inquiries: initialInquiries,
+  integrationSummary,
+  roomBlocks: initialRoomBlocks,
   roomChannelMappings: initialRoomChannelMappings,
   rooms: initialRooms
 }: OwnerDashboardProps) {
   const [form, setForm] = useState(initialForm);
   const [localBookings, setLocalBookings] = useState<Booking[]>(initialBookings);
   const [localInquiries, setLocalInquiries] = useState<Inquiry[]>(initialInquiries);
+  const [localRoomBlocks, setLocalRoomBlocks] = useState<RoomBlock[]>(initialRoomBlocks);
   const [localMappings, setLocalMappings] = useState<RoomChannelMapping[]>(initialRoomChannelMappings);
   const [localRooms, setLocalRooms] = useState<Room[]>(initialRooms);
   const [mappingDrafts, setMappingDrafts] = useState<Record<string, MappingDraft>>(() =>
@@ -415,10 +411,6 @@ export function OwnerDashboard({
   }
 
   const occupiedCount = localRooms.filter((room) => room.status === "occupied").length;
-  const cleaningCount = localRooms.filter((room) => room.status === "cleaning").length;
-  const arrivalsToday = localBookings.filter((booking) => booking.status === "arriving").length;
-  const today = new Date();
-  const calendarDays = Array.from({ length: 14 }, (_, index) => addDays(today, index));
   const upcomingBookings = [...localBookings].sort((leftBooking, rightBooking) =>
     leftBooking.checkIn.localeCompare(rightBooking.checkIn)
   );
@@ -430,7 +422,7 @@ export function OwnerDashboard({
 
   return (
     <div className="dashboard-grid">
-      <section className="dashboard-panel hero-panel">
+      <section className="dashboard-panel hero-panel" id="overview">
         <p className="eyebrow">Owner control panel</p>
         <h1>Pregled soba, rezervacija, kalendara i Booking.com povezivanja</h1>
         <p>
@@ -457,157 +449,122 @@ export function OwnerDashboard({
         </div>
       </section>
 
-      <section className="dashboard-panel">
-        <div className="section-heading wide">
-          <div>
-            <p className="eyebrow">Dostupnost</p>
-            <h2>Kalendar soba za narednih 14 dana</h2>
-          </div>
-          <span className="inline-note">
-            Owner kalendar sada prikazuje sobu po sobu i sluzi kao osnova za buduci Booking sync.
-          </span>
-        </div>
-        <div className="calendar-legend">
-          <span className="calendar-legend__item is-free">Slobodno</span>
-          <span className="calendar-legend__item is-occupied">Zauzeto</span>
-          <span className="calendar-legend__item is-arrival">Dolazak</span>
-          <span className="calendar-legend__item is-departure">Odlazak</span>
-          <span className="calendar-legend__item is-cleaning">Ciscenje</span>
-        </div>
-        <div className="availability-calendar">
-          <div
-            className="availability-calendar__row availability-calendar__row--head"
-            style={{ gridTemplateColumns: `220px repeat(${calendarDays.length}, minmax(76px, 1fr))` }}
-          >
-            <div className="availability-calendar__room availability-calendar__room--head">
-              Soba
-            </div>
-            {calendarDays.map((day) => (
-              <div key={day.toISOString()} className="availability-calendar__day">
-                <strong>{dayLabelFormatter.format(day)}</strong>
-                <span>{weekdayFormatter.format(day)}</span>
-              </div>
-            ))}
-          </div>
+      <AdminRoomCalendar
+        audience="owner"
+        bookings={localBookings}
+        onBookingsChange={setLocalBookings}
+        onRoomBlocksChange={setLocalRoomBlocks}
+        roomBlocks={localRoomBlocks}
+        rooms={localRooms}
+        sectionId="calendar"
+      />
 
-          {localRooms.map((room) => (
-            <div
-              key={room.id}
-              className="availability-calendar__row"
-              style={{ gridTemplateColumns: `220px repeat(${calendarDays.length}, minmax(76px, 1fr))` }}
-            >
-              <div className="availability-calendar__room">
-                <strong>{room.name}</strong>
-                <span>{room.neighborhood}</span>
-              </div>
-              {calendarDays.map((day) => {
-                const cell = getCalendarCellStatus(room, day, localBookings);
+      <div className="dashboard-split-grid">
+        <section className="dashboard-panel" id="bookings">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Termini</p>
+              <h2>Predstojeci boravci po sobama</h2>
+            </div>
+          </div>
+          {upcomingBookings.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Nema rezervacija u bazi</strong>
+              <p>Rucne rezervacije i potvrdeni inquiry unosi pojavice se ovde.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {upcomingBookings.map((booking) => {
+                const room = localRooms.find((item) => item.id === booking.roomId);
 
                 return (
-                  <div
-                    key={`${room.id}-${day.toISOString()}`}
-                    className={`availability-calendar__cell is-${cell.tone}`}
-                    title={cell.detail}
-                  >
-                    {cell.shortLabel}
+                  <div key={booking.id} className="table-row">
+                    <div>
+                      <strong>{room?.name ?? booking.roomId}</strong>
+                      <span>{booking.guestName}</span>
+                    </div>
+                    <div>{booking.source}</div>
+                    <div>
+                      {booking.checkIn} - {booking.checkOut}
+                    </div>
+                    <div>
+                      <span className={`status-pill status-${booking.status}`}>{booking.status}</span>
+                    </div>
                   </div>
                 );
               })}
             </div>
-          ))}
-        </div>
-      </section>
+          )}
+        </section>
 
-      <section className="dashboard-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Termini</p>
-            <h2>Predstojeci boravci po sobama</h2>
-          </div>
-        </div>
-        <div className="table-like">
-          {upcomingBookings.map((booking) => {
-            const room = localRooms.find((item) => item.id === booking.roomId);
-
-            return (
-              <div key={booking.id} className="table-row">
-                <div>
-                  <strong>{room?.name ?? booking.roomId}</strong>
-                  <span>{booking.guestName}</span>
-                </div>
-                <div>{booking.source}</div>
-                <div>
-                  {booking.checkIn} - {booking.checkOut}
-                </div>
-                <div>
-                  <span className={`status-pill status-${booking.status}`}>{booking.status}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="dashboard-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Upiti</p>
-            <h2>Novi upiti sa sajta i WhatsApp-a</h2>
-          </div>
-        </div>
-        <div className="table-like">
-          {activeInquiries.map((inquiry) => (
-            <div key={inquiry.id} className="table-row">
-              <div>
-                <strong>{inquiry.guestName}</strong>
-                <span>
-                  {inquiry.message} | {inquiry.phone}
-                </span>
-              </div>
-              <div className="admin-inline-stack">
-                <span>{inquiry.requestedRoomType}</span>
-                <select
-                  className="admin-inline-select"
-                  onChange={(event) => handleInquiryRoomChange(inquiry.id, event.target.value)}
-                  value={inquiryRoomSelection[inquiry.id] ?? ""}
-                >
-                  {localRooms.map((room) => (
-                    <option key={room.id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                {inquiry.checkIn} - {inquiry.checkOut}
-              </div>
-              <div className="admin-inline-actions">
-                <span className={`status-pill status-inquiry-${inquiry.status}`}>
-                  {inquiry.status}
-                </span>
-                <button
-                  className="secondary-button"
-                  onClick={() => void handleConvertInquiry(inquiry.id)}
-                  type="button"
-                >
-                  Pretvori u rezervaciju
-                </button>
-                {inquiryActionState[inquiry.id]?.message ? (
-                  <span
-                    className={`inline-note ${
-                      inquiryActionState[inquiry.id]?.status === "error" ? "inline-note-error" : ""
-                    }`}
-                  >
-                    {inquiryActionState[inquiry.id]?.message}
-                  </span>
-                ) : null}
-              </div>
+        <section className="dashboard-panel" id="inquiries">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Upiti</p>
+              <h2>Novi upiti sa sajta i WhatsApp-a</h2>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+          {activeInquiries.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Nema novih upita</strong>
+              <p>Kada stignu novi inquiry unosi iz baze, bice prikazani ovde.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {activeInquiries.map((inquiry) => (
+                <div key={inquiry.id} className="table-row">
+                  <div>
+                    <strong>{inquiry.guestName}</strong>
+                    <span>
+                      {inquiry.message} | {inquiry.phone}
+                    </span>
+                  </div>
+                  <div className="admin-inline-stack">
+                    <span>{inquiry.requestedRoomType}</span>
+                    <select
+                      className="admin-inline-select"
+                      onChange={(event) => handleInquiryRoomChange(inquiry.id, event.target.value)}
+                      value={inquiryRoomSelection[inquiry.id] ?? ""}
+                    >
+                      {localRooms.map((room) => (
+                        <option key={room.id} value={room.id}>
+                          {room.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    {inquiry.checkIn} - {inquiry.checkOut}
+                  </div>
+                  <div className="admin-inline-actions">
+                    <span className={`status-pill status-inquiry-${inquiry.status}`}>
+                      {inquiry.status}
+                    </span>
+                    <button
+                      className="secondary-button"
+                      onClick={() => void handleConvertInquiry(inquiry.id)}
+                      type="button"
+                    >
+                      Pretvori u rezervaciju
+                    </button>
+                    {inquiryActionState[inquiry.id]?.message ? (
+                      <span
+                        className={`inline-note ${
+                          inquiryActionState[inquiry.id]?.status === "error" ? "inline-note-error" : ""
+                        }`}
+                      >
+                        {inquiryActionState[inquiry.id]?.message}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
 
-      <section className="dashboard-panel">
+      <section className="dashboard-panel" id="mapping">
         <div className="section-heading wide">
           <div>
             <p className="eyebrow">Booking.com mapping</p>
@@ -702,7 +659,8 @@ export function OwnerDashboard({
         </div>
       </section>
 
-      <section className="dashboard-panel">
+      <div className="dashboard-split-grid">
+      <section className="dashboard-panel" id="rooms">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Sobe</p>
@@ -790,38 +748,46 @@ export function OwnerDashboard({
         </form>
       </section>
 
-      <section className="dashboard-panel">
+      <section className="dashboard-panel" id="inventory">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Inventar</p>
             <h2>Aktivne jedinice</h2>
           </div>
         </div>
-        <div className="table-like">
-          {localRooms.map((room) => {
-            const mapping = localMappings.find((item) => item.roomId === room.id);
+        {localRooms.length === 0 ? (
+          <div className="admin-empty-state">
+            <strong>Jos nema soba u bazi</strong>
+            <p>Dodaj prvu sobu kroz owner admin da bi se pojavila i u kalendaru i u inventaru.</p>
+          </div>
+        ) : (
+          <div className="table-like">
+            {localRooms.map((room) => {
+              const mapping = localMappings.find((item) => item.roomId === room.id);
 
-            return (
-              <div key={room.id} className="table-row">
-                <div>
-                  <strong>{room.name}</strong>
-                  <span>{room.neighborhood}</span>
+              return (
+                <div key={room.id} className="table-row">
+                  <div>
+                    <strong>{room.name}</strong>
+                    <span>{room.neighborhood}</span>
+                  </div>
+                  <div>{room.capacity} gosta</div>
+                  <div>{room.pricePerNight} EUR</div>
+                  <div className="admin-inline-actions">
+                    <span className={`status-pill status-${room.status}`}>{room.status}</span>
+                    <span className={`status-pill ${mapping?.syncEnabled ? "status-mapped" : "status-unmapped"}`}>
+                      {mapping?.syncEnabled ? "Booking.com" : "bez sync-a"}
+                    </span>
+                  </div>
                 </div>
-                <div>{room.capacity} gosta</div>
-                <div>{room.pricePerNight} EUR</div>
-                <div className="admin-inline-actions">
-                  <span className={`status-pill status-${room.status}`}>{room.status}</span>
-                  <span className={`status-pill ${mapping?.syncEnabled ? "status-mapped" : "status-unmapped"}`}>
-                    {mapping?.syncEnabled ? "Booking.com" : "bez sync-a"}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
+      </div>
 
-      <section className="dashboard-panel">
+      <section className="dashboard-panel" id="integrations">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Integracije</p>
@@ -831,21 +797,25 @@ export function OwnerDashboard({
         <div className="sync-card">
           <div className="sync-item">
             <span>Provider</span>
-            <strong>{bookingSyncSummary.provider}</strong>
+            <strong>{integrationSummary.provider}</strong>
           </div>
           <div className="sync-item">
             <span>Poslednji sync</span>
-            <strong>{bookingSyncSummary.lastSuccessfulSync}</strong>
+            <strong>{integrationSummary.lastSuccessfulSync ?? "Jos nema sync zapisa"}</strong>
           </div>
           <div className="sync-item">
             <span>Pending updates</span>
-            <strong>{bookingSyncSummary.pendingUpdates}</strong>
+            <strong>{integrationSummary.pendingUpdates}</strong>
           </div>
           <div className="sync-item">
             <span>Aktivne mape soba</span>
             <strong>{connectedMappings}</strong>
           </div>
-          <p>{bookingSyncSummary.note}</p>
+          <div className="sync-item">
+            <span>Mode</span>
+            <strong>{integrationSummary.mode}</strong>
+          </div>
+          <p>{integrationSummary.note}</p>
         </div>
       </section>
     </div>

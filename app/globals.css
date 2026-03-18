@@ -542,7 +542,20 @@ textarea {
 
 .admin-nav {
   display: grid;
+  gap: 18px;
+}
+
+.admin-nav__group {
+  display: grid;
   gap: 10px;
+}
+
+.admin-nav__label {
+  margin: 0;
+  color: rgba(247, 239, 228, 0.72);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .admin-nav a {
@@ -551,12 +564,22 @@ textarea {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.admin-nav a.is-active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .admin-content {
   padding: 28px;
 }
 
 .dashboard-grid {
   display: grid;
+  gap: 20px;
+}
+
+.dashboard-split-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
@@ -617,6 +640,23 @@ textarea {
 .table-row strong,
 .table-row span {
   display: block;
+}
+
+.admin-empty-state {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.admin-empty-state strong {
+  font-size: 1.05rem;
+}
+
+.admin-empty-state p {
+  margin: 0;
 }
 
 .admin-inline-stack,
@@ -690,6 +730,11 @@ textarea {
 .calendar-legend__item.is-cleaning {
   background: rgba(255, 204, 102, 0.22);
   color: #7c5600;
+}
+
+.calendar-legend__item.is-blocked {
+  background: rgba(124, 99, 168, 0.14);
+  color: #61438f;
 }
 
 .room-booking-section {
@@ -891,6 +936,11 @@ textarea {
   color: #7c5600;
 }
 
+.availability-calendar__cell.is-blocked {
+  background: rgba(124, 99, 168, 0.14);
+  color: #61438f;
+}
+
 .availability-calendar__cell.is-maintenance {
   background: rgba(177, 75, 75, 0.16);
   color: #8b2f2f;
@@ -955,9 +1005,120 @@ textarea {
   color: #7c5600;
 }
 
+.room-availability__cell.is-blocked {
+  background: rgba(124, 99, 168, 0.14);
+  color: #61438f;
+}
+
 .room-availability__cell.is-maintenance {
   background: rgba(177, 75, 75, 0.16);
   color: #8b2f2f;
+}
+
+.interactive-room-calendar {
+  display: grid;
+  gap: 18px;
+}
+
+.interactive-room-calendar__card {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--line);
+}
+
+.interactive-room-calendar__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.interactive-room-calendar__card-head strong,
+.interactive-room-calendar__card-head span {
+  display: block;
+}
+
+.interactive-room-calendar__card-head span:last-child {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.interactive-room-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interactive-room-calendar__cell {
+  display: grid;
+  gap: 4px;
+  min-height: 92px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.interactive-room-calendar__cell strong {
+  font-size: 0.95rem;
+}
+
+.interactive-room-calendar__cell span {
+  color: var(--muted);
+  text-transform: capitalize;
+  font-size: 0.85rem;
+}
+
+.interactive-room-calendar__cell small {
+  font-weight: 700;
+}
+
+.interactive-room-calendar__cell.is-free {
+  background: rgba(71, 159, 118, 0.1);
+  color: #205941;
+}
+
+.interactive-room-calendar__cell.is-occupied {
+  background: rgba(189, 123, 59, 0.16);
+  color: #8d5520;
+}
+
+.interactive-room-calendar__cell.is-arrival {
+  background: rgba(54, 112, 160, 0.14);
+  color: #275a85;
+}
+
+.interactive-room-calendar__cell.is-departure {
+  background: rgba(255, 204, 102, 0.22);
+  color: #7c5600;
+}
+
+.interactive-room-calendar__cell.is-blocked {
+  background: rgba(124, 99, 168, 0.14);
+  color: #61438f;
+}
+
+.interactive-room-calendar__cell.is-maintenance {
+  background: rgba(177, 75, 75, 0.16);
+  color: #8b2f2f;
+}
+
+.interactive-room-calendar__form {
+  display: grid;
+  gap: 12px;
+}
+
+.interactive-room-calendar__form input,
+.interactive-room-calendar__form select,
+.interactive-room-calendar__form textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.84);
+  padding: 14px 16px;
 }
 
 .room-detail-section {
@@ -1265,17 +1426,20 @@ textarea {
   inset: auto 0 0;
   padding: 28px;
   color: #fff;
-  background: linear-gradient(180deg, rgba(15, 22, 17, 0) 0%, rgba(15, 22, 17, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(15, 22, 17, 0.08) 0%, rgba(15, 22, 17, 0.94) 100%);
 }
 
 .home-showcase-card__overlay h3 {
   margin: 0 0 10px;
   font-size: clamp(1.6rem, 1.2rem + 1vw, 2.2rem);
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
 }
 
 .home-showcase-card__overlay p {
   margin: 0;
   color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
 .home-showcase-card__eyebrow {
@@ -1351,6 +1515,7 @@ textarea {
   .room-grid,
   .gallery-grid,
   .process-list,
+  .dashboard-split-grid,
   .stats-band,
   .stats-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1371,6 +1536,7 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .interactive-room-calendar__grid,
   .room-availability__grid,
   .room-detail-gallery__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1396,6 +1562,7 @@ textarea {
   .room-grid,
   .gallery-grid,
   .process-list,
+  .dashboard-split-grid,
   .stats-band,
   .stats-row {
     grid-template-columns: 1fr;
@@ -1420,6 +1587,7 @@ textarea {
   }
 
   .public-booking-form__grid,
+  .interactive-room-calendar__grid,
   .room-detail-copy__header,
   .room-detail-gallery__grid,
   .room-availability__grid {

@@ -2,7 +2,10 @@ import Link from "next/link";
 import { getRoomChannelMappingsData, getRoomsData } from "@/lib/admin-data";
 
 export default async function OwnerBookingSyncGuidePage() {
-  const [rooms, mappings] = await Promise.all([getRoomsData(), getRoomChannelMappingsData()]);
+  const [rooms, mappings] = await Promise.all([
+    getRoomsData({ allowDemoFallback: false }),
+    getRoomChannelMappingsData({ allowDemoFallback: false })
+  ]);
 
   return (
     <div className="dashboard-grid">

@@ -1,4 +1,12 @@
-import { Booking, CleaningTask, Inquiry, Room, RoomChannelMapping, TeamMember } from "@/lib/types";
+import {
+  Booking,
+  CleaningTask,
+  Inquiry,
+  Room,
+  RoomBlock,
+  RoomChannelMapping,
+  TeamMember
+} from "@/lib/types";
 
 export const rooms: Room[] = [
   {
@@ -75,6 +83,18 @@ export const bookings: Booking[] = [
     checkOut: "2026-03-20",
     status: "confirmed",
     guests: 1
+  }
+];
+
+export const roomBlocks: RoomBlock[] = [
+  {
+    id: "blk-101",
+    roomId: "rm-305",
+    checkIn: "2026-03-22",
+    checkOut: "2026-03-24",
+    reason: "Generalno sredjivanje sobe",
+    createdBy: "owner",
+    status: "blocked"
   }
 ];
 

@@ -30,6 +30,17 @@ create table if not exists reservations (
   created_at timestamptz not null default now()
 );
 
+create table if not exists room_blocks (
+  id text primary key,
+  room_id text not null references rooms(id) on delete cascade,
+  check_in date not null,
+  check_out date not null,
+  reason text not null,
+  created_by text not null,
+  status text not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists inquiries (
   id text primary key,
   guest_name text not null,

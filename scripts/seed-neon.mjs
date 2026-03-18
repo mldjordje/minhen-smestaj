@@ -75,6 +75,18 @@ const reservations = [
   }
 ];
 
+const roomBlocks = [
+  {
+    id: "blk-101",
+    roomId: "rm-305",
+    checkIn: "2026-03-22",
+    checkOut: "2026-03-24",
+    reason: "Generalno sredjivanje sobe",
+    createdBy: "owner",
+    status: "blocked"
+  }
+];
+
 const inquiries = [
   {
     id: "inq-101",
@@ -185,6 +197,7 @@ async function main() {
   try {
     await sql.begin(async (transaction) => {
       await transaction`delete from room_channel_mappings`;
+      await transaction`delete from room_blocks`;
       await transaction`delete from room_amenities`;
       await transaction`delete from reservations`;
       await transaction`delete from inquiries`;
@@ -231,6 +244,28 @@ async function main() {
             ${reservation.checkOut},
             ${reservation.status},
             ${reservation.guests}
+          )
+        `;
+      }
+
+      for (const block of roomBlocks) {
+        await transaction`
+          insert into room_blocks (
+            id,
+            room_id,
+            check_in,
+            check_out,
+            reason,
+            created_by,
+            status
+          ) values (
+            ${block.id},
+            ${block.roomId},
+            ${block.checkIn},
+            ${block.checkOut},
+            ${block.reason},
+            ${block.createdBy},
+            ${block.status}
           )
         `;
       }

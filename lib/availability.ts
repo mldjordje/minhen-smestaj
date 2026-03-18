@@ -1,10 +1,11 @@
-import { Booking, Room } from "@/lib/types";
+import { Booking, Room, RoomBlock } from "@/lib/types";
 
 export type AvailabilityTone =
   | "free"
   | "occupied"
   | "arrival"
   | "departure"
+  | "blocked"
   | "cleaning"
   | "maintenance";
 
@@ -27,7 +28,16 @@ export function isSameDate(leftDate: Date, rightDate: Date) {
   );
 }
 
-export function getCalendarCellStatus(room: Room, date: Date, sourceBookings: Booking[]) {
+function isWithinStay(date: Date, checkIn: Date, checkOut: Date) {
+  return isSameDate(checkIn, date) || isSameDate(checkOut, date) || (date > checkIn && date < checkOut);
+}
+
+export function getCalendarCellStatus(
+  room: Room,
+  date: Date,
+  sourceBookings: Booking[],
+  sourceBlocks: RoomBlock[] = []
+) {
   const matchingBooking = sourceBookings.find((booking) => {
     if (booking.roomId !== room.id) {
       return false;
@@ -36,11 +46,7 @@ export function getCalendarCellStatus(room: Room, date: Date, sourceBookings: Bo
     const checkIn = parseDate(booking.checkIn);
     const checkOut = parseDate(booking.checkOut);
 
-    return (
-      isSameDate(checkIn, date) ||
-      isSameDate(checkOut, date) ||
-      (date > checkIn && date < checkOut)
-    );
+    return isWithinStay(date, checkIn, checkOut);
   });
 
   if (matchingBooking) {
@@ -67,6 +73,25 @@ export function getCalendarCellStatus(room: Room, date: Date, sourceBookings: Bo
       tone: "occupied" as AvailabilityTone,
       shortLabel: "Zauz.",
       detail: `${matchingBooking.guestName} boravi`
+    };
+  }
+
+  const matchingBlock = sourceBlocks.find((block) => {
+    if (block.roomId !== room.id) {
+      return false;
+    }
+
+    const checkIn = parseDate(block.checkIn);
+    const checkOut = parseDate(block.checkOut);
+
+    return isWithinStay(date, checkIn, checkOut);
+  });
+
+  if (matchingBlock) {
+    return {
+      tone: matchingBlock.status === "maintenance" ? "maintenance" : ("blocked" as AvailabilityTone),
+      shortLabel: matchingBlock.status === "maintenance" ? "Serv." : "Blok.",
+      detail: matchingBlock.reason
     };
   }
 

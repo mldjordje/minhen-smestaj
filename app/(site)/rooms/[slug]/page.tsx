@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicBookingForm } from "@/components/public-booking-form";
 import { RoomAvailabilityCalendar } from "@/components/room-availability-calendar";
-import { getBookingsData, getRoomBySlug, getRoomsData } from "@/lib/admin-data";
+import { getBookingsData, getRoomBlocksData, getRoomBySlug, getRoomsData } from "@/lib/admin-data";
 
 type RoomDetailPageProps = {
   params: Promise<{
@@ -21,10 +21,11 @@ export async function generateStaticParams() {
 
 export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
   const { slug } = await params;
-  const [room, rooms, bookings] = await Promise.all([
+  const [room, rooms, bookings, roomBlocks] = await Promise.all([
     getRoomBySlug(slug),
     getRoomsData(),
-    getBookingsData()
+    getBookingsData(),
+    getRoomBlocksData()
   ]);
 
   if (!room) {
@@ -120,7 +121,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
                     Dolazak, odlazak i zauzeti termini su prikazani posebno za ovu sobu.
                   </span>
                 </div>
-                <RoomAvailabilityCalendar bookings={bookings} room={room} />
+                <RoomAvailabilityCalendar bookings={bookings} room={room} roomBlocks={roomBlocks} />
               </div>
             </div>
 

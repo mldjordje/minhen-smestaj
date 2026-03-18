@@ -47,6 +47,16 @@ async function createUniqueSlug(baseSlug: string) {
 }
 
 export async function POST(request: Request) {
+  if (!db) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Baza nije povezana. Admin cuvanje soba radi samo sa pravom bazom."
+      },
+      { status: 500 }
+    );
+  }
+
   try {
     const payload = (await request.json()) as CreateRoomPayload;
 
@@ -84,39 +94,37 @@ export async function POST(request: Request) {
         payload.amenities?.filter((amenity) => amenity.trim().length > 0) ?? ["Wi-Fi", "Kupatilo"]
     };
 
-    if (db) {
-      await db`
-        insert into rooms (
-          id,
-          slug,
-          name,
-          neighborhood,
-          price_per_night,
-          capacity,
-          beds,
-          status,
-          image,
-          short_description
-        ) values (
-          ${room.id},
-          ${room.slug},
-          ${room.name},
-          ${room.neighborhood},
-          ${room.pricePerNight},
-          ${room.capacity},
-          ${room.beds},
-          ${room.status},
-          ${room.image},
-          ${room.shortDescription}
-        )
-      `;
+    await db`
+      insert into rooms (
+        id,
+        slug,
+        name,
+        neighborhood,
+        price_per_night,
+        capacity,
+        beds,
+        status,
+        image,
+        short_description
+      ) values (
+        ${room.id},
+        ${room.slug},
+        ${room.name},
+        ${room.neighborhood},
+        ${room.pricePerNight},
+        ${room.capacity},
+        ${room.beds},
+        ${room.status},
+        ${room.image},
+        ${room.shortDescription}
+      )
+    `;
 
-      for (const amenity of room.amenities) {
-        await db`
-          insert into room_amenities (room_id, label)
-          values (${room.id}, ${amenity})
-        `;
-      }
+    for (const amenity of room.amenities) {
+      await db`
+        insert into room_amenities (room_id, label)
+        values (${room.id}, ${amenity})
+      `;
     }
 
     return NextResponse.json({

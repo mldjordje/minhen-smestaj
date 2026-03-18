@@ -1,14 +1,34 @@
 import { db } from "@/lib/db";
 import {
-  bookingSyncSummary,
   bookings as demoBookings,
   cleaningTasks as demoCleaningTasks,
   inquiries as demoInquiries,
+  roomBlocks as demoRoomBlocks,
   roomChannelMappings as demoRoomChannelMappings,
   rooms as demoRooms,
   teamMembers as demoTeamMembers
 } from "@/lib/data";
-import { Booking, CleaningTask, Inquiry, Room, RoomChannelMapping, TeamMember } from "@/lib/types";
+import {
+  Booking,
+  CleaningTask,
+  Inquiry,
+  Room,
+  RoomBlock,
+  RoomChannelMapping,
+  TeamMember
+} from "@/lib/types";
+
+type DataOptions = {
+  allowDemoFallback?: boolean;
+};
+
+export type AdminBookingSyncSummary = {
+  lastSuccessfulSync: string | null;
+  mode: string;
+  note: string;
+  pendingUpdates: number;
+  provider: "Booking.com";
+};
 
 type RoomRow = {
   capacity: number;
@@ -61,6 +81,17 @@ type ReservationRow = {
   status: Booking["status"];
 };
 
+type RoomBlockRow = {
+  check_in: Date | string;
+  check_out: Date | string;
+  created_at: string;
+  created_by: string;
+  id: string;
+  reason: string;
+  room_id: string;
+  status: RoomBlock["status"];
+};
+
 type InquiryRow = {
   check_in: Date | string;
   check_out: Date | string;
@@ -106,8 +137,18 @@ type RoomChannelMappingRow = {
   updated_at: string;
 };
 
-export async function getRoomsData() {
+function shouldUseDemoFallback(options?: DataOptions) {
+  return options?.allowDemoFallback !== false;
+}
+
+export async function getRoomsData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoRooms;
   }
 
@@ -117,7 +158,7 @@ export async function getRoomsData() {
     order by created_at desc
   `;
 
-  if (roomRows.length === 0) {
+  if (roomRows.length === 0 && allowDemoFallback) {
     return demoRooms;
   }
 
@@ -150,8 +191,14 @@ export async function getRoomBySlug(slug: string) {
   return rooms.find((room) => room.slug === slug) ?? null;
 }
 
-export async function getBookingsData() {
+export async function getBookingsData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoBookings;
   }
 
@@ -161,7 +208,7 @@ export async function getBookingsData() {
     order by check_in asc
   `;
 
-  if (reservationRows.length === 0) {
+  if (reservationRows.length === 0 && allowDemoFallback) {
     return demoBookings;
   }
 
@@ -177,8 +224,14 @@ export async function getBookingsData() {
   }));
 }
 
-export async function getInquiriesData() {
+export async function getInquiriesData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoInquiries;
   }
 
@@ -188,7 +241,7 @@ export async function getInquiriesData() {
     order by created_at desc
   `;
 
-  if (inquiryRows.length === 0) {
+  if (inquiryRows.length === 0 && allowDemoFallback) {
     return demoInquiries;
   }
 
@@ -205,8 +258,58 @@ export async function getInquiriesData() {
   }));
 }
 
-export async function getCleaningTasksData() {
+export async function getRoomBlocksData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
+    return demoRoomBlocks;
+  }
+
+  try {
+    const roomBlockRows = await db<RoomBlockRow[]>`
+      select id, room_id, check_in, check_out, reason, created_by, status, created_at
+      from room_blocks
+      order by check_in asc
+    `;
+
+    if (roomBlockRows.length === 0 && allowDemoFallback) {
+      return demoRoomBlocks;
+    }
+
+    return roomBlockRows.map((block) => ({
+      id: block.id,
+      roomId: block.room_id,
+      checkIn: normalizeDateValue(block.check_in),
+      checkOut: normalizeDateValue(block.check_out),
+      reason: block.reason,
+      createdBy: block.created_by,
+      status: block.status
+    }));
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !("code" in error) ||
+      !["42P01", "26000"].includes(String(error.code))
+    ) {
+      console.error("Room blocks query failed", error);
+    }
+
+    return allowDemoFallback ? demoRoomBlocks : [];
+  }
+}
+
+export async function getCleaningTasksData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
+  if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoCleaningTasks;
   }
 
@@ -216,7 +319,7 @@ export async function getCleaningTasksData() {
     order by created_at asc
   `;
 
-  if (taskRows.length === 0) {
+  if (taskRows.length === 0 && allowDemoFallback) {
     return demoCleaningTasks;
   }
 
@@ -230,8 +333,14 @@ export async function getCleaningTasksData() {
   }));
 }
 
-export async function getTeamMembersData() {
+export async function getTeamMembersData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoTeamMembers;
   }
 
@@ -241,7 +350,7 @@ export async function getTeamMembersData() {
     order by created_at asc
   `;
 
-  if (memberRows.length === 0) {
+  if (memberRows.length === 0 && allowDemoFallback) {
     return demoTeamMembers;
   }
 
@@ -253,8 +362,14 @@ export async function getTeamMembersData() {
   }));
 }
 
-export async function getRoomChannelMappingsData() {
+export async function getRoomChannelMappingsData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
   if (!db) {
+    if (!allowDemoFallback) {
+      return [];
+    }
+
     return demoRoomChannelMappings;
   }
 
@@ -276,7 +391,7 @@ export async function getRoomChannelMappingsData() {
       order by created_at asc
     `;
 
-    if (mappingRows.length === 0) {
+    if (mappingRows.length === 0 && allowDemoFallback) {
       return demoRoomChannelMappings;
     }
 
@@ -300,10 +415,33 @@ export async function getRoomChannelMappingsData() {
       console.error("Room channel mappings query failed", error);
     }
 
-    return demoRoomChannelMappings;
+    return allowDemoFallback ? demoRoomChannelMappings : [];
   }
 }
 
-export function getBookingSyncSummary() {
-  return bookingSyncSummary;
+export async function getBookingSyncSummary(
+  options?: DataOptions
+): Promise<AdminBookingSyncSummary> {
+  const [rooms, mappings] = await Promise.all([
+    getRoomsData(options),
+    getRoomChannelMappingsData(options)
+  ]);
+  const activeMappings = mappings.filter((mapping) => mapping.syncEnabled);
+  const lastSuccessfulSync =
+    activeMappings
+      .map((mapping) => mapping.lastSyncedAt)
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .at(-1) ?? null;
+
+  return {
+    provider: "Booking.com",
+    lastSuccessfulSync,
+    mode: process.env.BOOKING_SYNC_MODE || "manual",
+    pendingUpdates: Math.max(rooms.length - activeMappings.length, 0),
+    note:
+      activeMappings.length > 0
+        ? "Aktivne mape soba postoje i spremne su za Booking.com sync."
+        : "Nijedna soba jos nije povezana sa Booking.com mapiranjem."
+  };
 }
