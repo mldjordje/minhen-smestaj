@@ -1,4 +1,5 @@
-import { PublicSiteFooter, PublicSiteHeader, PublicTemplateHeadLinks } from "@/components/public-template";
+import { PublicSiteHeader } from "@/components/public-site-header";
+import { PublicSiteFooter, PublicTemplateHeadLinks } from "@/components/public-template";
 
 type SiteLayoutProps = {
   children: React.ReactNode;

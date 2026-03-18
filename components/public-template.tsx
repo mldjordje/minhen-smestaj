@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-css-tags, @next/next/no-img-element */
 import Link from "next/link";
-import { legacyGallery, rooms } from "@/lib/data";
+import { legacyGallery } from "@/lib/data";
+import type { LandingGalleryImage } from "@/lib/site-gallery";
+import { Room } from "@/lib/types";
 
 export function PublicTemplateHeadLinks() {
   return (
@@ -126,7 +128,11 @@ export function PublicSiteFooter() {
   );
 }
 
-export function PublicRoomsGrid() {
+type PublicRoomsGridProps = {
+  rooms: Room[];
+};
+
+export function PublicRoomsGrid({ rooms }: PublicRoomsGridProps) {
   return (
     <div className="cs_grid cs_style_7">
       {rooms.map((room, index) => (
@@ -135,14 +141,18 @@ export function PublicRoomsGrid() {
           className="cs_card cs_style_2 cs_type_1"
           data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
         >
-          <div className="cs_card_thumbnail cs_mb_20 position-relative overflow-hidden">
-            <img src={room.image} alt={room.name} />
-            <span className="cs_white_color cs_medium text-uppercase position-absolute">
-              Rezervacija
-            </span>
-          </div>
+          <Link href={`/rooms/${room.slug}`}>
+            <div className="cs_card_thumbnail cs_mb_20 position-relative overflow-hidden">
+              <img src={room.image} alt={room.name} />
+              <span className="cs_white_color cs_medium text-uppercase position-absolute">
+                Rezervacija
+              </span>
+            </div>
+          </Link>
           <div className="cs_card_info p-0">
-            <h3 className="cs_card_title cs_fs_48 cs_mb_15">{room.name}</h3>
+            <h3 className="cs_card_title cs_fs_48 cs_mb_15">
+              <Link href={`/rooms/${room.slug}`}>{room.name}</Link>
+            </h3>
             <p className="cs_card_subtitle cs_mb_24">{room.shortDescription}</p>
             <div className="cs_horizontal_line cs_border_bg cs_mb_32 cs_mb_lg_24" />
             <ul className="cs_card_meta_wrapper cs_fs_16 cs_normal cs_mb_32 cs_mb_lg_24 list-unstyled p-0">
@@ -161,9 +171,7 @@ export function PublicRoomsGrid() {
               <a
                 aria-label="Hotel booking button"
                 className="cs_btn cs_style_1 cs_accent_color cs_fs_20 cs_medium"
-                href="https://wa.me/491772078868"
-                target="_blank"
-                rel="noreferrer"
+                href={`/rooms/${room.slug}`}
               >
                 <span>POŠALJI UPIT</span>
               </a>
@@ -175,10 +183,14 @@ export function PublicRoomsGrid() {
   );
 }
 
-export function PublicLegacyGallery() {
+type PublicLegacyGalleryProps = {
+  items?: LandingGalleryImage[];
+};
+
+export function PublicLegacyGallery({ items = legacyGallery }: PublicLegacyGalleryProps) {
   return (
     <div className="row g-4">
-      {legacyGallery.map((item) => (
+      {items.map((item) => (
         <div key={item.image} className="col-lg-4 col-md-6">
           <div className="cs_card cs_style_2">
             <div className="cs_card_thumbnail cs_zoom position-relative overflow-hidden">

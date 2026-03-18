@@ -1,10 +1,22 @@
-import { bookings, cleaningTasks, rooms, teamMembers } from "@/lib/data";
+import { Booking, CleaningTask, Room, TeamMember } from "@/lib/types";
 
-function getRoomName(roomId: string) {
+function getRoomName(roomId: string, rooms: Room[]) {
   return rooms.find((room) => room.id === roomId)?.name ?? roomId;
 }
 
-export function StaffDashboard() {
+type StaffDashboardProps = {
+  bookings: Booking[];
+  cleaningTasks: CleaningTask[];
+  rooms: Room[];
+  teamMembers: TeamMember[];
+};
+
+export function StaffDashboard({
+  bookings,
+  cleaningTasks,
+  rooms,
+  teamMembers
+}: StaffDashboardProps) {
   const arrivalsToday = bookings.filter((booking) => booking.status === "arriving");
   const activeStaff = teamMembers.filter((member) => member.role !== "owner").length;
 
@@ -44,7 +56,7 @@ export function StaffDashboard() {
           {cleaningTasks.map((task) => (
             <div key={task.id} className="table-row">
               <div>
-                <strong>{getRoomName(task.roomId)}</strong>
+                <strong>{getRoomName(task.roomId, rooms)}</strong>
                 <span>{task.notes}</span>
               </div>
               <div>{task.assignee}</div>
@@ -69,7 +81,7 @@ export function StaffDashboard() {
             <div key={booking.id} className="table-row">
               <div>
                 <strong>{booking.guestName}</strong>
-                <span>{getRoomName(booking.roomId)}</span>
+                <span>{getRoomName(booking.roomId, rooms)}</span>
               </div>
               <div>{booking.source}</div>
               <div>

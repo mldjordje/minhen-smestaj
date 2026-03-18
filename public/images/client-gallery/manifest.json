@@ -1,0 +1,72 @@
+[
+  {
+    "src": "/images/client-gallery/gallery-01.webp",
+    "sourceName": "IMG_9873.HEIC",
+    "width": 2200,
+    "height": 2933,
+    "orientation": "portrait"
+  },
+  {
+    "src": "/images/client-gallery/gallery-02.webp",
+    "sourceName": "IMG_9941.HEIC",
+    "width": 2200,
+    "height": 2933,
+    "orientation": "portrait"
+  },
+  {
+    "src": "/images/client-gallery/gallery-03.webp",
+    "sourceName": "IMG_9953.HEIC",
+    "width": 2200,
+    "height": 1650,
+    "orientation": "landscape"
+  },
+  {
+    "src": "/images/client-gallery/gallery-04.webp",
+    "sourceName": "IMG_9956.HEIC",
+    "width": 2200,
+    "height": 1650,
+    "orientation": "landscape"
+  },
+  {
+    "src": "/images/client-gallery/gallery-05.webp",
+    "sourceName": "IMG_9961.HEIC",
+    "width": 2200,
+    "height": 2933,
+    "orientation": "portrait"
+  },
+  {
+    "src": "/images/client-gallery/gallery-06.webp",
+    "sourceName": "IMG_9962.HEIC",
+    "width": 2200,
+    "height": 2933,
+    "orientation": "portrait"
+  },
+  {
+    "src": "/images/client-gallery/gallery-07.webp",
+    "sourceName": "IMG_9970.HEIC",
+    "width": 2200,
+    "height": 2933,
+    "orientation": "portrait"
+  },
+  {
+    "src": "/images/client-gallery/gallery-08.webp",
+    "sourceName": "IMG_9982.HEIC",
+    "width": 2200,
+    "height": 1650,
+    "orientation": "landscape"
+  },
+  {
+    "src": "/images/client-gallery/gallery-09.webp",
+    "sourceName": "IMG_9994.HEIC",
+    "width": 2200,
+    "height": 1650,
+    "orientation": "landscape"
+  },
+  {
+    "src": "/images/client-gallery/gallery-10.webp",
+    "sourceName": "IMG_9995.HEIC",
+    "width": 2200,
+    "height": 1650,
+    "orientation": "landscape"
+  }
+]

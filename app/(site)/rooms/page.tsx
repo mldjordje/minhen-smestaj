@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { getRoomsData } from "@/lib/admin-data";
+import { PublicBookingForm } from "@/components/public-booking-form";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
 
-export default function RoomsPage() {
+export default async function RoomsPage() {
+  const rooms = await getRoomsData();
+
   return (
     <>
       <section
@@ -37,7 +41,29 @@ export default function RoomsPage() {
             </h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
-          <PublicRoomsGrid />
+          <PublicRoomsGrid rooms={rooms} />
+        </div>
+        <div className="cs_height_120 cs_height_lg_80" />
+      </section>
+
+      <section className="room-booking-section">
+        <div className="cs_height_120 cs_height_lg_80" />
+        <div className="container">
+          <div className="room-booking-layout">
+            <div className="room-booking-copy">
+              <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
+                DIREKTNA REZERVACIJA
+              </p>
+              <h2 className="cs_section_title cs_fs_64 mb-0">
+                Posaljite upit i izaberite sobu koja vam odgovara
+              </h2>
+              <p className="cs_fs_20 cs_light room-booking-copy__text">
+                Na jednom mestu mozete odabrati konkretnu sobu, uneti datume i broj gostiju.
+                Za svaku sobu postoji i zasebna stranica sa njenim kalendarom dostupnosti.
+              </p>
+            </div>
+            <PublicBookingForm rooms={rooms} />
+          </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
       </section>

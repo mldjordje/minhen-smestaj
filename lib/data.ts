@@ -1,4 +1,4 @@
-import { Booking, CleaningTask, Room, TeamMember } from "@/lib/types";
+import { Booking, CleaningTask, Inquiry, Room, RoomChannelMapping, TeamMember } from "@/lib/types";
 
 export const rooms: Room[] = [
   {
@@ -105,6 +105,31 @@ export const cleaningTasks: CleaningTask[] = [
   }
 ];
 
+export const inquiries: Inquiry[] = [
+  {
+    id: "inq-101",
+    guestName: "Milos Petrovic",
+    phone: "+381 63 111 222",
+    requestedRoomType: "Dvokrevetna soba",
+    checkIn: "2026-03-18",
+    checkOut: "2026-03-25",
+    guests: 2,
+    message: "Treba nam mirnija soba i parking za kombi.",
+    status: "new"
+  },
+  {
+    id: "inq-102",
+    guestName: "Nikola Markovic",
+    phone: "+387 61 555 444",
+    requestedRoomType: "Jednokrevetna soba",
+    checkIn: "2026-03-20",
+    checkOut: "2026-03-28",
+    guests: 1,
+    message: "Dolazim zbog posla, potreban mi je duzi boravak.",
+    status: "contacted"
+  }
+];
+
 export const teamMembers: TeamMember[] = [
   {
     id: "usr-1",
@@ -126,12 +151,37 @@ export const teamMembers: TeamMember[] = [
   }
 ];
 
+export const roomChannelMappings: RoomChannelMapping[] = [
+  {
+    id: "map-101",
+    roomId: "rm-204",
+    provider: "Booking.com",
+    externalRoomId: "bk-room-204",
+    externalRoomName: "Doppelzimmer Comfort",
+    exportUrl: "https://admin.booking.com/hotel/hoteladmin/ical.html?room=204&direction=export",
+    importUrl: "https://admin.booking.com/hotel/hoteladmin/ical.html?room=204&direction=import",
+    syncEnabled: true,
+    lastSyncedAt: "2026-03-16T08:45:00.000Z"
+  },
+  {
+    id: "map-102",
+    roomId: "rm-101",
+    provider: "Booking.com",
+    externalRoomId: "",
+    externalRoomName: "",
+    exportUrl: "",
+    importUrl: "",
+    syncEnabled: false,
+    lastSyncedAt: null
+  }
+];
+
 export const bookingSyncSummary = {
   provider: "Booking.com",
   lastSuccessfulSync: "2026-03-14 08:45",
   mode: "manual-stub",
   pendingUpdates: 2,
-  note: "Sledeci korak je povezivanje putem Booking.com iCal ili partnerskog API pristupa."
+  note: "Sledeci korak je povezivanje internih soba sa Booking.com sobama i unos iCal linkova po sobi."
 };
 
 export const legacyGallery = [

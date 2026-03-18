@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { bookings } from "@/lib/data";
+import { getBookingsData, getRoomsData } from "@/lib/admin-data";
+import { getLandingGallery } from "@/lib/site-gallery";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
 
 const heroHighlights = [
@@ -65,7 +66,12 @@ const whyChooseUs = [
   }
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [bookings, rooms, landingGallery] = await Promise.all([
+    getBookingsData(),
+    getRoomsData(),
+    getLandingGallery()
+  ]);
   const arrivalsToday = bookings.filter((booking) => booking.status === "arriving").length;
 
   return (
@@ -128,7 +134,7 @@ export default function HomePage() {
               <span className="cs_accent_color cs_ternary_font"> domaći</span>
             </h2>
             <div className="cs_card_thumbnail">
-              <img src="/images/legacy/jagdschloessl-1.jpg" alt="Property exterior" />
+              <img src={landingGallery.detailImage} alt="Fotografija prostora za smestaj" />
             </div>
             <p className="cs_card_subtitle cs_fs_20 cs_light">
               Bilo da dolazite u Minhen zbog posla, projekta ili odmora, kod nas ćete
@@ -145,6 +151,57 @@ export default function HomePage() {
                     <h3 className="cs_iconbox_title cs_fs_32 cs_mb_16">{item.text}</h3>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="cs_height_120 cs_height_lg_80" />
+      </section>
+
+      <section className="home-showcase-section">
+        <div className="cs_height_120 cs_height_lg_80" />
+        <div className="container">
+          <div className="cs_section_heading cs_style_1 cs_type_1">
+            <div className="cs_section_heading_left">
+              <p className="cs_section_subtitle cs_fs_24 cs_accent_color text-uppercase cs_mb_16">
+                IZDVOJENO IZ SMESTAJA
+              </p>
+              <h2 className="cs_section_title cs_fs_64 mb-0">
+                Pogledajte kako izgleda boravak kod nas
+              </h2>
+            </div>
+            <div className="cs_section_heading_right">
+              <p className="cs_fs_20 cs_light mb-0">
+                Dodate fotografije smo rasporedili tako da na pocetnoj odmah pokazu ambijent
+                soba i kvalitet prostora.
+              </p>
+            </div>
+          </div>
+          <div className="cs_height_66 cs_height_lg_45" />
+          <div className="home-showcase-grid">
+            <article className="home-showcase-card home-showcase-card--large">
+              <img
+                className="home-showcase-card__image"
+                src={landingGallery.showcaseImages[0].src}
+                alt={landingGallery.showcaseImages[0].alt}
+              />
+              <div className="home-showcase-card__overlay">
+                <p className="home-showcase-card__eyebrow">Sobe</p>
+                <h3>{landingGallery.showcaseImages[0].title}</h3>
+                <p>{landingGallery.showcaseImages[0].text}</p>
+              </div>
+            </article>
+
+            <div className="home-showcase-stack">
+              {landingGallery.showcaseImages.slice(1).map((item) => (
+                <article key={item.src} className="home-showcase-card">
+                  <img className="home-showcase-card__image" src={item.src} alt={item.alt} />
+                  <div className="home-showcase-card__overlay">
+                    <p className="home-showcase-card__eyebrow">Ambijent</p>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -250,7 +307,7 @@ export default function HomePage() {
             <div className="col-lg-6">
               <div className="cs_card cs_style_2">
                 <div className="cs_card_thumbnail cs_zoom position-relative overflow-hidden">
-                  <img src="/images/legacy/jagdschloessl-5.jpg" alt="Lokacija objekta" />
+                  <img src={landingGallery.locationImage} alt="Fotografija smestaja" />
                 </div>
                 <div className="cs_card_info cs_white_bg">
                   <h3 className="cs_card_title cs_fs_32 cs_mb_2">Mirno okruženje za odmor</h3>
@@ -319,7 +376,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="cs_height_66 cs_height_lg_45" />
-          <PublicRoomsGrid />
+          <PublicRoomsGrid rooms={rooms} />
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
       </section>
@@ -379,7 +436,7 @@ export default function HomePage() {
             <h2 className="cs_section_title cs_fs_64 mb-0">Fotografije objekta i soba</h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
-          <PublicLegacyGallery />
+          <PublicLegacyGallery items={landingGallery.galleryImages} />
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
       </section>

@@ -7,6 +7,7 @@ type AdminLayoutProps = {
 const links = [
   { href: "/", label: "Nazad na sajt" },
   { href: "/admin/owner", label: "Owner" },
+  { href: "/admin/owner/booking-sync", label: "Booking.com guide" },
   { href: "/admin/staff", label: "Staff" }
 ];
 

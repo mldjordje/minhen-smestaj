@@ -14,6 +14,18 @@ export type Room = {
   shortDescription: string;
 };
 
+export type RoomChannelMapping = {
+  id: string;
+  roomId: string;
+  provider: "Booking.com";
+  externalRoomId: string;
+  externalRoomName: string;
+  exportUrl: string;
+  importUrl: string;
+  syncEnabled: boolean;
+  lastSyncedAt?: string | null;
+};
+
 export type Booking = {
   id: string;
   guestName: string;
@@ -39,4 +51,16 @@ export type TeamMember = {
   name: string;
   role: "owner" | "cleaner" | "host";
   shift: string;
+};
+
+export type Inquiry = {
+  id: string;
+  guestName: string;
+  phone: string;
+  requestedRoomType: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  message: string;
+  status: "new" | "contacted" | "converted" | "closed";
 };

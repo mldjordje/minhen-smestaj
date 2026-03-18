@@ -8,3 +8,7 @@ out
 *.log
 admintemplate/
 webshop-html-template/
+heic/
+
+.vercel
+.env*.local

@@ -14,6 +14,9 @@ export default function AdminIndexPage() {
           <Link href="/admin/owner" className="primary-button">
             Owner panel
           </Link>
+          <Link href="/admin/owner/booking-sync" className="secondary-button">
+            Booking.com guide
+          </Link>
           <Link href="/admin/staff" className="secondary-button">
             Staff panel
           </Link>
