@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { writeActivityLog } from "@/lib/activity-log";
+import { isValidDateRange } from "@/lib/calendar-admin";
 import { db } from "@/lib/db";
 import { getRoomsData } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
@@ -35,6 +37,16 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isValidDateRange(payload.checkIn, payload.checkOut)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Datumi boravka nisu ispravni."
+        },
+        { status: 400 }
+      );
+    }
+
     const rooms = await getRoomsData();
     const selectedRoom = rooms.find((room) => room.slug === payload.roomSlug);
 
@@ -47,6 +59,8 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+
+    const inquiryId = createInquiryId();
 
     if (db) {
       await db`
@@ -61,7 +75,7 @@ export async function POST(request: Request) {
           message,
           status
         ) values (
-          ${createInquiryId()},
+          ${inquiryId},
           ${payload.guestName},
           ${payload.phone},
           ${getRoomDisplayName(selectedRoom)},
@@ -72,6 +86,20 @@ export async function POST(request: Request) {
           ${"new"}
         )
       `;
+
+      await writeActivityLog({
+        action: "created",
+        actor: "public-site",
+        entityId: inquiryId,
+        entityType: "inquiry",
+        message: `Stigao je novi javni upit za ${getRoomDisplayName(selectedRoom)}.`,
+        metadata: {
+          checkIn: payload.checkIn,
+          checkOut: payload.checkOut,
+          guests: Number(payload.guests || 1),
+          roomSlug: payload.roomSlug
+        }
+      });
     }
 
     return NextResponse.json({

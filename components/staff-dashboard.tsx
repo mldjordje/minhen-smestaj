@@ -37,8 +37,8 @@ export function StaffDashboard({
         <p className="eyebrow">Staff operations</p>
         <h1>Ciscenje soba, uvodjenje gostiju i blokade termina na jednom mestu</h1>
         <p>
-          Staff sada ima isti operativni kalendar kao owner, pa moze da blokira termin
-          ili unese rucnu rezervaciju za konkretnu sobu bez izlaska iz admina.
+          Staff sada ima isti operativni kalendar kao owner, pa moze da blokira termin,
+          unese rucnu rezervaciju i menja postojeca zauzeca bez izlaska iz admina.
         </p>
         <div className="stats-row">
           <div className="stat-card">

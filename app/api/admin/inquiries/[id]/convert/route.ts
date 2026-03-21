@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { writeActivityLog } from "@/lib/activity-log";
+import { hasBlockConflict, hasReservationConflict, normalizeDateValue, roomExists } from "@/lib/calendar-admin";
 import { db } from "@/lib/db";
 
 type RouteContext = {
@@ -15,14 +17,6 @@ type InquiryRow = {
   id: string;
   status: "new" | "contacted" | "converted" | "closed";
 };
-
-function normalizeDateValue(value: Date | string) {
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  return value;
-}
 
 function createReservationId() {
   return `dir-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -52,6 +46,16 @@ export async function POST(request: Request, context: RouteContext) {
           message: "Izaberite sobu za potvrdu rezervacije."
         },
         { status: 400 }
+      );
+    }
+
+    if (!(await roomExists(payload.roomId))) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Izabrana soba nije pronadjena."
+        },
+        { status: 404 }
       );
     }
 
@@ -87,19 +91,21 @@ export async function POST(request: Request, context: RouteContext) {
     const checkIn = normalizeDateValue(inquiry.check_in);
     const checkOut = normalizeDateValue(inquiry.check_out);
 
-    const conflictingReservations = await db<{ id: string }[]>`
-      select id
-      from reservations
-      where room_id = ${payload.roomId}
-        and daterange(check_in, check_out, '[)') && daterange(${checkIn}::date, ${checkOut}::date, '[)')
-      limit 1
-    `;
-
-    if (conflictingReservations.length > 0) {
+    if (await hasReservationConflict(payload.roomId, checkIn, checkOut)) {
       return NextResponse.json(
         {
           ok: false,
           message: "Izabrana soba je vec zauzeta u tom terminu."
+        },
+        { status: 409 }
+      );
+    }
+
+    if (await hasBlockConflict(payload.roomId, checkIn, checkOut)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Izabrana soba je blokirana u tom terminu."
         },
         { status: 409 }
       );
@@ -134,6 +140,32 @@ export async function POST(request: Request, context: RouteContext) {
       set status = ${"converted"}
       where id = ${id}
     `;
+
+    await writeActivityLog({
+      action: "converted",
+      actor: "owner",
+      entityId: id,
+      entityType: "inquiry",
+      message: "Upit je pretvoren u direktnu rezervaciju.",
+      metadata: {
+        reservationId,
+        roomId: payload.roomId
+      }
+    });
+
+    await writeActivityLog({
+      action: "created",
+      actor: "owner",
+      entityId: reservationId,
+      entityType: "reservation",
+      message: `Direktna rezervacija za ${inquiry.guest_name} je kreirana iz upita.`,
+      metadata: {
+        checkIn,
+        checkOut,
+        guests: inquiry.guests,
+        roomId: payload.roomId
+      }
+    });
 
     return NextResponse.json({
       ok: true,

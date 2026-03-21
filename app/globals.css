@@ -258,7 +258,7 @@ textarea {
 .stats-band,
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
 }
 
@@ -1196,6 +1196,80 @@ textarea {
   padding: 14px 16px;
 }
 
+.interactive-room-calendar__list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.calendar-entry-section {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.calendar-entry-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.calendar-entry-section__head span {
+  color: var(--muted);
+}
+
+.calendar-entry-list {
+  display: grid;
+  gap: 12px;
+}
+
+.calendar-entry-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.calendar-entry-card--editing {
+  background: rgba(255, 249, 241, 0.92);
+}
+
+.calendar-entry-card strong,
+.calendar-entry-card span {
+  display: block;
+}
+
+.calendar-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.calendar-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.calendar-entry-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.calendar-entry-empty {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--muted);
+}
+
 .room-detail-section {
   background:
     radial-gradient(circle at top right, rgba(216, 157, 98, 0.12), transparent 25%),
@@ -1766,6 +1840,10 @@ textarea {
   .room-detail-gallery__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .interactive-room-calendar__list-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1813,6 +1891,7 @@ textarea {
 
   .public-booking-form__grid,
   .interactive-room-calendar__grid,
+  .interactive-room-calendar__list-grid,
   .room-detail-copy__header,
   .room-detail-gallery__grid {
     grid-template-columns: 1fr;

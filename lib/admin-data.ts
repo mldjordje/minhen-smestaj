@@ -9,6 +9,7 @@ import {
   teamMembers as demoTeamMembers
 } from "@/lib/data";
 import {
+  ActivityLogEntry,
   Booking,
   CleaningTask,
   Inquiry,
@@ -59,6 +60,22 @@ function normalizeDateTimeValue(value: Date | string | null) {
 
   if (value instanceof Date) {
     return value.toISOString();
+  }
+
+  return value;
+}
+
+function normalizeMetadataValue(value: ActivityLogRow["metadata"]) {
+  if (!value) {
+    return {};
+  }
+
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
   }
 
   return value;
@@ -121,6 +138,17 @@ type TeamMemberRow = {
   name: string;
   role: TeamMember["role"];
   shift: string;
+};
+
+type ActivityLogRow = {
+  action: string;
+  actor: string;
+  created_at: Date | string;
+  entity_id: string;
+  entity_type: ActivityLogEntry["entityType"];
+  id: number | string;
+  message: string;
+  metadata: Record<string, unknown> | string | null;
 };
 
 type RoomChannelMappingRow = {
@@ -444,4 +472,46 @@ export async function getBookingSyncSummary(
         ? "Aktivne mape soba postoje i spremne su za Booking.com sync."
         : "Nijedna soba jos nije povezana sa Booking.com mapiranjem."
   };
+}
+
+export async function getActivityLogData(options?: DataOptions) {
+  const allowDemoFallback = shouldUseDemoFallback(options);
+
+  if (!db) {
+    return [];
+  }
+
+  try {
+    const activityRows = await db<ActivityLogRow[]>`
+      select id, entity_type, entity_id, action, actor, message, metadata, created_at
+      from activity_log
+      order by created_at desc
+      limit 20
+    `;
+
+    if (activityRows.length === 0 && allowDemoFallback) {
+      return [];
+    }
+
+    return activityRows.map((entry) => ({
+      id: String(entry.id),
+      entityType: entry.entity_type,
+      entityId: entry.entity_id,
+      action: entry.action,
+      actor: entry.actor,
+      message: entry.message,
+      metadata: normalizeMetadataValue(entry.metadata),
+      createdAt: normalizeDateTimeValue(entry.created_at) ?? new Date().toISOString()
+    }));
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !("code" in error) ||
+      !["42P01", "26000"].includes(String(error.code))
+    ) {
+      console.error("Activity log query failed", error);
+    }
+
+    return [];
+  }
 }

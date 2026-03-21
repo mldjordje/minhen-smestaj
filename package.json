@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "node --env-file=.env.local scripts/seed-neon.mjs",
+    "db:migrate-activity-log": "node --env-file=.env.local scripts/migrate-activity-log.mjs",
     "db:migrate-room-identities": "node --env-file=.env.local scripts/migrate-room-identities.mjs",
     "images:convert": "node scripts/convert-heic-to-webp.mjs"
   },

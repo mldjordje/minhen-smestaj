@@ -1,5 +1,6 @@
 import { OwnerDashboard } from "@/components/owner-dashboard";
 import {
+  getActivityLogData,
   getBookingSyncSummary,
   getBookingsData,
   getInquiriesData,
@@ -9,17 +10,19 @@ import {
 } from "@/lib/admin-data";
 
 export default async function OwnerAdminPage() {
-  const [rooms, bookings, inquiries, roomChannelMappings, roomBlocks, integrationSummary] = await Promise.all([
+  const [rooms, bookings, inquiries, roomChannelMappings, roomBlocks, integrationSummary, activityLog] = await Promise.all([
     getRoomsData({ allowDemoFallback: false }),
     getBookingsData({ allowDemoFallback: false }),
     getInquiriesData({ allowDemoFallback: false }),
     getRoomChannelMappingsData({ allowDemoFallback: false }),
     getRoomBlocksData({ allowDemoFallback: false }),
-    getBookingSyncSummary({ allowDemoFallback: false })
+    getBookingSyncSummary({ allowDemoFallback: false }),
+    getActivityLogData({ allowDemoFallback: false })
   ]);
 
   return (
     <OwnerDashboard
+      activityLog={activityLog}
       bookings={bookings}
       inquiries={inquiries}
       integrationSummary={integrationSummary}

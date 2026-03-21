@@ -65,6 +65,19 @@ export type TeamMember = {
 
 export type InquiryStatus = "new" | "contacted" | "converted" | "closed";
 
+export type ActivityLogEntityType = "inquiry" | "reservation" | "room_block";
+
+export type ActivityLogEntry = {
+  id: string;
+  action: string;
+  actor: string;
+  createdAt: string;
+  entityId: string;
+  entityType: ActivityLogEntityType;
+  message: string;
+  metadata: Record<string, unknown>;
+};
+
 export type Inquiry = {
   id: string;
   guestName: string;

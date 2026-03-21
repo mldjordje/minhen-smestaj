@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { writeActivityLog } from "@/lib/activity-log";
+import { hasBlockConflict, hasReservationConflict, isValidDateRange, roomExists } from "@/lib/calendar-admin";
 import { db } from "@/lib/db";
 import { Booking, RoomBlock } from "@/lib/types";
 
@@ -10,6 +12,7 @@ type CalendarEventPayload = {
   guests?: number;
   notes?: string;
   roomId?: string;
+  status?: RoomBlock["status"];
   type?: "reservation" | "block";
 };
 
@@ -19,48 +22,6 @@ function createReservationId() {
 
 function createRoomBlockId() {
   return `blk-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-}
-
-function isValidDateRange(checkIn?: string, checkOut?: string) {
-  return Boolean(checkIn && checkOut && checkIn < checkOut);
-}
-
-async function roomExists(roomId: string) {
-  const sql = db!;
-  const roomRows = await sql<{ id: string }[]>`
-    select id
-    from rooms
-    where id = ${roomId}
-    limit 1
-  `;
-
-  return roomRows.length > 0;
-}
-
-async function hasReservationConflict(roomId: string, checkIn: string, checkOut: string) {
-  const sql = db!;
-  const matchingReservations = await sql<{ id: string }[]>`
-    select id
-    from reservations
-    where room_id = ${roomId}
-      and daterange(check_in, check_out, '[)') && daterange(${checkIn}::date, ${checkOut}::date, '[)')
-    limit 1
-  `;
-
-  return matchingReservations.length > 0;
-}
-
-async function hasBlockConflict(roomId: string, checkIn: string, checkOut: string) {
-  const sql = db!;
-  const matchingBlocks = await sql<{ id: string }[]>`
-    select id
-    from room_blocks
-    where room_id = ${roomId}
-      and daterange(check_in, check_out, '[)') && daterange(${checkIn}::date, ${checkOut}::date, '[)')
-    limit 1
-  `;
-
-  return matchingBlocks.length > 0;
 }
 
 export async function POST(request: Request) {
@@ -164,6 +125,20 @@ export async function POST(request: Request) {
         )
       `;
 
+      await writeActivityLog({
+        action: "created",
+        actor: payload.createdBy?.trim() || "admin",
+        entityId: reservation.id,
+        entityType: "reservation",
+        message: `Rucna rezervacija za ${reservation.guestName} je dodata u kalendar.`,
+        metadata: {
+          checkIn: reservation.checkIn,
+          checkOut: reservation.checkOut,
+          guests: reservation.guests,
+          roomId: reservation.roomId
+        }
+      });
+
       return NextResponse.json({
         ok: true,
         type: "reservation",
@@ -179,7 +154,7 @@ export async function POST(request: Request) {
       checkOut,
       reason: payload.notes?.trim() || "Rucno blokiran termin",
       createdBy: payload.createdBy?.trim() || "admin",
-      status: "blocked"
+      status: payload.status === "maintenance" ? "maintenance" : "blocked"
     };
 
     await db`
@@ -201,6 +176,20 @@ export async function POST(request: Request) {
         ${roomBlock.status}
       )
     `;
+
+    await writeActivityLog({
+      action: "created",
+      actor: roomBlock.createdBy,
+      entityId: roomBlock.id,
+      entityType: "room_block",
+      message: `Blokada termina je dodata za sobu ${roomBlock.roomId}.`,
+      metadata: {
+        checkIn: roomBlock.checkIn,
+        checkOut: roomBlock.checkOut,
+        reason: roomBlock.reason,
+        roomId: roomBlock.roomId
+      }
+    });
 
     return NextResponse.json({
       ok: true,

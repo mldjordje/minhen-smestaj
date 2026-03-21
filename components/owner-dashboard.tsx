@@ -2,11 +2,19 @@
 
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AdminRoomCalendar } from "@/components/admin-room-calendar";
 import type { AdminBookingSyncSummary } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
-import { Booking, Inquiry, InquiryStatus, Room, RoomBlock, RoomChannelMapping } from "@/lib/types";
+import {
+  ActivityLogEntry,
+  Booking,
+  Inquiry,
+  InquiryStatus,
+  Room,
+  RoomBlock,
+  RoomChannelMapping
+} from "@/lib/types";
 
 const initialForm = {
   roomNumber: "",
@@ -44,6 +52,7 @@ type MappingDraft = {
 };
 
 type OwnerDashboardProps = {
+  activityLog: ActivityLogEntry[];
   bookings: Booking[];
   inquiries: Inquiry[];
   integrationSummary: AdminBookingSyncSummary;
@@ -96,6 +105,20 @@ function isActiveInquiryStatus(status: InquiryStatus) {
   return status === "new" || status === "contacted";
 }
 
+function buildInquiryRoomSelection(rooms: Room[], inquiries: Inquiry[], current?: Record<string, string>) {
+  return Object.fromEntries(
+    inquiries.map((inquiry) => {
+      const matchingRoom =
+        rooms.find(
+          (room) =>
+            room.name === inquiry.requestedRoomType || getRoomDisplayName(room) === inquiry.requestedRoomType
+        ) ?? rooms[0];
+
+      return [inquiry.id, current?.[inquiry.id] ?? matchingRoom?.id ?? ""];
+    })
+  );
+}
+
 function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "success") {
   if (status === "submitting") {
     switch (action) {
@@ -119,6 +142,7 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
 }
 
 export function OwnerDashboard({
+  activityLog: initialActivityLog,
   bookings: initialBookings,
   inquiries: initialInquiries,
   integrationSummary,
@@ -127,6 +151,7 @@ export function OwnerDashboard({
   rooms: initialRooms
 }: OwnerDashboardProps) {
   const [form, setForm] = useState(initialForm);
+  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>(initialActivityLog);
   const [localBookings, setLocalBookings] = useState<Booking[]>(initialBookings);
   const [localInquiries, setLocalInquiries] = useState<Inquiry[]>(initialInquiries);
   const [localRoomBlocks, setLocalRoomBlocks] = useState<RoomBlock[]>(initialRoomBlocks);
@@ -137,18 +162,7 @@ export function OwnerDashboard({
   );
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [inquiryRoomSelection, setInquiryRoomSelection] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      initialInquiries.map((inquiry) => {
-        const matchingRoom =
-          initialRooms.find(
-            (room) =>
-              room.name === inquiry.requestedRoomType ||
-              getRoomDisplayName(room) === inquiry.requestedRoomType
-          ) ?? initialRooms[0];
-
-        return [inquiry.id, matchingRoom?.id ?? ""];
-      })
-    )
+    buildInquiryRoomSelection(initialRooms, initialInquiries)
   );
   const [inquiryActionState, setInquiryActionState] = useState<Record<string, InquiryActionState>>(
     {}
@@ -298,6 +312,54 @@ export function OwnerDashboard({
     }));
   }
 
+  const refreshOwnerFeed = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/owner-feed", {
+        method: "GET",
+        cache: "no-store"
+      });
+
+      const result = (await response.json()) as
+        | {
+            ok: true;
+            activityLog: ActivityLogEntry[];
+            inquiries: Inquiry[];
+          }
+        | {
+            ok: false;
+          };
+
+      if (!response.ok || !result.ok) {
+        return;
+      }
+
+      setLocalInquiries(result.inquiries);
+      setActivityLog(result.activityLog);
+      setInquiryRoomSelection((currentValue) =>
+        buildInquiryRoomSelection(localRooms, result.inquiries, currentValue)
+      );
+    } catch (error) {
+      console.error("Owner feed refresh failed", error);
+    }
+  }, [localRooms]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      void refreshOwnerFeed();
+    }, 15000);
+
+    const handleWindowFocus = () => {
+      void refreshOwnerFeed();
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [refreshOwnerFeed]);
+
   function updateLocalInquiryStatus(inquiryId: string, nextStatus: InquiryStatus) {
     setLocalInquiries((currentValue) =>
       currentValue.map((inquiry) =>
@@ -355,6 +417,7 @@ export function OwnerDashboard({
         message: result.message
       }
     }));
+    await refreshOwnerFeed();
   }
 
   async function handleConvertInquiry(inquiryId: string) {
@@ -424,6 +487,7 @@ export function OwnerDashboard({
         message: result.message
       }
     }));
+    await refreshOwnerFeed();
   }
 
   function handleMappingFieldChange(
@@ -517,8 +581,8 @@ export function OwnerDashboard({
         <p className="eyebrow">Owner control panel</p>
         <h1>Pregled soba, rezervacija, kalendara i Booking.com povezivanja</h1>
         <p>
-          Owner panel sada cuva nove sobe kroz admin API i omogucava da svaka soba dobije
-          svoj Booking.com room mapping pre ukljucivanja sync-a.
+          Owner panel sada automatski osvezava nove upite sa sajta, belezi audit trail i
+          omogucava da svaka soba dobije svoj Booking.com room mapping pre ukljucivanja sync-a.
         </p>
         <div className="stats-row">
           <div className="stat-card">
@@ -536,6 +600,10 @@ export function OwnerDashboard({
           <div className="stat-card">
             <span>Sobe bez mapiranja</span>
             <strong>{roomsWithoutMapping}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Aktivni upiti</span>
+            <strong>{activeInquiries.length}</strong>
           </div>
         </div>
       </section>
@@ -707,6 +775,39 @@ export function OwnerDashboard({
                       {inquiry.status}
                     </span>
                     <span className="inline-note">{inquiry.message}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="dashboard-panel">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Aktivnost</p>
+              <h2>Poslednje izmene u sistemu</h2>
+            </div>
+          </div>
+          {activityLog.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Jos nema audit zapisa</strong>
+              <p>Promene statusa upita, rezervacija i blokada pojavljivace se ovde.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {activityLog.map((entry) => (
+                <div key={entry.id} className="table-row">
+                  <div>
+                    <strong>{entry.message}</strong>
+                    <span>
+                      {entry.entityType} | {entry.action}
+                    </span>
+                  </div>
+                  <div>{entry.actor}</div>
+                  <div>{new Date(entry.createdAt).toLocaleString("sr-RS")}</div>
+                  <div>
+                    <span className="inline-note">{entry.entityId}</span>
                   </div>
                 </div>
               ))}

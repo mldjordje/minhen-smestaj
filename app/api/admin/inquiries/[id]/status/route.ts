@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { writeActivityLog } from "@/lib/activity-log";
 import { db } from "@/lib/db";
 import type { InquiryStatus } from "@/lib/types";
 
@@ -95,6 +96,17 @@ export async function POST(request: Request, context: RouteContext) {
       set status = ${payload.status}
       where id = ${id}
     `;
+
+    await writeActivityLog({
+      action: "status-updated",
+      actor: "owner",
+      entityId: id,
+      entityType: "inquiry",
+      message: getStatusMessage(payload.status),
+      metadata: {
+        status: payload.status
+      }
+    });
 
     return NextResponse.json({
       ok: true,

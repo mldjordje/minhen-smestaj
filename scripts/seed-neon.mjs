@@ -227,7 +227,21 @@ async function main() {
   const sql = postgres(connectionString, { max: 1 });
 
   try {
+    await sql`
+      create table if not exists activity_log (
+        id bigserial primary key,
+        entity_type text not null,
+        entity_id text not null,
+        action text not null,
+        actor text not null,
+        message text not null,
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now()
+      )
+    `;
+
     await sql.begin(async (transaction) => {
+      await transaction`delete from activity_log`;
       await transaction`delete from room_channel_mappings`;
       await transaction`delete from room_blocks`;
       await transaction`delete from room_amenities`;

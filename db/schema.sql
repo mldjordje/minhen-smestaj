@@ -85,3 +85,14 @@ create table if not exists room_channel_mappings (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create table if not exists activity_log (
+  id bigserial primary key,
+  entity_type text not null,
+  entity_id text not null,
+  action text not null,
+  actor text not null,
+  message text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
