@@ -29,7 +29,7 @@ export function PublicSiteHeader() {
           <div className="cs_main_header_in">
             <div className="cs_main_header_left">
               <Link aria-label="Home page link" className="cs_site_brand site-text-brand" href="/">
-                <span>Jagdschlössl</span>
+                <span>Jagdschlossl</span>
                 <small>Eichenried</small>
               </Link>
             </div>
@@ -39,10 +39,10 @@ export function PublicSiteHeader() {
                   <div className="cs_nav_links_wrap">
                     <ul className="cs_nav_list cs_mp_0">
                       <li>
-                        <Link href="/">Početna</Link>
+                        <Link href="/">Pocetna</Link>
                       </li>
                       <li>
-                        <Link href="/#o-smestaju">O smeštaju</Link>
+                        <Link href="/#o-smestaju">O smestaju</Link>
                       </li>
                       <li>
                         <Link href="/rooms">Sobe</Link>
@@ -89,11 +89,11 @@ export function PublicSiteFooter() {
               className="cs_site_brand site-text-brand site-text-brand-light cs_mb_29"
               href="/"
             >
-              <span>Jagdschlössl</span>
+              <span>Jagdschlossl</span>
               <small>Eichenried</small>
             </Link>
             <p className="mb-0 cs_light">
-              Udoban i pristupačan smeštaj u blizini Minhena za goste iz Srbije,
+              Udoban i pristupacan smestaj u blizini Minhena za goste iz Srbije,
               Bosne, Hrvatske, Crne Gore i regiona.
             </p>
           </div>
@@ -101,10 +101,10 @@ export function PublicSiteFooter() {
             <h3 className="cs_fs_24 cs_white_color cs_mb_24">Navigacija</h3>
             <ul className="cs_footer_menu cs_mp_0">
               <li>
-                <Link href="/">Početna</Link>
+                <Link href="/">Pocetna</Link>
               </li>
               <li>
-                <Link href="/#o-smestaju">O smeštaju</Link>
+                <Link href="/#o-smestaju">O smestaju</Link>
               </li>
               <li>
                 <Link href="/rooms">Sobe</Link>
@@ -119,7 +119,7 @@ export function PublicSiteFooter() {
             <ul className="cs_footer_contact cs_mp_0">
               <li>Eichenried, blizu Minhena</li>
               <li>Viber / WhatsApp: +49 1772078868</li>
-              <li>Pošaljite poruku za slobodne termine</li>
+              <li>Posaljite poruku za slobodne termine</li>
             </ul>
           </div>
         </div>
@@ -135,50 +135,43 @@ type PublicRoomsGridProps = {
 
 export function PublicRoomsGrid({ rooms }: PublicRoomsGridProps) {
   return (
-    <div className="cs_grid cs_style_7">
-      {rooms.map((room, index) => (
-        <div
-          key={room.id}
-          className="cs_card cs_style_2 cs_type_1"
-          data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
-        >
-          <Link href={`/rooms/${room.slug}`}>
-            <div className="cs_card_thumbnail cs_mb_20 position-relative overflow-hidden">
-              <img src={room.image} alt={getRoomDisplayName(room)} />
-              <span className="cs_white_color cs_medium text-uppercase position-absolute">
-                Rezervacija
-              </span>
+    <div className="room-grid public-room-grid">
+      {rooms.map((room) => (
+        <article key={room.id} className="room-card public-room-card">
+          <Link className="public-room-card__media" href={`/rooms/${room.slug}`}>
+            <div className="room-image-wrap">
+              <img className="room-image public-room-card__image" src={room.image} alt={getRoomDisplayName(room)} />
+              <span className={`status-pill status-${room.status}`}>{room.status}</span>
             </div>
           </Link>
-          <div className="cs_card_info p-0">
-            <h3 className="cs_card_title cs_fs_48 cs_mb_15">
-              <Link href={`/rooms/${room.slug}`}>{getRoomDisplayName(room)}</Link>
-            </h3>
-            <p className="cs_card_subtitle cs_mb_24">{room.shortDescription}</p>
-            <div className="cs_horizontal_line cs_border_bg cs_mb_32 cs_mb_lg_24" />
-            <ul className="cs_card_meta_wrapper cs_fs_16 cs_normal cs_mb_32 cs_mb_lg_24 list-unstyled p-0">
-              <li className="cs_card_meta">{room.neighborhood}</li>
-              <li className="cs_card_meta">{room.capacity} gosta</li>
-              <li className="cs_card_meta">{room.beds}</li>
-            </ul>
-            <div className="cs_horizontal_line cs_border_bg cs_mb_24" />
-            <div className="d-flex justify-content-between align-items-center flex-wrap gap-4">
-              <div className="cs_card_price">
-                <span className="cs_fs_16 cs_heading_color">od</span>
-                <span className="cs_fs_40 cs_accent_color cs_normal cs_heading_font">
-                  {room.pricePerNight} EUR/noć
-                </span>
+          <div className="room-card-body">
+            <div className="room-card-header">
+              <div>
+                <p className="eyebrow">{room.neighborhood}</p>
+                <h3>{getRoomDisplayName(room)}</h3>
               </div>
-              <a
-                aria-label="Hotel booking button"
-                className="cs_btn cs_style_1 cs_accent_color cs_fs_20 cs_medium"
-                href={`/rooms/${room.slug}`}
-              >
-                <span>POŠALJI UPIT</span>
-              </a>
+              <strong>{room.pricePerNight} EUR / noc</strong>
+            </div>
+            <p>{room.shortDescription}</p>
+            <div className="meta-row">
+              <span>{room.capacity} gosta</span>
+              <span>{room.beds}</span>
+            </div>
+            <div className="tag-row">
+              {room.amenities.map((amenity) => (
+                <span key={amenity}>{amenity}</span>
+              ))}
+            </div>
+            <div className="public-room-card__actions">
+              <Link className="secondary-button" href={`/rooms/${room.slug}`}>
+                Otvori sobu
+              </Link>
+              <Link className="primary-button" href={`/rooms/${room.slug}#booking`}>
+                Posalji upit
+              </Link>
             </div>
           </div>
-        </div>
+        </article>
       ))}
     </div>
   );

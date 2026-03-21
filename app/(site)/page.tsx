@@ -220,33 +220,24 @@ export default async function HomePage() {
       <section className="cs_heading_bg">
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
-          <div className="cs_section_heading cs_style_1 cs_type_1">
+          <div className="section-heading landing-section-heading landing-section-heading--light">
             <div className="cs_section_heading_left">
-              <p className="cs_section_subtitle cs_fs_24 cs_accent_color text-uppercase cs_mb_16">
-                O SMESTAJU
-              </p>
-              <h2 className="cs_section_title cs_fs_64 cs_white_color mb-0">
-                Gostima su na raspolaganju
-              </h2>
+              <p className="eyebrow">O Smestaju</p>
+              <h2 className="cs_white_color">Gostima su na raspolaganju</h2>
             </div>
-            <div className="cs_section_heading_right">
-              <p className="cs_fs_20 cs_white_color cs_light">
+            <div>
+              <p className="landing-section-heading__text cs_white_color">
                 Jagdschlossl Eichenried je mesto gde se mnogi nasi ljudi iz regiona rado
                 vracaju kada dolaze u Minhen.
               </p>
             </div>
           </div>
-          <div className="cs_height_66 cs_height_lg_45" />
-          <div className="row g-4">
-            {accommodationFeatures.map((item, index) => (
-              <div key={item} className="col-lg-4 col-md-6">
-                <div className="cs_card cs_style_3" data-aos="fade-up" data-aos-delay={index * 100}>
-                  <h3 className="cs_fs_40 cs_mb_20">* {item}</h3>
-                  <p className="mb-0 cs_white_color cs_light">
-                    Prakticna pogodnost za goste koji dolaze na kraci ili duzi boravak.
-                  </p>
-                </div>
-              </div>
+          <div className="landing-feature-grid">
+            {accommodationFeatures.map((item) => (
+              <article key={item} className="landing-feature-card landing-feature-card--light">
+                <strong>{item}</strong>
+                <p>Prakticna pogodnost za goste koji dolaze na kraci ili duzi boravak.</p>
+              </article>
             ))}
           </div>
         </div>
@@ -256,31 +247,29 @@ export default async function HomePage() {
       <section>
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
-          <div className="cs_section_heading cs_style_1 text-center">
-            <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              IDEALNO ZA BORAVAK U MINHENU
-            </p>
-            <h2 className="cs_section_title cs_fs_64 mb-0">Kod nas cesto borave</h2>
+          <div className="section-heading landing-section-heading">
+            <div>
+              <p className="eyebrow">Idealno Za Boravak U Minhenu</p>
+              <h2>Kod nas cesto borave</h2>
+            </div>
+            <div>
+              <p className="landing-section-heading__text">
+                Smestaj je prilagodjen gostima kojima treba jednostavan, brz i pregledan booking proces.
+              </p>
+            </div>
           </div>
-          <div className="cs_height_70 cs_height_lg_45" />
-          <div className="row g-4">
-            {guestTypes.map((item, index) => (
-              <div key={item} className="col-lg-4 col-md-6">
-                <div
-                  className="cs_iconbox cs_style_1 cs_center_column text-center"
-                  data-aos="fade-up"
-                  data-aos-delay={index * 100}
-                >
-                  <div className="cs_iconbox_icon cs_center cs_accent_bg cs_radius_100 cs_mb_24 cs_mb_lg_20">
-                    <img src="/hotel-template/assets/img/icons/user.svg" alt="" />
-                  </div>
-                  <h3 className="cs_iconbox_title cs_fs_40 cs_mb_24 cs_mb_lg_16">{item}</h3>
-                  <p className="cs_iconbox_subtitle mb-0">
-                    Nudimo fleksibilne opcije boravka i prijatnu atmosferu gde se gosti
-                    osecaju kao kod kuce.
-                  </p>
+          <div className="landing-audience-grid">
+            {guestTypes.map((item) => (
+              <article key={item} className="landing-audience-card">
+                <div className="landing-audience-card__icon">
+                  <img src="/hotel-template/assets/img/icons/user.svg" alt="" />
                 </div>
-              </div>
+                <strong>{item}</strong>
+                <p>
+                  Nudimo fleksibilne opcije boravka i prijatnu atmosferu gde se gosti
+                  osecaju kao kod kuce.
+                </p>
+              </article>
             ))}
           </div>
         </div>

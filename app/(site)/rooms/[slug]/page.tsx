@@ -127,7 +127,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
               </div>
             </div>
 
-            <aside className="room-detail-sidebar">
+            <aside className="room-detail-sidebar" id="booking">
               <PublicBookingForm
                 bookings={bookings}
                 defaultRoomSlug={room.slug}
