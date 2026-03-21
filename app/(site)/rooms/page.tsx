@@ -5,9 +5,9 @@ import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-templa
 
 export default async function RoomsPage() {
   const [bookings, roomBlocks, rooms] = await Promise.all([
-    getBookingsData(),
-    getRoomBlocksData(),
-    getRoomsData()
+    getBookingsData({ allowDemoFallback: false }),
+    getRoomBlocksData({ allowDemoFallback: false }),
+    getRoomsData({ allowDemoFallback: false })
   ]);
 
   return (
@@ -45,7 +45,14 @@ export default async function RoomsPage() {
             </h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
-          <PublicRoomsGrid rooms={rooms} />
+          {rooms.length > 0 ? (
+            <PublicRoomsGrid rooms={rooms} />
+          ) : (
+            <div className="admin-empty-state">
+              <strong>Trenutno nema aktivnih soba</strong>
+              <p>Pozovite nas ili posaljite poruku za raspolozive termine.</p>
+            </div>
+          )}
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
       </section>
@@ -66,12 +73,14 @@ export default async function RoomsPage() {
                 Za svaku sobu postoji i zasebna stranica sa njenim kalendarom dostupnosti.
               </p>
             </div>
-            <PublicBookingForm
-              bookings={bookings}
-              roomBlocks={roomBlocks}
-              rooms={rooms}
-              subtitle="Izaberi sobu i odmah proveri dostupnost pre slanja upita."
-            />
+            {rooms.length > 0 ? (
+              <PublicBookingForm
+                bookings={bookings}
+                roomBlocks={roomBlocks}
+                rooms={rooms}
+                subtitle="Izaberi sobu i odmah proveri dostupnost pre potvrde rezervacije."
+              />
+            ) : null}
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />

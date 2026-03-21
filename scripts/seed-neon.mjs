@@ -1,4 +1,30 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import postgres from "postgres";
+
+const users = [
+  {
+    id: "user-owner-demo",
+    email: "owner@example.com",
+    name: "Vlasnik",
+    image: null,
+    role: "owner"
+  },
+  {
+    id: "user-staff-demo",
+    email: "staff@example.com",
+    name: "Recepcija",
+    image: null,
+    role: "staff"
+  },
+  {
+    id: "user-guest-demo",
+    email: "guest@example.com",
+    name: "Test Gost",
+    image: null,
+    role: "guest"
+  }
+];
 
 const rooms = [
   {
@@ -64,7 +90,12 @@ const reservations = [
     checkIn: "2026-03-14",
     checkOut: "2026-03-18",
     status: "checked-in",
-    guests: 2
+    guests: 2,
+    guestUserId: null,
+    contactEmail: null,
+    contactPhone: null,
+    notes: "Imported from Booking.com iCal",
+    channelReference: "booking-204-20260314"
   },
   {
     id: "bk-782",
@@ -74,7 +105,12 @@ const reservations = [
     checkIn: "2026-03-14",
     checkOut: "2026-03-16",
     status: "arriving",
-    guests: 3
+    guests: 3,
+    guestUserId: null,
+    contactEmail: null,
+    contactPhone: null,
+    notes: "Imported from Booking.com iCal",
+    channelReference: "booking-305-20260314"
   },
   {
     id: "bk-783",
@@ -84,7 +120,12 @@ const reservations = [
     checkIn: "2026-03-15",
     checkOut: "2026-03-20",
     status: "confirmed",
-    guests: 1
+    guests: 1,
+    guestUserId: null,
+    contactEmail: "stefan@example.com",
+    contactPhone: "+38163111222",
+    notes: "Direktna rezervacija bez online naplate.",
+    channelReference: null
   },
   {
     id: "bk-784",
@@ -94,7 +135,12 @@ const reservations = [
     checkIn: "2026-03-21",
     checkOut: "2026-03-24",
     status: "confirmed",
-    guests: 2
+    guests: 2,
+    guestUserId: "user-guest-demo",
+    contactEmail: "guest@example.com",
+    contactPhone: "+381641234567",
+    notes: "Test direktni booking preko sajta.",
+    channelReference: null
   }
 ];
 
@@ -199,10 +245,12 @@ const roomChannelMappings = [
     provider: "Booking.com",
     externalRoomId: "bk-room-204",
     externalRoomName: "Doppelzimmer Comfort",
-    exportUrl: "https://admin.booking.com/hotel/hoteladmin/ical.html?room=204&direction=export",
-    importUrl: "https://admin.booking.com/hotel/hoteladmin/ical.html?room=204&direction=import",
+    exportUrl: "http://localhost:3000/api/booking-sync/rooms/rm-204",
+    importUrl: "https://example.com/booking-room-204.ics",
     syncEnabled: true,
-    lastSyncedAt: "2026-03-16T08:45:00.000Z"
+    lastSyncedAt: "2026-03-16T08:45:00.000Z",
+    lastSyncStatus: "success",
+    lastSyncError: null
   },
   {
     id: "map-102",
@@ -210,10 +258,12 @@ const roomChannelMappings = [
     provider: "Booking.com",
     externalRoomId: "",
     externalRoomName: "",
-    exportUrl: "",
+    exportUrl: "http://localhost:3000/api/booking-sync/rooms/rm-101",
     importUrl: "",
     syncEnabled: false,
-    lastSyncedAt: null
+    lastSyncedAt: null,
+    lastSyncStatus: "idle",
+    lastSyncError: null
   }
 ];
 
@@ -224,32 +274,31 @@ async function main() {
     throw new Error("POSTGRES_URL ili DATABASE_URL nije definisan.");
   }
 
+  const schemaPath = path.join(process.cwd(), "db", "schema.sql");
+  const schemaSql = await fs.readFile(schemaPath, "utf8");
   const sql = postgres(connectionString, { max: 1 });
 
   try {
-    await sql`
-      create table if not exists activity_log (
-        id bigserial primary key,
-        entity_type text not null,
-        entity_id text not null,
-        action text not null,
-        actor text not null,
-        message text not null,
-        metadata jsonb not null default '{}'::jsonb,
-        created_at timestamptz not null default now()
-      )
-    `;
+    await sql.unsafe(schemaSql);
 
     await sql.begin(async (transaction) => {
       await transaction`delete from activity_log`;
       await transaction`delete from room_channel_mappings`;
       await transaction`delete from room_blocks`;
-      await transaction`delete from room_amenities`;
       await transaction`delete from reservations`;
       await transaction`delete from inquiries`;
       await transaction`delete from cleaning_tasks`;
       await transaction`delete from team_members`;
+      await transaction`delete from room_amenities`;
       await transaction`delete from rooms`;
+      await transaction`delete from users`;
+
+      for (const user of users) {
+        await transaction`
+          insert into users (id, email, name, image, role)
+          values (${user.id}, ${user.email}, ${user.name}, ${user.image}, ${user.role})
+        `;
+      }
 
       for (const room of rooms) {
         await transaction`
@@ -280,7 +329,20 @@ async function main() {
       for (const reservation of reservations) {
         await transaction`
           insert into reservations (
-            id, guest_name, room_id, source, check_in, check_out, status, guests
+            id,
+            guest_name,
+            room_id,
+            source,
+            check_in,
+            check_out,
+            status,
+            guests,
+            guest_user_id,
+            contact_email,
+            contact_phone,
+            notes,
+            channel_reference,
+            updated_at
           ) values (
             ${reservation.id},
             ${reservation.guestName},
@@ -289,7 +351,13 @@ async function main() {
             ${reservation.checkIn},
             ${reservation.checkOut},
             ${reservation.status},
-            ${reservation.guests}
+            ${reservation.guests},
+            ${reservation.guestUserId},
+            ${reservation.contactEmail},
+            ${reservation.contactPhone},
+            ${reservation.notes},
+            ${reservation.channelReference},
+            now()
           )
         `;
       }
@@ -371,7 +439,9 @@ async function main() {
             export_url,
             import_url,
             sync_enabled,
-            last_synced_at
+            last_synced_at,
+            last_sync_status,
+            last_sync_error
           ) values (
             ${mapping.id},
             ${mapping.roomId},
@@ -381,7 +451,9 @@ async function main() {
             ${mapping.exportUrl},
             ${mapping.importUrl},
             ${mapping.syncEnabled},
-            ${mapping.lastSyncedAt}
+            ${mapping.lastSyncedAt},
+            ${mapping.lastSyncStatus},
+            ${mapping.lastSyncError}
           )
         `;
       }

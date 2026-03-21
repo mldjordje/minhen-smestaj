@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AuthButtons } from "@/components/auth-buttons";
 
 const navigation = [
   { href: "/", label: "Pocetna" },
@@ -66,15 +67,7 @@ export function PublicSiteHeader() {
               ))}
             </nav>
 
-            <a
-              className="public-site-header__cta"
-              href="https://wa.me/491772078868"
-              onClick={closeMenu}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Posalji upit
-            </a>
+            <AuthButtons />
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ type RoomDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  const rooms = await getRoomsData();
+  const rooms = await getRoomsData({ allowDemoFallback: false });
 
   return rooms.map((room) => ({
     slug: room.slug
@@ -24,9 +24,9 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
   const { slug } = await params;
   const [room, rooms, bookings, roomBlocks] = await Promise.all([
     getRoomBySlug(slug),
-    getRoomsData(),
-    getBookingsData(),
-    getRoomBlocksData()
+    getRoomsData({ allowDemoFallback: false }),
+    getBookingsData({ allowDemoFallback: false }),
+    getRoomBlocksData({ allowDemoFallback: false })
   ]);
 
   if (!room) {

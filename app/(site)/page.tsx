@@ -75,9 +75,9 @@ const bookingHighlights = [
 
 export default async function HomePage() {
   const [bookings, roomBlocks, rooms, landingGallery] = await Promise.all([
-    getBookingsData(),
-    getRoomBlocksData(),
-    getRoomsData(),
+    getBookingsData({ allowDemoFallback: false }),
+    getRoomBlocksData({ allowDemoFallback: false }),
+    getRoomsData({ allowDemoFallback: false }),
     getLandingGallery()
   ]);
   const arrivalsToday = bookings.filter((booking) => booking.status === "arriving").length;
@@ -373,7 +373,14 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="cs_height_66 cs_height_lg_45" />
-          <PublicRoomsGrid rooms={rooms} />
+          {rooms.length > 0 ? (
+            <PublicRoomsGrid rooms={rooms} />
+          ) : (
+            <div className="admin-empty-state">
+              <strong>Trenutno nema aktivnih soba</strong>
+              <p>Pisite nam direktno za raspolozive termine.</p>
+            </div>
+          )}
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
       </section>
@@ -416,13 +423,15 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
-            <PublicBookingForm
-              bookings={bookings}
-              roomBlocks={roomBlocks}
-              rooms={rooms}
-              subtitle="Na telefonu ili desktopu mozes odmah da vidis sledecih 14 dana za izabranu sobu."
-              title="Direktan booking upit"
-            />
+            {rooms.length > 0 ? (
+              <PublicBookingForm
+                bookings={bookings}
+                roomBlocks={roomBlocks}
+                rooms={rooms}
+                subtitle="Na telefonu ili desktopu mozes odmah da vidis sledecih 14 dana za izabranu sobu."
+                title="Direktna rezervacija"
+              />
+            ) : null}
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />

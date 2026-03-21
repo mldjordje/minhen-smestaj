@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { writeActivityLog } from "@/lib/activity-log";
+import { requireApiRole } from "@/lib/auth";
 import { hasBlockConflict, hasReservationConflict, isValidDateRange, roomExists } from "@/lib/calendar-admin";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import { Booking } from "@/lib/types";
 
 type RouteContext = {
@@ -32,11 +33,19 @@ type ReservationRow = {
 };
 
 export async function PUT(request: Request, context: RouteContext) {
+  const roleCheck = await requireApiRole(request as never, ["owner", "staff"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json({ ok: false, message: "Baza nije povezana." }, { status: 500 });
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const { id } = await context.params;
     const payload = (await request.json()) as ReservationPayload;
 
@@ -131,7 +140,7 @@ export async function PUT(request: Request, context: RouteContext) {
 
     await writeActivityLog({
       action: "updated",
-      actor: payload.actor?.trim() || "admin",
+      actor: payload.actor?.trim() || roleCheck.user.email || roleCheck.user.role,
       entityId: id,
       entityType: "reservation",
       message: `Rezervacija za ${updatedReservation.guestName} je izmenjena.`,
@@ -163,14 +172,22 @@ export async function PUT(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
+  const roleCheck = await requireApiRole(request as never, ["owner", "staff"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json({ ok: false, message: "Baza nije povezana." }, { status: 500 });
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const { id } = await context.params;
     const url = new URL(request.url);
-    const actor = url.searchParams.get("actor")?.trim() || "admin";
+    const actor = url.searchParams.get("actor")?.trim() || roleCheck.user.email || roleCheck.user.role;
 
     const deletedRows = await db<ReservationRow[]>`
       delete from reservations

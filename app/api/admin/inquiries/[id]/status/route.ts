@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { writeActivityLog } from "@/lib/activity-log";
-import { db } from "@/lib/db";
+import { requireApiRole } from "@/lib/auth";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import type { InquiryStatus } from "@/lib/types";
 
 type RouteContext = {
@@ -28,6 +29,12 @@ function getStatusMessage(status: InquiryStatus) {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const roleCheck = await requireApiRole(request as never, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json(
       {
@@ -39,6 +46,8 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const { id } = await context.params;
     const payload = (await request.json()) as {
       status?: InquiryStatus;
@@ -99,7 +108,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     await writeActivityLog({
       action: "status-updated",
-      actor: "owner",
+      actor: roleCheck.user.email || roleCheck.user.role,
       entityId: id,
       entityType: "inquiry",
       message: getStatusMessage(payload.status),

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { writeActivityLog } from "@/lib/activity-log";
 import { isValidDateRange } from "@/lib/calendar-admin";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseSchema } from "@/lib/db";
+import { sendInquiryAdminEmail } from "@/lib/email";
 import { getRoomsData } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
 
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
     const inquiryId = createInquiryId();
 
     if (db) {
+      await ensureDatabaseSchema();
+
       await db`
         insert into inquiries (
           id,
@@ -99,6 +102,15 @@ export async function POST(request: Request) {
           guests: Number(payload.guests || 1),
           roomSlug: payload.roomSlug
         }
+      });
+
+      await sendInquiryAdminEmail({
+        checkIn: payload.checkIn,
+        checkOut: payload.checkOut,
+        guestName: payload.guestName,
+        guests: Number(payload.guests || 1),
+        phone: payload.phone,
+        roomName: getRoomDisplayName(selectedRoom)
       });
     }
 

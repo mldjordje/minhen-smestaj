@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { writeActivityLog } from "@/lib/activity-log";
+import { requireApiRole } from "@/lib/auth";
 import { hasBlockConflict, hasReservationConflict, isValidDateRange, roomExists } from "@/lib/calendar-admin";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import { Booking, RoomBlock } from "@/lib/types";
 
 type CalendarEventPayload = {
@@ -25,6 +26,12 @@ function createRoomBlockId() {
 }
 
 export async function POST(request: Request) {
+  const roleCheck = await requireApiRole(request as never, ["owner", "staff"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json(
       {
@@ -36,6 +43,8 @@ export async function POST(request: Request) {
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const payload = (await request.json()) as CalendarEventPayload;
 
     if (!payload.type || !payload.roomId || !isValidDateRange(payload.checkIn, payload.checkOut)) {
@@ -127,7 +136,7 @@ export async function POST(request: Request) {
 
       await writeActivityLog({
         action: "created",
-        actor: payload.createdBy?.trim() || "admin",
+        actor: payload.createdBy?.trim() || roleCheck.user.role,
         entityId: reservation.id,
         entityType: "reservation",
         message: `Rucna rezervacija za ${reservation.guestName} je dodata u kalendar.`,
@@ -153,7 +162,7 @@ export async function POST(request: Request) {
       checkIn,
       checkOut,
       reason: payload.notes?.trim() || "Rucno blokiran termin",
-      createdBy: payload.createdBy?.trim() || "admin",
+      createdBy: payload.createdBy?.trim() || roleCheck.user.role,
       status: payload.status === "maintenance" ? "maintenance" : "blocked"
     };
 

@@ -1,8 +1,20 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getRoomChannelMappingsData, getRoomsData } from "@/lib/admin-data";
+import { getAuthSession } from "@/lib/auth";
 import { getRoomDisplayName } from "@/lib/rooms";
 
 export default async function OwnerBookingSyncGuidePage() {
+  const session = await getAuthSession();
+
+  if (!session?.user) {
+    redirect("/signin?callbackUrl=/admin/owner/booking-sync");
+  }
+
+  if (session.user.role !== "owner") {
+    redirect("/admin");
+  }
+
   const [rooms, mappings] = await Promise.all([
     getRoomsData({ allowDemoFallback: false }),
     getRoomChannelMappingsData({ allowDemoFallback: false })

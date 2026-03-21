@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import {
   bookings as demoBookings,
   cleaningTasks as demoCleaningTasks,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/data";
 import {
   ActivityLogEntry,
+  AppUser,
   Booking,
   CleaningTask,
   Inquiry,
@@ -89,13 +90,19 @@ type AmenityRow = {
 type ReservationRow = {
   check_in: Date | string;
   check_out: Date | string;
+  channel_reference: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
   created_at: string;
+  guest_user_id: string | null;
   guest_name: string;
   guests: number;
   id: string;
+  notes: string | null;
   room_id: string;
   source: Booking["source"];
   status: Booking["status"];
+  updated_at: Date | string | null;
 };
 
 type RoomBlockRow = {
@@ -158,11 +165,21 @@ type RoomChannelMappingRow = {
   external_room_name: string;
   id: string;
   import_url: string;
+  last_sync_error: string | null;
+  last_sync_status: "idle" | "success" | "error";
   last_synced_at: Date | string | null;
   provider: RoomChannelMapping["provider"];
   room_id: string;
   sync_enabled: boolean;
   updated_at: string;
+};
+
+type UserRow = {
+  email: string;
+  id: string;
+  image: string | null;
+  name: string;
+  role: AppUser["role"];
 };
 
 function shouldUseDemoFallback(options?: DataOptions) {
@@ -179,6 +196,8 @@ export async function getRoomsData(options?: DataOptions) {
 
     return demoRooms;
   }
+
+  await ensureDatabaseSchema();
 
   const roomRows = await db<RoomRow[]>`
     select id, slug, name, neighborhood, price_per_night, capacity, beds, status, image, short_description, created_at
@@ -214,7 +233,7 @@ export async function getRoomsData(options?: DataOptions) {
 }
 
 export async function getRoomBySlug(slug: string) {
-  const rooms = await getRoomsData();
+  const rooms = await getRoomsData({ allowDemoFallback: false });
 
   return rooms.find((room) => room.slug === slug) ?? null;
 }
@@ -230,8 +249,25 @@ export async function getBookingsData(options?: DataOptions) {
     return demoBookings;
   }
 
+  await ensureDatabaseSchema();
+
   const reservationRows = await db<ReservationRow[]>`
-    select id, guest_name, room_id, source, check_in, check_out, status, guests, created_at
+    select
+      id,
+      guest_name,
+      room_id,
+      source,
+      check_in,
+      check_out,
+      status,
+      guests,
+      guest_user_id,
+      contact_email,
+      contact_phone,
+      notes,
+      channel_reference,
+      created_at,
+      updated_at
     from reservations
     order by check_in asc
   `;
@@ -248,7 +284,13 @@ export async function getBookingsData(options?: DataOptions) {
     checkIn: normalizeDateValue(reservation.check_in),
     checkOut: normalizeDateValue(reservation.check_out),
     status: reservation.status,
-    guests: reservation.guests
+    guests: reservation.guests,
+    guestUserId: reservation.guest_user_id,
+    contactEmail: reservation.contact_email,
+    contactPhone: reservation.contact_phone,
+    notes: reservation.notes,
+    channelReference: reservation.channel_reference,
+    updatedAt: normalizeDateTimeValue(reservation.updated_at)
   }));
 }
 
@@ -262,6 +304,8 @@ export async function getInquiriesData(options?: DataOptions) {
 
     return demoInquiries;
   }
+
+  await ensureDatabaseSchema();
 
   const inquiryRows = await db<InquiryRow[]>`
     select id, guest_name, phone, requested_room_type, check_in, check_out, guests, message, status, created_at
@@ -296,6 +340,8 @@ export async function getRoomBlocksData(options?: DataOptions) {
 
     return demoRoomBlocks;
   }
+
+  await ensureDatabaseSchema();
 
   try {
     const roomBlockRows = await db<RoomBlockRow[]>`
@@ -340,6 +386,8 @@ export async function getCleaningTasksData(options?: DataOptions) {
 
     return demoCleaningTasks;
   }
+
+  await ensureDatabaseSchema();
 
   const taskRows = await db<CleaningTaskRow[]>`
     select id, room_id, assignee, due_at, status, notes, created_at
@@ -410,11 +458,13 @@ export async function getRoomChannelMappingsData(options?: DataOptions) {
         external_room_id,
         external_room_name,
         export_url,
-        import_url,
-        sync_enabled,
-        last_synced_at,
-        created_at,
-        updated_at
+          import_url,
+          sync_enabled,
+          last_sync_status,
+          last_sync_error,
+          last_synced_at,
+          created_at,
+          updated_at
       from room_channel_mappings
       order by created_at asc
     `;
@@ -432,7 +482,9 @@ export async function getRoomChannelMappingsData(options?: DataOptions) {
       exportUrl: mapping.export_url,
       importUrl: mapping.import_url,
       syncEnabled: mapping.sync_enabled,
-      lastSyncedAt: normalizeDateTimeValue(mapping.last_synced_at)
+      lastSyncedAt: normalizeDateTimeValue(mapping.last_synced_at),
+      lastSyncStatus: mapping.last_sync_status,
+      lastSyncError: mapping.last_sync_error
     }));
   } catch (error) {
     if (
@@ -481,6 +533,8 @@ export async function getActivityLogData(options?: DataOptions) {
     return [];
   }
 
+  await ensureDatabaseSchema();
+
   try {
     const activityRows = await db<ActivityLogRow[]>`
       select id, entity_type, entity_id, action, actor, message, metadata, created_at
@@ -514,4 +568,39 @@ export async function getActivityLogData(options?: DataOptions) {
 
     return [];
   }
+}
+
+export async function getUserByEmail(email: string) {
+  if (!db) {
+    return null;
+  }
+
+  await ensureDatabaseSchema();
+
+  const userRows = await db<UserRow[]>`
+    select id, email, name, image, role
+    from users
+    where email = ${email}
+    limit 1
+  `;
+
+  const user = userRows[0];
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    image: user.image,
+    role: user.role
+  };
+}
+
+export async function getBookingsForUser(userId: string) {
+  const bookings = await getBookingsData({ allowDemoFallback: false });
+
+  return bookings.filter((booking) => booking.guestUserId === userId);
 }

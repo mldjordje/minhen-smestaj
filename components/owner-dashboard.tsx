@@ -41,6 +41,11 @@ type RoomActionState = {
   status: "idle" | "submitting" | "success" | "error";
 };
 
+type SyncActionState = {
+  message: string;
+  status: "idle" | "submitting" | "success" | "error";
+};
+
 type InquiryAction = "contacted" | "closed" | "converted";
 
 type MappingDraft = {
@@ -157,6 +162,8 @@ export function OwnerDashboard({
   const [localRoomBlocks, setLocalRoomBlocks] = useState<RoomBlock[]>(initialRoomBlocks);
   const [localMappings, setLocalMappings] = useState<RoomChannelMapping[]>(initialRoomChannelMappings);
   const [localRooms, setLocalRooms] = useState<Room[]>(initialRooms);
+  const [localIntegrationSummary, setLocalIntegrationSummary] =
+    useState<AdminBookingSyncSummary>(integrationSummary);
   const [mappingDrafts, setMappingDrafts] = useState<Record<string, MappingDraft>>(() =>
     buildInitialMappingDrafts(initialRooms, initialRoomChannelMappings)
   );
@@ -171,6 +178,15 @@ export function OwnerDashboard({
   const [roomActionState, setRoomActionState] = useState<RoomActionState>({
     status: "idle",
     message: "Nova soba se cuva u bazi i odmah postaje dostupna u admin kalendaru."
+  });
+  const [syncActionState, setSyncActionState] = useState<SyncActionState>({
+    status: "idle",
+    message: "Pokreni rucni iCal sync kad hoces da povuces Booking.com izmene odmah."
+  });
+  const [bookingFilters, setBookingFilters] = useState({
+    roomId: "all",
+    status: "all",
+    date: ""
   });
   const [uploadState, setUploadState] = useState<UploadState>({
     status: "idle",
@@ -342,6 +358,33 @@ export function OwnerDashboard({
       console.error("Owner feed refresh failed", error);
     }
   }, [localRooms]);
+
+  const refreshSyncStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/booking-sync", {
+        method: "GET",
+        cache: "no-store"
+      });
+
+      const result = (await response.json()) as
+        | ({ ok: true } & AdminBookingSyncSummary)
+        | { ok: false };
+
+      if (!response.ok || !result.ok) {
+        return;
+      }
+
+      setLocalIntegrationSummary({
+        provider: result.provider,
+        lastSuccessfulSync: result.lastSuccessfulSync,
+        mode: result.mode,
+        note: result.note,
+        pendingUpdates: result.pendingUpdates
+      });
+    } catch (error) {
+      console.error("Sync status refresh failed", error);
+    }
+  }, []);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -560,12 +603,59 @@ export function OwnerDashboard({
         message: result.message
       }
     }));
+    await refreshSyncStatus();
+  }
+
+  async function handleRunSync() {
+    setSyncActionState({
+      status: "submitting",
+      message: "Povlacim Booking.com iCal rezervacije i osvezavam health status..."
+    });
+
+    const response = await fetch("/api/booking-sync", {
+      method: "POST"
+    });
+
+    const result = (await response.json()) as
+      | {
+          ok: true;
+          message: string;
+          syncedRooms: number;
+        }
+      | {
+          ok: false;
+          message: string;
+        };
+
+    if (!response.ok || !result.ok) {
+      setSyncActionState({
+        status: "error",
+        message: result.message
+      });
+      return;
+    }
+
+    setSyncActionState({
+      status: "success",
+      message: `${result.message} Obradjene sobe: ${result.syncedRooms}.`
+    });
+    await Promise.all([refreshOwnerFeed(), refreshSyncStatus()]);
   }
 
   const occupiedCount = localRooms.filter((room) => room.status === "occupied").length;
   const upcomingBookings = [...localBookings].sort((leftBooking, rightBooking) =>
     leftBooking.checkIn.localeCompare(rightBooking.checkIn)
   );
+  const filteredBookings = upcomingBookings.filter((booking) => {
+    const matchesRoom = bookingFilters.roomId === "all" || booking.roomId === bookingFilters.roomId;
+    const matchesStatus =
+      bookingFilters.status === "all" || booking.status === bookingFilters.status;
+    const matchesDate =
+      !bookingFilters.date ||
+      (booking.checkIn <= bookingFilters.date && booking.checkOut > bookingFilters.date);
+
+    return matchesRoom && matchesStatus && matchesDate;
+  });
   const activeInquiries = localInquiries.filter(
     (inquiry) => isActiveInquiryStatus(inquiry.status)
   );
@@ -626,14 +716,51 @@ export function OwnerDashboard({
               <h2>Predstojeci boravci po sobama</h2>
             </div>
           </div>
-          {upcomingBookings.length === 0 ? (
+          <div className="admin-filters">
+            <select
+              className="admin-inline-select"
+              onChange={(event) =>
+                setBookingFilters((current) => ({ ...current, roomId: event.target.value }))
+              }
+              value={bookingFilters.roomId}
+            >
+              <option value="all">Sve sobe</option>
+              {localRooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {getRoomDisplayName(room)}
+                </option>
+              ))}
+            </select>
+            <select
+              className="admin-inline-select"
+              onChange={(event) =>
+                setBookingFilters((current) => ({ ...current, status: event.target.value }))
+              }
+              value={bookingFilters.status}
+            >
+              <option value="all">Svi statusi</option>
+              <option value="confirmed">confirmed</option>
+              <option value="arriving">arriving</option>
+              <option value="checked-in">checked-in</option>
+              <option value="checked-out">checked-out</option>
+            </select>
+            <input
+              className="admin-inline-select"
+              onChange={(event) =>
+                setBookingFilters((current) => ({ ...current, date: event.target.value }))
+              }
+              type="date"
+              value={bookingFilters.date}
+            />
+          </div>
+          {filteredBookings.length === 0 ? (
             <div className="admin-empty-state">
-              <strong>Nema rezervacija u bazi</strong>
-              <p>Rucne rezervacije i potvrdeni inquiry unosi pojavice se ovde.</p>
+              <strong>Nema rezervacija za izabrani filter</strong>
+              <p>Rucne rezervacije, direktni booking i Booking.com sync unosi pojavice se ovde.</p>
             </div>
           ) : (
             <div className="table-like">
-              {upcomingBookings.map((booking) => {
+              {filteredBookings.map((booking) => {
                 const room = localRooms.find((item) => item.id === booking.roomId);
 
                 return (
@@ -894,6 +1021,11 @@ export function OwnerDashboard({
                   >
                     Sacuvaj mapping
                   </button>
+                  {mapping?.exportUrl ? (
+                    <a className="text-link" href={mapping.exportUrl} rel="noreferrer" target="_blank">
+                      Otvori export feed
+                    </a>
+                  ) : null}
                   <p
                     className={`inline-note ${
                       mappingActionState[room.id]?.status === "error" ? "inline-note-error" : ""
@@ -904,6 +1036,22 @@ export function OwnerDashboard({
                         ? `Poslednji sync: ${mapping.lastSyncedAt}`
                         : "Unesi Booking.com room podatke ili sacuvaj draft za kasnije.")}
                   </p>
+                  {mapping?.lastSyncStatus ? (
+                    <span
+                      className={`status-pill ${
+                        mapping.lastSyncStatus === "success"
+                          ? "status-mapped"
+                          : mapping.lastSyncStatus === "error"
+                            ? "status-maintenance"
+                            : "status-draft"
+                      }`}
+                    >
+                      sync: {mapping.lastSyncStatus}
+                    </span>
+                  ) : null}
+                  {mapping?.lastSyncError ? (
+                    <p className="inline-note inline-note-error">{mapping.lastSyncError}</p>
+                  ) : null}
                 </div>
               </article>
             );
@@ -1052,18 +1200,34 @@ export function OwnerDashboard({
             <h2>Booking.com sync status</h2>
           </div>
         </div>
-        <div className="sync-card">
+          <div className="sync-card">
+          <div className="admin-inline-actions admin-inline-actions--wrap">
+            <button
+              className="primary-button"
+              onClick={() => void handleRunSync()}
+              type="button"
+            >
+              {syncActionState.status === "submitting" ? "Sync u toku..." : "Sync now"}
+            </button>
+            <span
+              className={`inline-note ${
+                syncActionState.status === "error" ? "inline-note-error" : ""
+              }`}
+            >
+              {syncActionState.message}
+            </span>
+          </div>
           <div className="sync-item">
             <span>Provider</span>
-            <strong>{integrationSummary.provider}</strong>
+            <strong>{localIntegrationSummary.provider}</strong>
           </div>
           <div className="sync-item">
             <span>Poslednji sync</span>
-            <strong>{integrationSummary.lastSuccessfulSync ?? "Jos nema sync zapisa"}</strong>
+            <strong>{localIntegrationSummary.lastSuccessfulSync ?? "Jos nema sync zapisa"}</strong>
           </div>
           <div className="sync-item">
             <span>Pending updates</span>
-            <strong>{integrationSummary.pendingUpdates}</strong>
+            <strong>{localIntegrationSummary.pendingUpdates}</strong>
           </div>
           <div className="sync-item">
             <span>Aktivne mape soba</span>
@@ -1071,9 +1235,9 @@ export function OwnerDashboard({
           </div>
           <div className="sync-item">
             <span>Mode</span>
-            <strong>{integrationSummary.mode}</strong>
+            <strong>{localIntegrationSummary.mode}</strong>
           </div>
-          <p>{integrationSummary.note}</p>
+          <p>{localIntegrationSummary.note}</p>
         </div>
       </section>
     </div>

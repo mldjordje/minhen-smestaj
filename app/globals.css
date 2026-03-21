@@ -691,6 +691,17 @@ textarea {
   gap: 10px;
 }
 
+.admin-inline-actions--wrap {
+  align-items: start;
+}
+
+.admin-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .admin-checkbox {
   display: flex;
   align-items: center;
@@ -862,6 +873,29 @@ textarea {
   gap: 14px;
 }
 
+.public-booking-form__signed-in,
+.public-booking-form__signed-out {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+}
+
+.public-booking-form__signed-in {
+  background: rgba(71, 159, 118, 0.1);
+}
+
+.public-booking-form__signed-out {
+  background: rgba(255, 249, 241, 0.9);
+}
+
+.public-booking-form__signed-in span,
+.public-booking-form__signed-out span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .public-booking-form__availability {
   display: grid;
   gap: 16px;
@@ -906,6 +940,12 @@ textarea {
 .public-booking-form__status {
   margin: 0;
   font-size: 0.95rem;
+}
+
+.public-booking-form__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .public-booking-form__status.is-success {
@@ -1724,6 +1764,11 @@ textarea {
   .public-booking-form__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .public-booking-form__actions {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
 }
 
 @media (min-width: 1081px) {
@@ -1775,6 +1820,23 @@ textarea {
   text-transform: uppercase;
 }
 
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sign-in-shell,
+.account-shell {
+  display: grid;
+  gap: 24px;
+  padding: 40px 0 80px;
+}
+
+.sign-in-card {
+  max-width: 620px;
+}
+
 .site-template-shell .site-text-brand-light {
   color: #fff;
 }
@@ -1819,6 +1881,10 @@ textarea {
   .stats-band,
   .stats-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-filters {
+    grid-template-columns: 1fr;
   }
 
   .home-showcase-grid {
@@ -1896,6 +1962,11 @@ textarea {
   .room-detail-gallery__grid {
     grid-template-columns: 1fr;
     flex-direction: column;
+  }
+
+  .auth-actions {
+    width: 100%;
+    display: grid;
   }
 }
 

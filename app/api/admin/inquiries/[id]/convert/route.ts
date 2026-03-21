@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { writeActivityLog } from "@/lib/activity-log";
+import { requireApiRole } from "@/lib/auth";
 import { hasBlockConflict, hasReservationConflict, normalizeDateValue, roomExists } from "@/lib/calendar-admin";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 
 type RouteContext = {
   params: Promise<{
@@ -23,6 +24,12 @@ function createReservationId() {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const roleCheck = await requireApiRole(request as never, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json(
       {
@@ -34,6 +41,8 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const { id } = await context.params;
     const payload = (await request.json()) as {
       roomId?: string;
@@ -143,7 +152,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     await writeActivityLog({
       action: "converted",
-      actor: "owner",
+      actor: roleCheck.user.email || roleCheck.user.role,
       entityId: id,
       entityType: "inquiry",
       message: "Upit je pretvoren u direktnu rezervaciju.",
@@ -155,7 +164,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     await writeActivityLog({
       action: "created",
-      actor: "owner",
+      actor: roleCheck.user.email || roleCheck.user.role,
       entityId: reservationId,
       entityType: "reservation",
       message: `Direktna rezervacija za ${inquiry.guest_name} je kreirana iz upita.`,

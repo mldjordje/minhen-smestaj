@@ -1,4 +1,5 @@
 import { OwnerDashboard } from "@/components/owner-dashboard";
+import { redirect } from "next/navigation";
 import {
   getActivityLogData,
   getBookingSyncSummary,
@@ -8,8 +9,19 @@ import {
   getRoomChannelMappingsData,
   getRoomsData
 } from "@/lib/admin-data";
+import { getAuthSession } from "@/lib/auth";
 
 export default async function OwnerAdminPage() {
+  const session = await getAuthSession();
+
+  if (!session?.user) {
+    redirect("/signin?callbackUrl=/admin/owner");
+  }
+
+  if (session.user.role !== "owner") {
+    redirect("/admin");
+  }
+
   const [rooms, bookings, inquiries, roomChannelMappings, roomBlocks, integrationSummary, activityLog] = await Promise.all([
     getRoomsData({ allowDemoFallback: false }),
     getBookingsData({ allowDemoFallback: false }),

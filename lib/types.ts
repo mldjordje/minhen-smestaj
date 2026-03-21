@@ -1,4 +1,5 @@
 export type RoomStatus = "available" | "occupied" | "cleaning" | "maintenance";
+export type UserRole = "guest" | "staff" | "owner";
 
 export type Room = {
   id: string;
@@ -24,6 +25,8 @@ export type RoomChannelMapping = {
   importUrl: string;
   syncEnabled: boolean;
   lastSyncedAt?: string | null;
+  lastSyncError?: string | null;
+  lastSyncStatus?: "idle" | "success" | "error";
 };
 
 export type RoomBlock = {
@@ -45,6 +48,12 @@ export type Booking = {
   checkOut: string;
   status: "confirmed" | "arriving" | "checked-in" | "checked-out";
   guests: number;
+  guestUserId?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  notes?: string | null;
+  channelReference?: string | null;
+  updatedAt?: string | null;
 };
 
 export type CleaningTask = {
@@ -61,6 +70,14 @@ export type TeamMember = {
   name: string;
   role: "owner" | "cleaner" | "host";
   shift: string;
+};
+
+export type AppUser = {
+  id: string;
+  email: string;
+  image?: string | null;
+  name: string;
+  role: UserRole;
 };
 
 export type InquiryStatus = "new" | "contacted" | "converted" | "closed";

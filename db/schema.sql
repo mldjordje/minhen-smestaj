@@ -18,6 +18,16 @@ create table if not exists room_amenities (
   label text not null
 );
 
+create table if not exists users (
+  id text primary key,
+  email text not null unique,
+  name text not null,
+  image text,
+  role text not null default 'guest',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists reservations (
   id text primary key,
   guest_name text not null,
@@ -27,7 +37,13 @@ create table if not exists reservations (
   check_out date not null,
   status text not null,
   guests integer not null,
-  created_at timestamptz not null default now()
+  guest_user_id text references users(id) on delete set null,
+  contact_email text,
+  contact_phone text,
+  notes text,
+  channel_reference text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists room_blocks (
@@ -82,6 +98,8 @@ create table if not exists room_channel_mappings (
   import_url text not null default '',
   sync_enabled boolean not null default false,
   last_synced_at timestamptz,
+  last_sync_status text not null default 'idle',
+  last_sync_error text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -96,3 +114,7 @@ create table if not exists activity_log (
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+create unique index if not exists reservations_room_channel_reference_idx
+on reservations (room_id, channel_reference)
+where channel_reference is not null;

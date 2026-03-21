@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import { RoomAvailabilityCalendar } from "@/components/room-availability-calendar";
 import { getRoomDisplayName } from "@/lib/rooms";
@@ -27,11 +28,11 @@ export function PublicBookingForm({
   roomBlocks = [],
   rooms,
   showAvailabilityPreview = true,
-  subtitle = "Odaberite sobu, proverite slobodne termine i posaljite upit u jednom koraku.",
-  title = "Posaljite upit za rezervaciju"
+  subtitle = "Odaberite sobu, proverite slobodne termine i odmah potvrdite rezervaciju.",
+  title = "Rezervisite boravak"
 }: PublicBookingFormProps) {
+  const { data: session, status: sessionStatus } = useSession();
   const [formState, setFormState] = useState({
-    guestName: "",
     phone: "",
     checkIn: "",
     checkOut: "",
@@ -41,7 +42,7 @@ export function PublicBookingForm({
   });
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
-    message: "Odaberite sobu i datume, a mi vam potvrdu saljemo sto pre."
+    message: "Odaberite sobu i datume. Ako je termin slobodan, rezervacija se potvrduje odmah."
   });
   const selectedRoom = rooms.find((room) => room.slug === formState.roomSlug) ?? rooms[0] ?? null;
 
@@ -59,21 +60,31 @@ export function PublicBookingForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!session?.user) {
+      await signIn("google", {
+        callbackUrl: `${window.location.pathname}${window.location.hash || "#booking"}`
+      });
+      return;
+    }
+
     setSubmitState({
       status: "submitting",
-      message: "Saljemo upit..."
+      message: "Proveravamo termin i potvrdjujemo rezervaciju..."
     });
 
-    const response = await fetch("/api/inquiries", {
+    const response = await fetch("/api/public/bookings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(formState)
+      body: JSON.stringify({
+        ...formState,
+        guests: Number(formState.guests || 1)
+      })
     });
 
     const result = (await response.json()) as
-      | { ok: true; message: string }
+      | { ok: true; message: string; booking?: Booking }
       | { ok: false; message: string };
 
     if (!response.ok || !result.ok) {
@@ -86,10 +97,11 @@ export function PublicBookingForm({
 
     setSubmitState({
       status: "success",
-      message: result.message
+      message: result.booking
+        ? `${result.message} Referenca: ${result.booking.id}`
+        : result.message
     });
     setFormState({
-      guestName: "",
       phone: "",
       checkIn: "",
       checkOut: "",
@@ -99,21 +111,52 @@ export function PublicBookingForm({
     });
   };
 
+  const handleInquirySubmit = async () => {
+    setSubmitState({
+      status: "submitting",
+      message: "Saljemo inquiry..."
+    });
+
+    const response = await fetch("/api/inquiries", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...formState,
+        guestName: session?.user?.name || session?.user?.email || "Gost sajta"
+      })
+    });
+
+    const result = (await response.json()) as
+      | { ok: true; message: string }
+      | { ok: false; message: string };
+
+    setSubmitState({
+      status: response.ok && result.ok ? "success" : "error",
+      message: result.message
+    });
+  };
+
   return (
     <div className="public-booking-card">
       <div className="public-booking-card__header">
-        <p className="public-booking-card__eyebrow">Direktan upit</p>
+        <p className="public-booking-card__eyebrow">Direktan booking</p>
         <h3>{title}</h3>
         <p className="public-booking-card__intro">{subtitle}</p>
       </div>
       <form className="public-booking-form" onSubmit={handleSubmit}>
-        <input
-          name="guestName"
-          onChange={handleChange}
-          placeholder="Ime i prezime"
-          required
-          value={formState.guestName}
-        />
+        {session?.user ? (
+          <div className="public-booking-form__signed-in">
+            <strong>{session.user.name || session.user.email}</strong>
+            <span>{session.user.email}</span>
+          </div>
+        ) : (
+          <div className="public-booking-form__signed-out">
+            <strong>Google login je potreban za potvrdu rezervacije.</strong>
+            <span>Formu mozete popuniti odmah, a login se trazi tek na finalnom koraku.</span>
+          </div>
+        )}
         <input
           name="phone"
           onChange={handleChange}
@@ -177,18 +220,25 @@ export function PublicBookingForm({
         <textarea
           name="message"
           onChange={handleChange}
-          placeholder="Dodatne informacije, broj radnika, parking, duzi boravak..."
+          placeholder="Napomena za boravak, broj radnika, parking, kasniji dolazak..."
           rows={5}
           value={formState.message}
         />
-        <p
-          className={`public-booking-form__status is-${submitState.status}`}
-        >
-          {submitState.message}
-        </p>
-        <button className="public-booking-form__submit" type="submit">
-          {submitState.status === "submitting" ? "Slanje..." : "Posalji upit"}
-        </button>
+        <div className="public-booking-form__actions">
+          <button className="public-booking-form__submit" type="submit">
+            {submitState.status === "submitting"
+              ? "Rezervacija u toku..."
+              : sessionStatus === "loading"
+                ? "Ucitavanje naloga..."
+                : session?.user
+                  ? "Potvrdi rezervaciju"
+                  : "Nastavi sa Google login-om"}
+          </button>
+          <button className="secondary-button" onClick={() => void handleInquirySubmit()} type="button">
+            Pitaj pre rezervacije
+          </button>
+        </div>
+        <p className={`public-booking-form__status is-${submitState.status}`}>{submitState.message}</p>
       </form>
     </div>
   );

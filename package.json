@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "db:migrate-launch-v1": "node --env-file=.env.local scripts/migrate-launch-v1.mjs",
     "db:seed": "node --env-file=.env.local scripts/seed-neon.mjs",
     "db:migrate-activity-log": "node --env-file=.env.local scripts/migrate-activity-log.mjs",
     "db:migrate-room-identities": "node --env-file=.env.local scripts/migrate-room-identities.mjs",
@@ -15,7 +16,11 @@
   "dependencies": {
     "@vercel/blob": "^2.3.1",
     "heic-convert": "^2.1.0",
+    "ical-generator": "^10.1.0",
     "next": "15.5.12",
+    "next-auth": "^4.24.13",
+    "node-ical": "^0.25.6",
+    "nodemailer": "^7.0.10",
     "postgres": "^3.4.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -23,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "22.14.1",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
     "eslint": "9.38.0",

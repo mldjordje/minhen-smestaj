@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { buildRoomExportUrl } from "@/lib/app-url";
+import { requireApiRole } from "@/lib/auth";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import { RoomChannelMapping } from "@/lib/types";
 
 type RouteContext = {
@@ -21,6 +23,12 @@ function createMappingId(roomId: string) {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const roleCheck = await requireApiRole(request as never, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json(
       {
@@ -32,6 +40,8 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const { id: roomId } = await context.params;
     const payload = (await request.json()) as MappingPayload;
 
@@ -51,10 +61,12 @@ export async function POST(request: Request, context: RouteContext) {
       provider: "Booking.com",
       externalRoomId: payload.externalRoomId?.trim() ?? "",
       externalRoomName: payload.externalRoomName?.trim() ?? "",
-      exportUrl: payload.exportUrl?.trim() ?? "",
+      exportUrl: payload.exportUrl?.trim() || buildRoomExportUrl(roomId),
       importUrl: payload.importUrl?.trim() ?? "",
       syncEnabled: Boolean(payload.syncEnabled),
-      lastSyncedAt: null
+      lastSyncedAt: null,
+      lastSyncError: null,
+      lastSyncStatus: "idle"
     };
 
     if (mapping.syncEnabled && (!mapping.externalRoomId || !mapping.externalRoomName)) {
@@ -94,6 +106,8 @@ export async function POST(request: Request, context: RouteContext) {
         export_url,
         import_url,
         sync_enabled,
+        last_sync_status,
+        last_sync_error,
         last_synced_at,
         updated_at
       ) values (
@@ -105,6 +119,8 @@ export async function POST(request: Request, context: RouteContext) {
         ${mapping.exportUrl},
         ${mapping.importUrl},
         ${mapping.syncEnabled},
+        ${mapping.lastSyncStatus ?? "idle"},
+        ${mapping.lastSyncError ?? null},
         ${mapping.lastSyncedAt ?? null},
         now()
       )
@@ -116,6 +132,8 @@ export async function POST(request: Request, context: RouteContext) {
         export_url = excluded.export_url,
         import_url = excluded.import_url,
         sync_enabled = excluded.sync_enabled,
+        last_sync_status = excluded.last_sync_status,
+        last_sync_error = excluded.last_sync_error,
         last_synced_at = excluded.last_synced_at,
         updated_at = now()
     `;

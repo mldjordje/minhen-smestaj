@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { requireApiRole } from "@/lib/auth";
+import { db, ensureDatabaseSchema } from "@/lib/db";
 import { createRoomIdentity } from "@/lib/rooms";
 import { Room } from "@/lib/types";
 
@@ -39,6 +40,12 @@ async function createUniqueSlug(baseSlug: string) {
 }
 
 export async function POST(request: Request) {
+  const roleCheck = await requireApiRole(request as never, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!db) {
     return NextResponse.json(
       {
@@ -50,6 +57,8 @@ export async function POST(request: Request) {
   }
 
   try {
+    await ensureDatabaseSchema();
+
     const payload = (await request.json()) as CreateRoomPayload;
 
     if (

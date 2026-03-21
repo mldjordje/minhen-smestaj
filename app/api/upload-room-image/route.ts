@@ -1,5 +1,6 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth";
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_UPLOAD_SIZE_BYTES = 4 * 1024 * 1024;
@@ -15,6 +16,12 @@ function sanitizeFilename(filename: string) {
 }
 
 export async function POST(request: Request) {
+  const roleCheck = await requireApiRole(request, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     return NextResponse.json(
       {

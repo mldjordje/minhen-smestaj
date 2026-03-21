@@ -1,7 +1,16 @@
-import { NextResponse } from "next/server";
-import { getBookingSyncSummary, getRoomChannelMappingsData, getRoomsData } from "@/lib/admin-data";
+import { NextRequest, NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth";
+import { getBookingSyncSummary, getBookingsData, getRoomChannelMappingsData, getRoomsData } from "@/lib/admin-data";
 
-export async function GET() {
+export const runtime = "nodejs";
+
+export async function GET(request: NextRequest) {
+  const roleCheck = await requireApiRole(request, ["owner"]);
+
+  if (roleCheck instanceof NextResponse) {
+    return roleCheck;
+  }
+
   const [summary, rooms, mappings] = await Promise.all([
     getBookingSyncSummary({ allowDemoFallback: false }),
     getRoomsData({ allowDemoFallback: false }),
@@ -18,16 +27,51 @@ export async function GET() {
     tutorialUrl: "/admin/owner/booking-sync",
     envStatus: {
       bookingSyncMode: Boolean(process.env.BOOKING_SYNC_MODE),
-      bookingExportUrl: Boolean(process.env.BOOKING_EXPORT_URL),
-      bookingImportUrl: Boolean(process.env.BOOKING_IMPORT_URL),
       blobToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-      databaseUrl: Boolean(process.env.POSTGRES_URL || process.env.DATABASE_URL)
-    },
-    requiredEnv: [
-      "BOOKING_SYNC_MODE",
-      "BOOKING_EXPORT_URL",
-      "BOOKING_IMPORT_URL",
-      "BLOB_READ_WRITE_TOKEN"
-    ]
+      databaseUrl: Boolean(process.env.POSTGRES_URL || process.env.DATABASE_URL),
+      smtp: Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM),
+      googleAuth: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+    }
+  });
+}
+
+export async function POST(request: NextRequest) {
+  if (request.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`) {
+    // Cron path is allowed.
+  } else {
+    const roleCheck = await requireApiRole(request, ["owner"]);
+
+    if (roleCheck instanceof NextResponse) {
+      return roleCheck;
+    }
+  }
+
+  const [rooms, mappings, bookings] = await Promise.all([
+    getRoomsData({ allowDemoFallback: false }),
+    getRoomChannelMappingsData({ allowDemoFallback: false }),
+    getBookingsData({ allowDemoFallback: false })
+  ]);
+  const { runRoomImportSync } = await import("@/lib/ical-sync");
+
+  const activeMappings = mappings.filter((mapping) => mapping.syncEnabled && mapping.importUrl);
+  const roomMap = new Map(rooms.map((room) => [room.id, room]));
+  const results = [];
+
+  for (const mapping of activeMappings) {
+    const room = roomMap.get(mapping.roomId);
+
+    if (!room) {
+      continue;
+    }
+
+    results.push(await runRoomImportSync(room, mapping));
+  }
+
+  return NextResponse.json({
+    ok: true,
+    message: "Sync je zavrsen.",
+    syncedRooms: results.length,
+    results,
+    bookingsKnown: bookings.length
   });
 }
