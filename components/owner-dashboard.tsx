@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AdminRoomCalendar } from "@/components/admin-room-calendar";
 import type { AdminBookingSyncSummary } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
-import { Booking, Inquiry, Room, RoomBlock, RoomChannelMapping } from "@/lib/types";
+import { Booking, Inquiry, InquiryStatus, Room, RoomBlock, RoomChannelMapping } from "@/lib/types";
 
 const initialForm = {
   roomNumber: "",
@@ -32,6 +32,8 @@ type RoomActionState = {
   message: string;
   status: "idle" | "submitting" | "success" | "error";
 };
+
+type InquiryAction = "contacted" | "closed" | "converted";
 
 type MappingDraft = {
   exportUrl: string;
@@ -88,6 +90,32 @@ function getMappingVisualState(draft: MappingDraft) {
     badgeClassName: "status-unmapped",
     label: "nije povezano"
   };
+}
+
+function isActiveInquiryStatus(status: InquiryStatus) {
+  return status === "new" || status === "contacted";
+}
+
+function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "success") {
+  if (status === "submitting") {
+    switch (action) {
+      case "contacted":
+        return "Belezim da je gost kontaktiran...";
+      case "closed":
+        return "Zatvaram upit...";
+      default:
+        return "Potvrdjujem rezervaciju...";
+    }
+  }
+
+  switch (action) {
+    case "contacted":
+      return "Upit je oznacen kao kontaktiran.";
+    case "closed":
+      return "Upit je zatvoren.";
+    default:
+      return "Upit je uspesno pretvoren u rezervaciju.";
+  }
 }
 
 export function OwnerDashboard({
@@ -270,6 +298,65 @@ export function OwnerDashboard({
     }));
   }
 
+  function updateLocalInquiryStatus(inquiryId: string, nextStatus: InquiryStatus) {
+    setLocalInquiries((currentValue) =>
+      currentValue.map((inquiry) =>
+        inquiry.id === inquiryId ? { ...inquiry, status: nextStatus } : inquiry
+      )
+    );
+  }
+
+  async function handleInquiryStatusUpdate(inquiryId: string, nextStatus: Extract<InquiryStatus, "new" | "contacted" | "closed">) {
+    setInquiryActionState((currentValue) => ({
+      ...currentValue,
+      [inquiryId]: {
+        status: "submitting",
+        message: getInquiryActionMessage(nextStatus === "closed" ? "closed" : "contacted", "submitting")
+      }
+    }));
+
+    const response = await fetch(`/api/admin/inquiries/${inquiryId}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        status: nextStatus
+      })
+    });
+
+    const result = (await response.json()) as
+      | {
+          ok: true;
+          message: string;
+          status: InquiryStatus;
+        }
+      | {
+          ok: false;
+          message: string;
+        };
+
+    if (!response.ok || !result.ok) {
+      setInquiryActionState((currentValue) => ({
+        ...currentValue,
+        [inquiryId]: {
+          status: "error",
+          message: result.message
+        }
+      }));
+      return;
+    }
+
+    updateLocalInquiryStatus(inquiryId, result.status);
+    setInquiryActionState((currentValue) => ({
+      ...currentValue,
+      [inquiryId]: {
+        status: "success",
+        message: result.message
+      }
+    }));
+  }
+
   async function handleConvertInquiry(inquiryId: string) {
     const selectedRoomId = inquiryRoomSelection[inquiryId];
 
@@ -288,7 +375,7 @@ export function OwnerDashboard({
       ...currentValue,
       [inquiryId]: {
         status: "submitting",
-        message: "Potvrdjujem rezervaciju..."
+        message: getInquiryActionMessage("converted", "submitting")
       }
     }));
 
@@ -313,7 +400,7 @@ export function OwnerDashboard({
           message: string;
         };
 
-    if (!result.ok) {
+    if (!response.ok || !result.ok) {
       setInquiryActionState((currentValue) => ({
         ...currentValue,
         [inquiryId]: {
@@ -329,11 +416,7 @@ export function OwnerDashboard({
         leftBooking.checkIn.localeCompare(rightBooking.checkIn)
       )
     );
-    setLocalInquiries((currentValue) =>
-      currentValue.map((inquiry) =>
-        inquiry.id === inquiryId ? { ...inquiry, status: "converted" } : inquiry
-      )
-    );
+    updateLocalInquiryStatus(inquiryId, "converted");
     setInquiryActionState((currentValue) => ({
       ...currentValue,
       [inquiryId]: {
@@ -420,7 +503,10 @@ export function OwnerDashboard({
     leftBooking.checkIn.localeCompare(rightBooking.checkIn)
   );
   const activeInquiries = localInquiries.filter(
-    (inquiry) => inquiry.status === "new" || inquiry.status === "contacted"
+    (inquiry) => isActiveInquiryStatus(inquiry.status)
+  );
+  const resolvedInquiries = localInquiries.filter(
+    (inquiry) => !isActiveInquiryStatus(inquiry.status)
   );
   const connectedMappings = localMappings.filter((mapping) => mapping.syncEnabled).length;
   const roomsWithoutMapping = localRooms.length - connectedMappings;
@@ -525,7 +611,9 @@ export function OwnerDashboard({
                     </span>
                   </div>
                   <div className="admin-inline-stack">
-                    <span>{inquiry.requestedRoomType}</span>
+                    <span>
+                      {inquiry.requestedRoomType} | {inquiry.guests} gosta
+                    </span>
                     <select
                       className="admin-inline-select"
                       onChange={(event) => handleInquiryRoomChange(inquiry.id, event.target.value)}
@@ -547,6 +635,26 @@ export function OwnerDashboard({
                     </span>
                     <button
                       className="secondary-button"
+                      disabled={
+                        inquiry.status === "contacted" ||
+                        inquiryActionState[inquiry.id]?.status === "submitting"
+                      }
+                      onClick={() => void handleInquiryStatusUpdate(inquiry.id, "contacted")}
+                      type="button"
+                    >
+                      Oznaci kontaktiranim
+                    </button>
+                    <button
+                      className="secondary-button"
+                      disabled={inquiryActionState[inquiry.id]?.status === "submitting"}
+                      onClick={() => void handleInquiryStatusUpdate(inquiry.id, "closed")}
+                      type="button"
+                    >
+                      Zatvori upit
+                    </button>
+                    <button
+                      className="secondary-button"
+                      disabled={inquiryActionState[inquiry.id]?.status === "submitting"}
                       onClick={() => void handleConvertInquiry(inquiry.id)}
                       type="button"
                     >
@@ -561,6 +669,44 @@ export function OwnerDashboard({
                         {inquiryActionState[inquiry.id]?.message}
                       </span>
                     ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="dashboard-panel">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Istorija</p>
+              <h2>Obradjeni upiti</h2>
+            </div>
+          </div>
+          {resolvedInquiries.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Jos nema obradjenih upita</strong>
+              <p>Kontaktirani, zatvoreni i pretvoreni upiti pojavljivace se ovde.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {resolvedInquiries.map((inquiry) => (
+                <div key={inquiry.id} className="table-row">
+                  <div>
+                    <strong>{inquiry.guestName}</strong>
+                    <span>
+                      {inquiry.requestedRoomType} | {inquiry.guests} gosta
+                    </span>
+                  </div>
+                  <div>{inquiry.phone}</div>
+                  <div>
+                    {inquiry.checkIn} - {inquiry.checkOut}
+                  </div>
+                  <div className="admin-inline-actions">
+                    <span className={`status-pill status-inquiry-${inquiry.status}`}>
+                      {inquiry.status}
+                    </span>
+                    <span className="inline-note">{inquiry.message}</span>
                   </div>
                 </div>
               ))}

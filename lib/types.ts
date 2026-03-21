@@ -63,6 +63,8 @@ export type TeamMember = {
   shift: string;
 };
 
+export type InquiryStatus = "new" | "contacted" | "converted" | "closed";
+
 export type Inquiry = {
   id: string;
   guestName: string;
@@ -72,5 +74,5 @@ export type Inquiry = {
   checkOut: string;
   guests: number;
   message: string;
-  status: "new" | "contacted" | "converted" | "closed";
+  status: InquiryStatus;
 };
