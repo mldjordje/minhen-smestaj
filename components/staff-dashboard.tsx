@@ -141,17 +141,24 @@ export function StaffDashboard({
             <h2>Ko je danas aktivan</h2>
           </div>
         </div>
-        <div className="table-like">
-          {teamMembers.map((member) => (
-            <div key={member.id} className="table-row">
-              <div>
-                <strong>{member.name}</strong>
-                <span>{member.role}</span>
+        {teamMembers.length === 0 ? (
+          <div className="admin-empty-state">
+            <strong>Tim jos nije unet</strong>
+            <p>Dodaj owner i staff korisnike kada budes pripremao produkcioni raspored smena.</p>
+          </div>
+        ) : (
+          <div className="table-like">
+            {teamMembers.map((member) => (
+              <div key={member.id} className="table-row">
+                <div>
+                  <strong>{member.name}</strong>
+                  <span>{member.role}</span>
+                </div>
+                <div>{member.shift}</div>
               </div>
-              <div>{member.shift}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

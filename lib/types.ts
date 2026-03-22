@@ -82,7 +82,12 @@ export type AppUser = {
 
 export type InquiryStatus = "new" | "contacted" | "converted" | "closed";
 
-export type ActivityLogEntityType = "inquiry" | "reservation" | "room_block";
+export type ActivityLogEntityType =
+  | "inquiry"
+  | "reservation"
+  | "room_block"
+  | "cleaning_task"
+  | "team_member";
 
 export type ActivityLogEntry = {
   id: string;

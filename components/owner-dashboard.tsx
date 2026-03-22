@@ -9,11 +9,13 @@ import { getRoomDisplayName } from "@/lib/rooms";
 import {
   ActivityLogEntry,
   Booking,
+  CleaningTask,
   Inquiry,
   InquiryStatus,
   Room,
   RoomBlock,
-  RoomChannelMapping
+  RoomChannelMapping,
+  TeamMember
 } from "@/lib/types";
 
 const initialForm = {
@@ -23,6 +25,12 @@ const initialForm = {
   capacity: "",
   beds: "",
   shortDescription: ""
+};
+
+const initialTeamForm = {
+  name: "",
+  role: "host" as TeamMember["role"],
+  shift: ""
 };
 
 type UploadState = {
@@ -59,11 +67,13 @@ type MappingDraft = {
 type OwnerDashboardProps = {
   activityLog: ActivityLogEntry[];
   bookings: Booking[];
+  cleaningTasks: CleaningTask[];
   inquiries: Inquiry[];
   integrationSummary: AdminBookingSyncSummary;
   roomBlocks: RoomBlock[];
   roomChannelMappings: RoomChannelMapping[];
   rooms: Room[];
+  teamMembers: TeamMember[];
 };
 
 function createMappingDraft(mapping?: RoomChannelMapping): MappingDraft {
@@ -149,19 +159,31 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
 export function OwnerDashboard({
   activityLog: initialActivityLog,
   bookings: initialBookings,
+  cleaningTasks: initialCleaningTasks,
   inquiries: initialInquiries,
   integrationSummary,
   roomBlocks: initialRoomBlocks,
   roomChannelMappings: initialRoomChannelMappings,
-  rooms: initialRooms
+  rooms: initialRooms,
+  teamMembers: initialTeamMembers
 }: OwnerDashboardProps) {
   const [form, setForm] = useState(initialForm);
+  const [teamForm, setTeamForm] = useState(initialTeamForm);
+  const [taskForm, setTaskForm] = useState({
+    roomId: initialRooms[0]?.id ?? "",
+    assignee: "",
+    dueAt: "",
+    status: "todo" as CleaningTask["status"],
+    notes: ""
+  });
   const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>(initialActivityLog);
   const [localBookings, setLocalBookings] = useState<Booking[]>(initialBookings);
+  const [localCleaningTasks, setLocalCleaningTasks] = useState<CleaningTask[]>(initialCleaningTasks);
   const [localInquiries, setLocalInquiries] = useState<Inquiry[]>(initialInquiries);
   const [localRoomBlocks, setLocalRoomBlocks] = useState<RoomBlock[]>(initialRoomBlocks);
   const [localMappings, setLocalMappings] = useState<RoomChannelMapping[]>(initialRoomChannelMappings);
   const [localRooms, setLocalRooms] = useState<Room[]>(initialRooms);
+  const [localTeamMembers, setLocalTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [localIntegrationSummary, setLocalIntegrationSummary] =
     useState<AdminBookingSyncSummary>(integrationSummary);
   const [mappingDrafts, setMappingDrafts] = useState<Record<string, MappingDraft>>(() =>
@@ -178,6 +200,14 @@ export function OwnerDashboard({
   const [roomActionState, setRoomActionState] = useState<RoomActionState>({
     status: "idle",
     message: "Nova soba se cuva u bazi i odmah postaje dostupna u admin kalendaru."
+  });
+  const [teamActionState, setTeamActionState] = useState<RoomActionState>({
+    status: "idle",
+    message: "Dodaj stvarne owner/staff clanove kako bi staff panel bio spreman za rad."
+  });
+  const [taskActionState, setTaskActionState] = useState<RoomActionState>({
+    status: "idle",
+    message: "Dodaj prvi operativni zadatak za ciscenje, check-in ili pripremu sobe."
   });
   const [syncActionState, setSyncActionState] = useState<SyncActionState>({
     status: "idle",
@@ -196,6 +226,26 @@ export function OwnerDashboard({
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
     setForm((current) => ({
+      ...current,
+      [name]: value
+    }));
+  }
+
+  function handleTeamFormChange(
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    const { name, value } = event.target;
+    setTeamForm((current) => ({
+      ...current,
+      [name]: value
+    }));
+  }
+
+  function handleTaskFormChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) {
+    const { name, value } = event.target;
+    setTaskForm((current) => ({
       ...current,
       [name]: value
     }));
@@ -319,6 +369,146 @@ export function OwnerDashboard({
       status: "success",
       message: "Soba je uspesno sacuvana i spremna za Booking.com povezivanje."
     });
+  }
+
+  async function handleCreateTeamMember(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setTeamActionState({
+      status: "submitting",
+      message: "Dodajem clana tima..."
+    });
+
+    const response = await fetch("/api/admin/team-members", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(teamForm)
+    });
+
+    const result = (await response.json()) as
+      | { ok: true; member: TeamMember; message: string }
+      | { ok: false; message: string };
+
+    if (!response.ok || !result.ok) {
+      setTeamActionState({
+        status: "error",
+        message: result.message
+      });
+      return;
+    }
+
+    setLocalTeamMembers((current) => [...current, result.member]);
+    setTeamForm(initialTeamForm);
+    setTeamActionState({
+      status: "success",
+      message: result.message
+    });
+    await refreshOwnerFeed();
+  }
+
+  async function handleDeleteTeamMember(memberId: string) {
+    setTeamActionState({
+      status: "submitting",
+      message: "Brisem clana tima..."
+    });
+
+    const response = await fetch(`/api/admin/team-members/${memberId}`, {
+      method: "DELETE"
+    });
+
+    const result = (await response.json()) as
+      | { ok: true; message: string }
+      | { ok: false; message: string };
+
+    if (!response.ok || !result.ok) {
+      setTeamActionState({
+        status: "error",
+        message: result.message
+      });
+      return;
+    }
+
+    setLocalTeamMembers((current) => current.filter((member) => member.id !== memberId));
+    setTeamActionState({
+      status: "success",
+      message: result.message
+    });
+    await refreshOwnerFeed();
+  }
+
+  async function handleCreateCleaningTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setTaskActionState({
+      status: "submitting",
+      message: "Dodajem zadatak..."
+    });
+
+    const response = await fetch("/api/admin/cleaning-tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(taskForm)
+    });
+
+    const result = (await response.json()) as
+      | { ok: true; task: CleaningTask; message: string }
+      | { ok: false; message: string };
+
+    if (!response.ok || !result.ok) {
+      setTaskActionState({
+        status: "error",
+        message: result.message
+      });
+      return;
+    }
+
+    setLocalCleaningTasks((current) => [...current, result.task]);
+    setTaskForm({
+      roomId: localRooms[0]?.id ?? "",
+      assignee: "",
+      dueAt: "",
+      status: "todo",
+      notes: ""
+    });
+    setTaskActionState({
+      status: "success",
+      message: result.message
+    });
+    await refreshOwnerFeed();
+  }
+
+  async function handleDeleteCleaningTask(taskId: string) {
+    setTaskActionState({
+      status: "submitting",
+      message: "Brisem zadatak..."
+    });
+
+    const response = await fetch(`/api/admin/cleaning-tasks/${taskId}`, {
+      method: "DELETE"
+    });
+
+    const result = (await response.json()) as
+      | { ok: true; message: string }
+      | { ok: false; message: string };
+
+    if (!response.ok || !result.ok) {
+      setTaskActionState({
+        status: "error",
+        message: result.message
+      });
+      return;
+    }
+
+    setLocalCleaningTasks((current) => current.filter((task) => task.id !== taskId));
+    setTaskActionState({
+      status: "success",
+      message: result.message
+    });
+    await refreshOwnerFeed();
   }
 
   function handleInquiryRoomChange(inquiryId: string, roomId: string) {
@@ -669,10 +859,11 @@ export function OwnerDashboard({
     <div className="dashboard-grid">
       <section className="dashboard-panel hero-panel" id="overview">
         <p className="eyebrow">Owner control panel</p>
-        <h1>Pregled soba, rezervacija, kalendara i Booking.com povezivanja</h1>
+        <h1>Pregled soba, rezervacija, tima, zadataka i Booking.com povezivanja</h1>
         <p>
           Owner panel sada automatski osvezava nove upite sa sajta, belezi audit trail i
-          omogucava da svaka soba dobije svoj Booking.com room mapping pre ukljucivanja sync-a.
+          omogucava da svaka soba dobije svoj Booking.com room mapping, a tim i zadaci mogu da se
+          vode direktno iz istog operativnog panela.
         </p>
         <div className="stats-row">
           <div className="stat-card">
@@ -694,6 +885,14 @@ export function OwnerDashboard({
           <div className="stat-card">
             <span>Aktivni upiti</span>
             <strong>{activeInquiries.length}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Clanovi tima</span>
+            <strong>{localTeamMembers.length}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Otvoreni zadaci</span>
+            <strong>{localCleaningTasks.length}</strong>
           </div>
         </div>
       </section>
@@ -935,6 +1134,182 @@ export function OwnerDashboard({
                   <div>{new Date(entry.createdAt).toLocaleString("sr-RS")}</div>
                   <div>
                     <span className="inline-note">{entry.entityId}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      <div className="dashboard-split-grid">
+        <section className="dashboard-panel" id="team-management">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Tim</p>
+              <h2>Dodaj owner i staff clanove</h2>
+            </div>
+          </div>
+          <form className="admin-form" onSubmit={handleCreateTeamMember}>
+            <input
+              name="name"
+              onChange={handleTeamFormChange}
+              placeholder="Ime i prezime"
+              required
+              value={teamForm.name}
+            />
+            <select
+              className="admin-inline-select"
+              name="role"
+              onChange={handleTeamFormChange}
+              value={teamForm.role}
+            >
+              <option value="owner">owner</option>
+              <option value="host">host</option>
+              <option value="cleaner">cleaner</option>
+            </select>
+            <input
+              name="shift"
+              onChange={handleTeamFormChange}
+              placeholder="Smena, npr. 08:00 - 16:00"
+              required
+              value={teamForm.shift}
+            />
+            <button className="primary-button" type="submit">
+              {teamActionState.status === "submitting" ? "Cuvanje..." : "Dodaj clana tima"}
+            </button>
+            <p
+              className={`inline-note ${teamActionState.status === "error" ? "inline-note-error" : ""}`}
+            >
+              {teamActionState.message}
+            </p>
+          </form>
+          {localTeamMembers.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Tim jos nije dodat</strong>
+              <p>Dodaj owner i staff clanove da bi operativni panel bio spreman za smene.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {localTeamMembers.map((member) => (
+                <div key={member.id} className="table-row">
+                  <div>
+                    <strong>{member.name}</strong>
+                    <span>{member.role}</span>
+                  </div>
+                  <div>{member.shift}</div>
+                  <div />
+                  <div className="admin-inline-actions">
+                    <button
+                      className="secondary-button"
+                      onClick={() => void handleDeleteTeamMember(member.id)}
+                      type="button"
+                    >
+                      Obrisi
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="dashboard-panel" id="task-management">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Zadaci</p>
+              <h2>Dodaj operativne taskove</h2>
+            </div>
+          </div>
+          <form className="admin-form" onSubmit={handleCreateCleaningTask}>
+            <select
+              className="admin-inline-select"
+              name="roomId"
+              onChange={handleTaskFormChange}
+              required
+              value={taskForm.roomId}
+            >
+              {localRooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {getRoomDisplayName(room)}
+                </option>
+              ))}
+            </select>
+            <input
+              name="assignee"
+              onChange={handleTaskFormChange}
+              placeholder="Zaduzeno lice"
+              required
+              value={taskForm.assignee}
+            />
+            <div className="admin-filters">
+              <input
+                name="dueAt"
+                onChange={handleTaskFormChange}
+                placeholder="Vreme, npr. 14:30"
+                required
+                value={taskForm.dueAt}
+              />
+              <select
+                className="admin-inline-select"
+                name="status"
+                onChange={handleTaskFormChange}
+                value={taskForm.status}
+              >
+                <option value="todo">todo</option>
+                <option value="in-progress">in-progress</option>
+                <option value="done">done</option>
+              </select>
+            </div>
+            <textarea
+              name="notes"
+              onChange={handleTaskFormChange}
+              placeholder="Napomena za zadatak"
+              required
+              rows={4}
+              value={taskForm.notes}
+            />
+            <button className="primary-button" type="submit">
+              {taskActionState.status === "submitting" ? "Cuvanje..." : "Dodaj zadatak"}
+            </button>
+            <p
+              className={`inline-note ${taskActionState.status === "error" ? "inline-note-error" : ""}`}
+            >
+              {taskActionState.message}
+            </p>
+          </form>
+          {localCleaningTasks.length === 0 ? (
+            <div className="admin-empty-state">
+              <strong>Nema aktivnih zadataka</strong>
+              <p>Dodaj prvi zadatak za ciscenje, pripremu sobe ili check-in operativu.</p>
+            </div>
+          ) : (
+            <div className="table-like">
+              {localCleaningTasks.map((task) => (
+                <div key={task.id} className="table-row">
+                  <div>
+                    <strong>
+                      {getRoomDisplayName(
+                        localRooms.find((room) => room.id === task.roomId) ?? {
+                          id: task.roomId,
+                          name: task.roomId,
+                          slug: task.roomId
+                        }
+                      )}
+                    </strong>
+                    <span>{task.notes}</span>
+                  </div>
+                  <div>{task.assignee}</div>
+                  <div>{task.dueAt}</div>
+                  <div className="admin-inline-actions">
+                    <span className={`status-pill status-${task.status}`}>{task.status}</span>
+                    <button
+                      className="secondary-button"
+                      onClick={() => void handleDeleteCleaningTask(task.id)}
+                      type="button"
+                    >
+                      Obrisi
+                    </button>
                   </div>
                 </div>
               ))}

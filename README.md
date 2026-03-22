@@ -17,6 +17,16 @@ npm run dev
 
 Ako povezujemo Booking.com i Vercel Blob, treba dodati `.env.local` na osnovu vrednosti iz `.env.example`.
 
+## Produkcijski utility skriptovi
+
+```bash
+npm run db:migrate-launch-v1
+npm run db:cleanup-live
+```
+
+- `db:migrate-launch-v1` uskladjuje launch v1 baznu semu
+- `db:cleanup-live` brise operativne test podatke (`reservations`, `inquiries`, `room_blocks`, `cleaning_tasks`, `team_members`, `users`, `activity_log`) i cuva sobe i room mapping konfiguraciju
+
 ## Stranice
 
 - `/` javna landing strana
