@@ -96,7 +96,7 @@ function buildInitialMappingDrafts(rooms: Room[], mappings: RoomChannelMapping[]
 }
 
 function getMappingVisualState(draft: MappingDraft) {
-  if (draft.syncEnabled && draft.externalRoomId && draft.externalRoomName) {
+  if (draft.syncEnabled && draft.externalRoomName && draft.importUrl) {
     return {
       badgeClassName: "status-mapped",
       label: "sync aktivan"

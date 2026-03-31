@@ -69,11 +69,11 @@ export async function POST(request: Request, context: RouteContext) {
       lastSyncStatus: "idle"
     };
 
-    if (mapping.syncEnabled && (!mapping.externalRoomId || !mapping.externalRoomName)) {
+    if (mapping.syncEnabled && (!mapping.externalRoomName || !mapping.importUrl)) {
       return NextResponse.json(
         {
           ok: false,
-          message: "Za aktivan sync unesi Booking.com room ID i naziv sobe."
+          message: "Za aktivan sync unesi bar tacan Booking.com naziv sobe i iCal import URL."
         },
         { status: 400 }
       );

@@ -61,7 +61,7 @@ function buildInitialMappingDrafts(rooms: Room[], mappings: RoomChannelMapping[]
 }
 
 function getMappingVisualState(draft: MappingDraft) {
-  if (draft.syncEnabled && draft.externalRoomId && draft.externalRoomName) {
+  if (draft.syncEnabled && draft.externalRoomName && draft.importUrl) {
     return {
       badgeClassName: "status-mapped",
       label: "sync aktivan"
@@ -355,7 +355,7 @@ export function OwnerBookingSyncPanel({
                       onChange={(event) =>
                         handleMappingFieldChange(room.id, "externalRoomId", event.target.value)
                       }
-                      placeholder="Booking.com room ID"
+                      placeholder="Booking.com room ID (opciono)"
                       value={draft.externalRoomId}
                     />
                     <input
@@ -365,7 +365,7 @@ export function OwnerBookingSyncPanel({
                     />
                     <input
                       onChange={(event) => handleMappingFieldChange(room.id, "importUrl", event.target.value)}
-                      placeholder="iCal import URL"
+                      placeholder="Booking.com iCal import URL"
                       value={draft.importUrl}
                     />
                     <label className="admin-checkbox">
@@ -378,6 +378,10 @@ export function OwnerBookingSyncPanel({
                       />
                       <span>Aktiviraj sync za ovu sobu</span>
                     </label>
+                    <p className="inline-note">
+                      Za aktivan iCal sync dovoljni su tacan naziv sobe i Booking.com import URL.
+                      Room ID je koristan za internu proveru, ali nije obavezan.
+                    </p>
                     <button
                       className="primary-button"
                       onClick={() => void handleSaveMapping(room.id)}

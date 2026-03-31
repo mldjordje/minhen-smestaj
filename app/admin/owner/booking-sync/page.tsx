@@ -58,24 +58,40 @@ export default async function OwnerBookingSyncGuidePage() {
           <article className="process-card">
             <strong>1. Pronadji sobu u Extranet-u</strong>
             <p>
-              U Booking.com panelu otvori Rooms and rates i nadji naziv sobe koji se
-              poklapa sa internom sobom iz nase aplikacije.
+              U Booking.com Extranet-u otvori `Rooms & Rates`, zatim listu soba ili
+              `Room types`, i prekopiraj tacan naziv sobe koji se poklapa sa nasom internom sobom.
             </p>
           </article>
           <article className="process-card">
             <strong>2. Prekopiraj room ID i naziv</strong>
             <p>
-              U owner panel unesi Booking.com room ID i tacan naziv sobe kako bi mapiranje
-              bilo jasno i proverljivo.
+              Ako se Booking.com room ID vidi u URL-u stranice sobe, u detaljima sobe ili u
+              connectivity sekciji, unesi ga u owner panel. Ako ga ne vidis, ostavi to polje prazno
+              i unesi samo tacan naziv sobe.
             </p>
           </article>
           <article className="process-card">
             <strong>3. Dodaj iCal linkove</strong>
             <p>
-              Ako koristimo iCal sync, kopiraj export i import URL za tu sobu i unesi ih
-              u Booking.com mapping sekciju.
+              U Booking.com kalendaru za tu sobu otvori `Sync calendars`, `Calendar sync`
+              ili deo za import/export kalendara i odatle kopiraj iCal linkove.
             </p>
           </article>
+        </div>
+      </section>
+
+      <section className="dashboard-panel">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Gde tacno da klikne</p>
+            <h2>Sta trazis u Booking.com nalogu</h2>
+          </div>
+        </div>
+        <div className="bullet-list">
+          <span>`Booking.com room naziv`: otvori `Rooms & Rates` i kopiraj naziv sobe tacno kako pise u Extranet-u.</span>
+          <span>`Booking.com room ID`: najcesce je vidljiv u URL-u, u room setup detaljima ili connectivity ekranu. Ako ga ne nadjes, sada nije obavezan za iCal sync.</span>
+          <span>`Booking.com iCal import URL`: u kalendaru te sobe trazi opciju `Sync calendars`, `Export calendar` ili `Calendar import/export`, pa kopiraj URL koji Booking daje za izvoz rezervacija.</span>
+          <span>`Nas export URL`: to je link koji se prikazuje u nasem adminu. Njega kopiras nazad u Booking.com ako zelis da Booking vidi nase direktne rezervacije i blokade.</span>
         </div>
       </section>
 
@@ -88,7 +104,7 @@ export default async function OwnerBookingSyncGuidePage() {
         </div>
         <div className="bullet-list">
           <span>Naziv sobe u aplikaciji mora jasno odgovarati nazivu na Booking.com-u.</span>
-          <span>Room ID i naziv sobe nisu isto, unesi oba podatka ako su dostupna.</span>
+          <span>Room ID i naziv sobe nisu isto, ali room ID je sada opcion ako nije lako dostupan u Extranet-u.</span>
           <span>Pre aktivacije proveri da import/export URL vode bas na tu sobu.</span>
           <span>Aktiviraj sync tek kada je mapiranje provereno, inace ostavi kao draft.</span>
         </div>
@@ -137,7 +153,7 @@ export default async function OwnerBookingSyncGuidePage() {
         </div>
         <div className="bullet-list">
           <span>Vrati se u owner panel i sacuvaj Booking.com mapping za svaku sobu.</span>
-          <span>Pokreni test sync sa jednom sobom pre nego sto ukljucis sve jedinice.</span>
+          <span>Prvo mapiraj jednu sobu i klikni `Sync now` da proveris da li rezervacije stizu u interni kalendar.</span>
           <span>Prati da li se termini iz Booking.com-a prikazuju u internom kalendaru.</span>
         </div>
       </section>
