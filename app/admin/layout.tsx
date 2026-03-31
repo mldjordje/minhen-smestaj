@@ -7,29 +7,72 @@ type AdminLayoutProps = {
   children: React.ReactNode;
 };
 
-const ownerLinks = [
-  { href: "/admin/owner", label: "Pregled" },
-  { href: "/admin/owner#calendar", label: "Kalendar" },
-  { href: "/admin/owner#inquiries", label: "Upiti" },
-  { href: "/admin/owner#mapping", label: "Booking.com" },
-  { href: "/admin/owner#rooms", label: "Sobe" },
-  { href: "/admin/owner#integrations", label: "Integracije" },
-  { href: "/admin/owner/booking-sync", label: "Booking Guide" }
+type NavGroup = {
+  label: string;
+  links: Array<{
+    href: string;
+    label: string;
+  }>;
+};
+
+const ownerGroups: NavGroup[] = [
+  {
+    label: "Pregled i rezervacije",
+    links: [
+      { href: "/admin/owner", label: "Pregled" },
+      { href: "/admin/owner/calendar", label: "Kalendar" },
+      { href: "/admin/owner/inquiries", label: "Upiti" }
+    ]
+  },
+  {
+    label: "Operativa",
+    links: [
+      { href: "/admin/owner/rooms", label: "Sobe" },
+      { href: "/admin/owner/tasks", label: "Zadaci" },
+      { href: "/admin/owner/team", label: "Tim" },
+      { href: "/admin/owner/users", label: "Korisnici" }
+    ]
+  },
+  {
+    label: "Integracije",
+    links: [
+      { href: "/admin/owner/booking", label: "Booking.com" },
+      { href: "/admin/owner/booking-sync", label: "Booking Guide" }
+    ]
+  }
 ];
 
-const staffLinks = [
-  { href: "/admin/staff", label: "Pregled" },
-  { href: "/admin/staff#calendar", label: "Kalendar" },
-  { href: "/admin/staff#tasks", label: "Ciscenje" },
-  { href: "/admin/staff#arrivals", label: "Dolasci" },
-  { href: "/admin/staff#team", label: "Tim" }
+const staffGroups: NavGroup[] = [
+  {
+    label: "Dnevni rad",
+    links: [
+      { href: "/admin/staff", label: "Pregled" },
+      { href: "/admin/staff/calendar", label: "Kalendar" },
+      { href: "/admin/staff/arrivals", label: "Dolasci" }
+    ]
+  },
+  {
+    label: "Operativa",
+    links: [
+      { href: "/admin/staff/tasks", label: "Ciscenje" },
+      { href: "/admin/staff/team", label: "Tim" }
+    ]
+  }
 ];
+
+function isLinkActive(pathname: string, href: string) {
+  if (href === "/admin" || href === "/admin/owner" || href === "/admin/staff") {
+    return pathname === href;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const isOwnerRoute = pathname.startsWith("/admin/owner");
   const isStaffRoute = pathname.startsWith("/admin/staff");
-  const sectionLinks = isOwnerRoute ? ownerLinks : isStaffRoute ? staffLinks : [];
+  const navGroups = isOwnerRoute ? ownerGroups : isStaffRoute ? staffGroups : [];
 
   return (
     <main className="admin-wrap">
@@ -39,9 +82,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <h2>{isOwnerRoute ? "Owner panel" : isStaffRoute ? "Staff panel" : "Operativni panel"}</h2>
           <p className="sidebar-copy">
             {isOwnerRoute
-              ? "Vlasnik upravlja sobama, rezervacijama, mapiranjem i integracijama."
+              ? "Funkcije su rasporedjene po celinama da se do kalendara, upita i integracija stize bez trazenja po dugackim stranicama."
               : isStaffRoute
-                ? "Staff vodi operativu, blokade termina, dolaske i zadatke po sobama."
+                ? "Staff dobija krace putanje do dnevnog kalendara, dolazaka i zadataka bez dodatnog skrolovanja."
                 : "Izaberi odgovarajucu admin zonu i funkcije koje su ti potrebne."}
           </p>
         </div>
@@ -52,29 +95,29 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <Link className={pathname === "/admin" ? "is-active" : ""} href="/admin">
               Admin pocetna
             </Link>
-            <Link className={pathname === "/admin/owner" ? "is-active" : ""} href="/admin/owner">
+            <Link className={isLinkActive(pathname, "/admin/owner") ? "is-active" : ""} href="/admin/owner">
               Owner
             </Link>
-            <Link className={pathname === "/admin/staff" ? "is-active" : ""} href="/admin/staff">
+            <Link className={isLinkActive(pathname, "/admin/staff") ? "is-active" : ""} href="/admin/staff">
               Staff
             </Link>
             <Link href="/">Nazad na sajt</Link>
           </div>
 
-          {sectionLinks.length > 0 ? (
-            <div className="admin-nav__group">
-              <p className="admin-nav__label">Sekcije</p>
-              {sectionLinks.map((link) => (
+          {navGroups.map((group) => (
+            <div key={group.label} className="admin-nav__group">
+              <p className="admin-nav__label">{group.label}</p>
+              {group.links.map((link) => (
                 <Link
                   key={link.href}
-                  className={pathname === link.href ? "is-active" : ""}
+                  className={isLinkActive(pathname, link.href) ? "is-active" : ""}
                   href={link.href}
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
-          ) : null}
+          ))}
         </nav>
       </aside>
       <section className="admin-content">{children}</section>

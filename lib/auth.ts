@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { db, ensureDatabaseSchema } from "@/lib/db";
 import type { AppUser, UserRole } from "@/lib/types";
 
-function resolveRole(email: string) {
+function resolveRoleFromConfig(email: string) {
   const normalizedEmail = email.toLowerCase();
   const ownerEmails = (process.env.OWNER_EMAILS || "")
     .split(",")
@@ -26,7 +26,44 @@ function resolveRole(email: string) {
     return "staff" as UserRole;
   }
 
-  return "guest" as UserRole;
+  return null;
+}
+
+async function getStoredUserByEmail(email: string) {
+  if (!db) {
+    return null;
+  }
+
+  await ensureDatabaseSchema();
+
+  const userRows = await db<AppUser[]>`
+    select id, email, name, image, role
+    from users
+    where email = ${email}
+    limit 1
+  `;
+
+  return userRows[0] ?? null;
+}
+
+export function getDefaultPostLoginPath(role: UserRole) {
+  if (role === "owner") {
+    return "/admin/owner";
+  }
+
+  if (role === "staff") {
+    return "/admin/staff";
+  }
+
+  return "/account";
+}
+
+export function sanitizeCallbackUrl(callbackUrl?: string | null) {
+  if (!callbackUrl || !callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) {
+    return null;
+  }
+
+  return callbackUrl;
 }
 
 async function upsertAppUser(params: {
@@ -40,13 +77,14 @@ async function upsertAppUser(params: {
       email: params.email,
       name: params.name,
       image: params.image ?? null,
-      role: resolveRole(params.email)
+      role: resolveRoleFromConfig(params.email) ?? "guest"
     } satisfies AppUser;
   }
 
   await ensureDatabaseSchema();
 
-  const role = resolveRole(params.email);
+  const existingUser = await getStoredUserByEmail(params.email);
+  const role = resolveRoleFromConfig(params.email) ?? existingUser?.role ?? "guest";
   const userRows = await db<AppUser[]>`
     insert into users (id, email, name, image, role, updated_at)
     values (
@@ -70,6 +108,7 @@ async function upsertAppUser(params: {
 }
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt"
   },

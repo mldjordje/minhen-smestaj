@@ -30,8 +30,11 @@ export default async function OwnerBookingSyncGuidePage() {
           mapiranje izmedju nase sobe u aplikaciji i odgovarajuce sobe na Booking.com-u.
         </p>
         <div className="cta-row">
-          <Link className="primary-button" href="/admin/owner">
-            Nazad na owner panel
+          <Link className="primary-button" href="/admin/owner/booking">
+            Nazad na Booking.com
+          </Link>
+          <Link className="secondary-button" href="/admin/owner">
+            Owner pregled
           </Link>
           <a
             className="secondary-button"

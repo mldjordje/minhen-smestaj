@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth";
 import { db, ensureDatabaseSchema } from "@/lib/db";
 import { createRoomIdentity } from "@/lib/rooms";
+import { DEFAULT_ROOM_LOCATION } from "@/lib/site-config";
 import { Room } from "@/lib/types";
 
 type CreateRoomPayload = {
@@ -10,7 +11,6 @@ type CreateRoomPayload = {
   capacity?: number;
   image?: string;
   name?: string;
-  neighborhood?: string;
   pricePerNight?: number;
   roomNumber?: string;
   shortDescription?: string;
@@ -63,7 +63,6 @@ export async function POST(request: Request) {
 
     if (
       !payload.roomNumber ||
-      !payload.neighborhood ||
       !payload.beds ||
       !payload.shortDescription ||
       !payload.pricePerNight ||
@@ -72,7 +71,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          message: "Popunite broj sobe, lokaciju, cenu, kapacitet, krevete i opis sobe."
+          message: "Popunite broj sobe, cenu, kapacitet, krevete i opis sobe."
         },
         { status: 400 }
       );
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
       id: roomId,
       slug,
       name: roomIdentity.name,
-      neighborhood: payload.neighborhood.trim(),
+      neighborhood: DEFAULT_ROOM_LOCATION,
       pricePerNight: Number(payload.pricePerNight),
       capacity: Number(payload.capacity),
       beds: payload.beds.trim(),

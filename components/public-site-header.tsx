@@ -67,7 +67,7 @@ export function PublicSiteHeader() {
               ))}
             </nav>
 
-            <AuthButtons />
+            <AuthButtons callbackUrl="/account" label="Prijava klijenta" />
           </div>
         </div>
       </div>

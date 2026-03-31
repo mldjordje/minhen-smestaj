@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getBookingsData, getRoomBlocksData, getRoomsData } from "@/lib/admin-data";
-import { PublicBookingForm } from "@/components/public-booking-form";
+import { BookingExperiencePanel } from "@/components/booking-experience-panel";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
 
 export default async function RoomsPage() {
@@ -66,19 +66,24 @@ export default async function RoomsPage() {
                 DIREKTNA REZERVACIJA
               </p>
               <h2 className="cs_section_title cs_fs_64 mb-0">
-                Posaljite upit i izaberite sobu koja vam odgovara
+                Izaberite sobu, tip boravka i tacan termin na istom mestu
               </h2>
               <p className="cs_fs_20 cs_light room-booking-copy__text">
-                Na jednom mestu mozete odabrati konkretnu sobu, uneti datume i broj gostiju.
-                Za svaku sobu postoji i zasebna stranica sa njenim kalendarom dostupnosti.
+                Na jednom mestu mozete odabrati konkretnu sobu, dnevni ili mesecni booking i
+                klikom na kalendar uneti tacan period. Za svaku sobu postoji i zasebna stranica
+                sa istim interaktivnim kalendarom dostupnosti.
               </p>
             </div>
             {rooms.length > 0 ? (
-              <PublicBookingForm
+              <BookingExperiencePanel
                 bookings={bookings}
+                dailyFormSubtitle="Izabrani dnevni termin se odmah prenosi u formu za potvrdu rezervacije ili upit."
+                headingEyebrow="Booking flow"
+                headingNote="Izaberite sobu, zatim kliknite dolazak i odlazak ili uzastopne slobodne mesece."
+                headingTitle="Interaktivni kalendar za sve sobe"
+                monthlyFormSubtitle="Izabrani mesecni raspon se prenosi u upit za duzi boravak."
                 roomBlocks={roomBlocks}
                 rooms={rooms}
-                subtitle="Izaberi sobu i odmah proveri dostupnost pre potvrde rezervacije."
               />
             ) : null}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addDays, getCalendarCellStatus } from "@/lib/availability";
+import { addDays, getCalendarCellStatus, parseDate } from "@/lib/availability";
 import { getRoomDisplayName } from "@/lib/rooms";
 import { Booking, Room, RoomBlock } from "@/lib/types";
 
@@ -35,6 +35,11 @@ type BlockEditDraft = {
 type ActionState = {
   message: string;
   status: "idle" | "submitting" | "success" | "error";
+};
+
+type RangeDraftState = {
+  anchor: string | null;
+  touched?: boolean;
 };
 
 type AdminRoomCalendarProps = {
@@ -105,6 +110,16 @@ function createBlockEditDraft(roomBlock: RoomBlock): BlockEditDraft {
   };
 }
 
+function rangesOverlap(checkIn: string, checkOut: string, otherCheckIn: string, otherCheckOut: string) {
+  return checkIn < otherCheckOut && otherCheckIn < checkOut;
+}
+
+function getDraftRangeSummary(checkIn: string, checkOut: string) {
+  const inclusiveEnd = addDays(parseDate(checkOut), -1);
+
+  return `${checkIn} - ${formatDateInput(inclusiveEnd)}`;
+}
+
 export function AdminRoomCalendar({
   audience,
   bookings,
@@ -122,11 +137,105 @@ export function AdminRoomCalendar({
   const [blockDrafts, setBlockDrafts] = useState<Record<string, BlockEditDraft>>({});
   const [reservationActionState, setReservationActionState] = useState<Record<string, ActionState>>({});
   const [blockActionState, setBlockActionState] = useState<Record<string, ActionState>>({});
+  const [rangeDrafts, setRangeDrafts] = useState<Record<string, RangeDraftState>>({});
+  const [rangeFeedback, setRangeFeedback] = useState<Record<string, string>>({});
+  const [roomSearch, setRoomSearch] = useState("");
   const startDate = new Date();
   const calendarDays = Array.from({ length: 21 }, (_, index) => addDays(startDate, index));
 
   function handleDraftChange(roomId: string, field: keyof CalendarEntryDraft, value: string) {
     setDrafts((current) => ({ ...current, [roomId]: { ...(current[roomId] ?? createInitialDraft()), [field]: value } }));
+  }
+
+  function setRangeFeedbackMessage(roomId: string, message: string) {
+    setRangeFeedback((current) => ({ ...current, [roomId]: message }));
+  }
+
+  function isDraftRangeAvailable(
+    roomBookings: Booking[],
+    activeBlocks: RoomBlock[],
+    checkIn: string,
+    checkOut: string
+  ) {
+    if (checkIn >= checkOut) {
+      return false;
+    }
+
+    const hasBookingConflict = roomBookings.some((booking) =>
+      rangesOverlap(checkIn, checkOut, booking.checkIn, booking.checkOut)
+    );
+    const hasBlockConflict = activeBlocks.some((roomBlock) =>
+      rangesOverlap(checkIn, checkOut, roomBlock.checkIn, roomBlock.checkOut)
+    );
+
+    return !hasBookingConflict && !hasBlockConflict;
+  }
+
+  function handleCalendarRangeClick(
+    roomId: string,
+    date: Date,
+    roomBookings: Booking[],
+    activeBlocks: RoomBlock[]
+  ) {
+    const roomDraft = drafts[roomId] ?? createInitialDraft();
+    const dateKey = formatDateInput(date);
+    const nextDateKey = formatDateInput(addDays(date, 1));
+    const currentRangeState = rangeDrafts[roomId];
+    const canStartOnDate = isDraftRangeAvailable(roomBookings, activeBlocks, dateKey, nextDateKey);
+
+    if (!currentRangeState?.anchor) {
+      if (!canStartOnDate) {
+        setRangeFeedbackMessage(roomId, "Na ovom danu ne moze da pocne novi rucni unos. Izaberite slobodan dan.");
+        return;
+      }
+
+      setRangeDrafts((current) => ({ ...current, [roomId]: { anchor: dateKey, touched: true } }));
+      setDrafts((current) => ({
+        ...current,
+        [roomId]: { ...(current[roomId] ?? createInitialDraft()), checkIn: dateKey, checkOut: nextDateKey }
+      }));
+      setRangeFeedbackMessage(
+        roomId,
+        "Pocetak je izabran. Kliknite poslednji dan boravka ili blokade da se automatski popuni raspon."
+      );
+      return;
+    }
+
+    if (dateKey < currentRangeState.anchor) {
+      if (!canStartOnDate) {
+        setRangeFeedbackMessage(roomId, "Novi pocetak mora biti na slobodnom danu.");
+        return;
+      }
+
+      setRangeDrafts((current) => ({ ...current, [roomId]: { anchor: dateKey, touched: true } }));
+      setDrafts((current) => ({
+        ...current,
+        [roomId]: { ...(current[roomId] ?? createInitialDraft()), checkIn: dateKey, checkOut: nextDateKey }
+      }));
+      setRangeFeedbackMessage(roomId, "Pocetni dan je pomeren. Sada kliknite poslednji dan unosa.");
+      return;
+    }
+
+    const anchorDate = currentRangeState.anchor;
+    const checkOut = formatDateInput(addDays(date, 1));
+    if (!anchorDate || !isDraftRangeAvailable(roomBookings, activeBlocks, anchorDate, checkOut)) {
+      setRangeFeedbackMessage(roomId, "Izabrani raspon se preklapa sa rezervacijom ili blokadom. Probajte drugi kraj perioda.");
+      return;
+    }
+
+    setDrafts((current) => ({
+      ...current,
+        [roomId]: {
+          ...(current[roomId] ?? createInitialDraft()),
+          checkIn: anchorDate,
+          checkOut
+        }
+      }));
+    setRangeDrafts((current) => ({ ...current, [roomId]: { anchor: null, touched: true } }));
+    setRangeFeedbackMessage(
+      roomId,
+      `Raspon je spreman za unos: ${getDraftRangeSummary(anchorDate, checkOut)}.`
+    );
   }
 
   function handleReservationDraftChange(reservationId: string, field: keyof ReservationEditDraft, value: string) {
@@ -175,6 +284,8 @@ export function AdminRoomCalendar({
     }
 
     setDrafts((current) => ({ ...current, [roomId]: { ...createInitialDraft(), type: draft.type } }));
+    setRangeDrafts((current) => ({ ...current, [roomId]: { anchor: null, touched: false } }));
+    setRangeFeedbackMessage(roomId, "Kliknite pocetni i poslednji dan da pripremite sledeci rucni unos.");
     setCreateActionState((current) => ({ ...current, [roomId]: { status: "success", message: result.message } }));
   }
 
@@ -371,6 +482,20 @@ export function AdminRoomCalendar({
     );
   }
 
+  const filteredRooms = rooms.filter((room) => {
+    const query = roomSearch.trim().toLowerCase();
+
+    if (!query) {
+      return true;
+    }
+
+    return (
+      getRoomDisplayName(room).toLowerCase().includes(query) ||
+      room.neighborhood.toLowerCase().includes(query) ||
+      room.slug.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <section className="dashboard-panel" id={sectionId}>
       <div className="section-heading wide">
@@ -384,23 +509,66 @@ export function AdminRoomCalendar({
         <span className="calendar-legend__item is-departure">Odlazak</span>
         <span className="calendar-legend__item is-blocked">Blokirano</span>
       </div>
+      <div className="interactive-room-calendar__tools">
+        <input
+          onChange={(event) => setRoomSearch(event.target.value)}
+          placeholder="Pronadji sobu ili lokaciju..."
+          type="search"
+          value={roomSearch}
+        />
+        <div className="interactive-room-calendar__quick-links">
+          {filteredRooms.map((room) => (
+            <a key={room.id} className="secondary-button" href={`#room-calendar-${room.id}`}>
+              {getRoomDisplayName(room)}
+            </a>
+          ))}
+        </div>
+      </div>
       <div className="interactive-room-calendar">
         {rooms.length === 0 ? <div className="admin-empty-state"><strong>Jos nema soba u bazi</strong><p>Kada dodas prvu sobu, ovde ce se automatski pojaviti njen kalendar.</p></div> : null}
-        {rooms.map((room) => {
+        {rooms.length > 0 && filteredRooms.length === 0 ? (
+          <div className="admin-empty-state">
+            <strong>Nema rezultata za zadatu pretragu</strong>
+            <p>Probajte naziv sobe, slug ili lokaciju kako biste brze nasli trazeni kalendar.</p>
+          </div>
+        ) : null}
+        {filteredRooms.map((room) => {
           const roomDraft = drafts[room.id] ?? createInitialDraft();
           const roomBookings = sortBookings(bookings.filter((booking) => booking.roomId === room.id));
           const activeBlocks = sortRoomBlocks(roomBlocks.filter((block) => block.roomId === room.id));
+          const rangeState = rangeDrafts[room.id];
+          const inclusiveSelectionEnd = formatDateInput(addDays(parseDate(roomDraft.checkOut), -1));
+          const hasVisibleSelection = Boolean(rangeState?.touched);
 
           return (
-            <article key={room.id} className="interactive-room-calendar__card">
+            <article key={room.id} className="interactive-room-calendar__card" id={`room-calendar-${room.id}`}>
               <div className="interactive-room-calendar__card-head">
                 <div><strong>{getRoomDisplayName(room)}</strong><span>{room.neighborhood}</span></div>
                 <span className="status-pill status-available">{roomBookings.length} rezervacija / {activeBlocks.length} blokada</span>
               </div>
               <div className="interactive-room-calendar__grid">
                 {calendarDays.map((day) => {
+                  const dateKey = formatDateInput(day);
                   const cell = getCalendarCellStatus(room, day, roomBookings, activeBlocks);
-                  return <div key={`${room.id}-${day.toISOString()}`} className={`interactive-room-calendar__cell is-${cell.tone}`} title={cell.detail}><strong>{dayLabelFormatter.format(day)}</strong><span>{weekdayFormatter.format(day)}</span><small>{cell.shortLabel}</small></div>;
+                  const isSelectionStart =
+                    hasVisibleSelection && dateKey === (rangeState?.anchor ?? roomDraft.checkIn);
+                  const isSelectionEnd = hasVisibleSelection && dateKey === inclusiveSelectionEnd;
+                  const isSelectionRange =
+                    hasVisibleSelection && dateKey > roomDraft.checkIn && dateKey < roomDraft.checkOut;
+
+                  return (
+                    <button
+                      key={`${room.id}-${day.toISOString()}`}
+                      className={`interactive-room-calendar__cell is-${cell.tone}${isSelectionStart ? " is-selected-start" : ""}${isSelectionEnd ? " is-selected-end" : ""}${isSelectionRange ? " is-selected-range" : ""}`}
+                      onClick={() => handleCalendarRangeClick(room.id, day, roomBookings, activeBlocks)}
+                      title={cell.detail}
+                      type="button"
+                    >
+                      <strong>{dayLabelFormatter.format(day)}</strong>
+                      <span>{weekdayFormatter.format(day)}</span>
+                      <small>{cell.shortLabel}</small>
+                    </button>
+                  );
                 })}
               </div>
               <div className="interactive-room-calendar__form">
@@ -421,10 +589,16 @@ export function AdminRoomCalendar({
                   <input onChange={(event) => handleDraftChange(room.id, "checkIn", event.target.value)} type="date" value={roomDraft.checkIn} />
                   <input onChange={(event) => handleDraftChange(room.id, "checkOut", event.target.value)} type="date" value={roomDraft.checkOut} />
                 </div>
+                <p className="inline-note">
+                  Kliknite pocetni dan pa poslednji dan u kalendaru iznad da automatski popunite raspon.
+                </p>
                 {roomDraft.type === "reservation" ? <input onChange={(event) => handleDraftChange(room.id, "guestName", event.target.value)} placeholder="Ime gosta" value={roomDraft.guestName} /> : null}
                 <textarea onChange={(event) => handleDraftChange(room.id, "notes", event.target.value)} placeholder={roomDraft.type === "reservation" ? "Napomena za rucni unos rezervacije" : "Razlog blokade termina"} rows={3} value={roomDraft.notes} />
                 <button className="primary-button" onClick={() => void handleCreateEntry(room.id)} type="button">{createActionState[room.id]?.status === "submitting" ? "Cuvanje..." : roomDraft.type === "reservation" ? "Dodaj rezervaciju" : "Blokiraj termin"}</button>
                 <p className={`inline-note ${createActionState[room.id]?.status === "error" ? "inline-note-error" : ""}`}>{createActionState[room.id]?.message || "Svaki unos prolazi proveru konflikta sa postojecim rezervacijama i blokadama."}</p>
+                <p className={`inline-note ${rangeFeedback[room.id]?.includes("ne moze") || rangeFeedback[room.id]?.includes("preklapa") ? "inline-note-error" : ""}`}>
+                  {rangeFeedback[room.id] || "Klik-izbor raspona je aktivan za rucne rezervacije i blokade."}
+                </p>
               </div>
               <div className="interactive-room-calendar__list-grid">
                 <section className="calendar-entry-section">

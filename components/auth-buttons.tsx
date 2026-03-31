@@ -4,10 +4,24 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 type AuthButtonsProps = {
+  callbackUrl?: string;
   compact?: boolean;
+  label?: string;
 };
 
-export function AuthButtons({ compact = false }: AuthButtonsProps) {
+function buildSignInHref(callbackUrl?: string) {
+  if (!callbackUrl) {
+    return "/signin";
+  }
+
+  return `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+}
+
+export function AuthButtons({
+  callbackUrl,
+  compact = false,
+  label = "Uloguj se"
+}: AuthButtonsProps) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -15,13 +29,21 @@ export function AuthButtons({ compact = false }: AuthButtonsProps) {
   }
 
   if (!session?.user) {
+    if (!compact) {
+      return (
+        <Link className="public-site-header__cta" href={buildSignInHref(callbackUrl)}>
+          {label}
+        </Link>
+      );
+    }
+
     return (
       <button
-        className={compact ? "secondary-button" : "public-site-header__cta"}
-        onClick={() => void signIn("google")}
+        className="secondary-button"
+        onClick={() => void signIn("google", { callbackUrl: callbackUrl || "/account" })}
         type="button"
       >
-        Uloguj se
+        {label}
       </button>
     );
   }

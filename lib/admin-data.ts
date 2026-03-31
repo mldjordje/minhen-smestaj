@@ -599,6 +599,28 @@ export async function getUserByEmail(email: string) {
   };
 }
 
+export async function getUsersData() {
+  if (!db) {
+    return [];
+  }
+
+  await ensureDatabaseSchema();
+
+  const userRows = await db<UserRow[]>`
+    select id, email, name, image, role
+    from users
+    order by role asc, name asc, email asc
+  `;
+
+  return userRows.map((user) => ({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    image: user.image,
+    role: user.role
+  }));
+}
+
 export async function getBookingsForUser(userId: string) {
   const bookings = await getBookingsData({ allowDemoFallback: false });
 

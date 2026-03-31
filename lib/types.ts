@@ -1,5 +1,6 @@
 export type RoomStatus = "available" | "occupied" | "cleaning" | "maintenance";
 export type UserRole = "guest" | "staff" | "owner";
+export type BookingMode = "daily" | "monthly";
 
 export type Room = {
   id: string;
@@ -87,7 +88,8 @@ export type ActivityLogEntityType =
   | "reservation"
   | "room_block"
   | "cleaning_task"
-  | "team_member";
+  | "team_member"
+  | "user";
 
 export type ActivityLogEntry = {
   id: string;

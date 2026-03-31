@@ -5,6 +5,7 @@ import { db, ensureDatabaseSchema } from "@/lib/db";
 import { sendInquiryAdminEmail } from "@/lib/email";
 import { getRoomsData } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
+import type { BookingMode } from "@/lib/types";
 
 function createInquiryId() {
   return `inq-${Date.now()}`;
@@ -13,6 +14,7 @@ function createInquiryId() {
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as {
+      bookingMode?: BookingMode;
       checkIn?: string;
       checkOut?: string;
       guestName?: string;
@@ -20,6 +22,7 @@ export async function POST(request: Request) {
       message?: string;
       phone?: string;
       roomSlug?: string;
+      selectionSummary?: string | null;
     };
 
     if (
@@ -62,6 +65,14 @@ export async function POST(request: Request) {
     }
 
     const inquiryId = createInquiryId();
+    const bookingMode = payload.bookingMode === "monthly" ? "monthly" : "daily";
+    const finalMessage = [
+      payload.message?.trim(),
+      bookingMode === "monthly" ? "Tip boravka: mesecni najam." : null,
+      payload.selectionSummary ? `Odabrani period: ${payload.selectionSummary}` : null
+    ]
+      .filter(Boolean)
+      .join("\n\n") || "Direktan upit sa sajta.";
 
     if (db) {
       await ensureDatabaseSchema();
@@ -85,7 +96,7 @@ export async function POST(request: Request) {
           ${payload.checkIn},
           ${payload.checkOut},
           ${Number(payload.guests || 1)},
-          ${payload.message?.trim() || "Direktan upit sa sajta."},
+          ${finalMessage},
           ${"new"}
         )
       `;
@@ -97,20 +108,24 @@ export async function POST(request: Request) {
         entityType: "inquiry",
         message: `Stigao je novi javni upit za ${getRoomDisplayName(selectedRoom)}.`,
         metadata: {
+          bookingMode,
           checkIn: payload.checkIn,
           checkOut: payload.checkOut,
           guests: Number(payload.guests || 1),
-          roomSlug: payload.roomSlug
+          roomSlug: payload.roomSlug,
+          selectionSummary: payload.selectionSummary ?? null
         }
       });
 
       await sendInquiryAdminEmail({
+        bookingMode,
         checkIn: payload.checkIn,
         checkOut: payload.checkOut,
         guestName: payload.guestName,
         guests: Number(payload.guests || 1),
         phone: payload.phone,
-        roomName: getRoomDisplayName(selectedRoom)
+        roomName: getRoomDisplayName(selectedRoom),
+        selectionSummary: payload.selectionSummary ?? null
       });
     }
 

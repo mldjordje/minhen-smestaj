@@ -81,12 +81,14 @@ export async function sendBookingEmails(params: {
 }
 
 export async function sendInquiryAdminEmail(params: {
+  bookingMode?: "daily" | "monthly";
   checkIn: string;
   checkOut: string;
   guestName: string;
   guests: number;
   phone: string;
   roomName: string;
+  selectionSummary?: string | null;
 }) {
   const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL_TO;
 
@@ -94,10 +96,13 @@ export async function sendInquiryAdminEmail(params: {
     return;
   }
 
+  const bookingModeLabel = params.bookingMode === "monthly" ? "Mesecni upit" : "Dnevni upit";
+  const summaryLine = params.selectionSummary ? `\nOdabrani period: ${params.selectionSummary}` : "";
+
   await sendEmail({
     to: adminEmail,
     subject: `Novi inquiry za ${params.roomName}`,
-    text: `${params.guestName} je poslao inquiry za ${params.roomName} (${params.checkIn} - ${params.checkOut}). Telefon: ${params.phone}`,
-    html: `<p>Novi inquiry za <strong>${params.roomName}</strong>.</p><p>Gost: ${params.guestName}</p><p>Termin: ${params.checkIn} - ${params.checkOut}</p><p>Broj gostiju: ${params.guests}</p><p>Telefon: ${params.phone}</p>`
+    text: `${bookingModeLabel}: ${params.guestName} je poslao inquiry za ${params.roomName} (${params.checkIn} - ${params.checkOut}). Telefon: ${params.phone}${summaryLine}`,
+    html: `<p><strong>${bookingModeLabel}</strong> za <strong>${params.roomName}</strong>.</p><p>Gost: ${params.guestName}</p><p>Termin: ${params.checkIn} - ${params.checkOut}</p><p>Broj gostiju: ${params.guests}</p><p>Telefon: ${params.phone}</p>${params.selectionSummary ? `<p>Odabrani period: ${params.selectionSummary}</p>` : ""}`
   });
 }

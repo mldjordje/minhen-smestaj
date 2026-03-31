@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { PublicBookingForm } from "@/components/public-booking-form";
+import { BookingExperiencePanel } from "@/components/booking-experience-panel";
 import { getBookingsData, getRoomBlocksData, getRoomsData } from "@/lib/admin-data";
 import { getLandingGallery } from "@/lib/site-gallery";
 import { PublicLegacyGallery, PublicRoomsGrid } from "@/components/public-template";
@@ -73,6 +73,45 @@ const bookingHighlights = [
   "najbrzi kontakt ostaje WhatsApp ili direktan upit sa sajta"
 ];
 
+const bookingProcess = [
+  {
+    step: "01",
+    title: "Pogledajte sobe i raspored",
+    text: "Na pocetnoj i na stranici svake sobe odmah se vidi sta je slobodno, bez dodatnog dopisivanja."
+  },
+  {
+    step: "02",
+    title: "Posaljite upit ili direktnu rezervaciju",
+    text: "Gost bira sobu, datume i broj osoba, a sve ostaje jasno i pregledno i na telefonu i na desktopu."
+  },
+  {
+    step: "03",
+    title: "Brz dogovor za dolazak",
+    text: "Za dodatna pitanja ostaju otvoreni WhatsApp i direktan kontakt, pa je ceo proces jednostavan i brz."
+  }
+];
+
+const guestTestimonials = [
+  {
+    name: "Milan, Novi Sad",
+    role: "Terenski radnik",
+    quote:
+      "Najvise nam znaci sto je sve jednostavno. Vidimo sobu, posaljemo poruku i odmah znamo da li termin odgovara."
+  },
+  {
+    name: "Ivana i Marko, Banja Luka",
+    role: "Kratak boravak u Minhenu",
+    quote:
+      "Fotografije i detalji na sajtu deluju realno, a upravo to je ono sto nam je trebalo pre nego sto krenemo na put."
+  },
+  {
+    name: "Firma iz regiona",
+    role: "Smestaj za zaposlene",
+    quote:
+      "Koristan nam je jasan pregled kapaciteta i brz kontakt, jer za timove koji dolaze u Minhen nema vremena za komplikovan booking."
+  }
+];
+
 export default async function HomePage() {
   const [bookings, roomBlocks, rooms, landingGallery] = await Promise.all([
     getBookingsData({ allowDemoFallback: false }),
@@ -81,51 +120,122 @@ export default async function HomePage() {
     getLandingGallery()
   ]);
   const arrivalsToday = bookings.filter((booking) => booking.status === "arriving").length;
+  const totalCapacity = rooms.reduce((sum, room) => sum + room.capacity, 0);
+  const startingPrice = rooms.length > 0 ? Math.min(...rooms.map((room) => room.pricePerNight)) : null;
+  const availableRoomsCount = rooms.filter((room) => room.status === "available").length;
+  const testimonialCards = guestTestimonials.map((testimonial, index) => ({
+    ...testimonial,
+    image:
+      landingGallery.galleryImages[index]?.image ??
+      landingGallery.showcaseImages[index]?.src ??
+      landingGallery.detailImage
+  }));
+  const trustHighlights = [
+    {
+      icon: "/hotel-template/assets/img/icons/bed.svg",
+      value: rooms.length > 0 ? `${rooms.length}+` : "Vise",
+      title: "tipova soba",
+      text: "Od single i double opcija do vecih soba za vise gostiju."
+    },
+    {
+      icon: "/hotel-template/assets/img/icons/user.svg",
+      value: totalCapacity > 0 ? `${totalCapacity}+` : "Fleksibilno",
+      title: "mesta za goste",
+      text: "Praktican smestaj za pojedince, parove, radnike i manje grupe."
+    },
+    {
+      icon: "/hotel-template/assets/img/icons/card.svg",
+      value: startingPrice ? `od ${startingPrice} EUR` : "Na upit",
+      title: "pocetna cena nocenja",
+      text: "Gost odmah dobija jasan pregled pre nego sto posalje poruku ili rezervaciju."
+    },
+    {
+      icon: "/hotel-template/assets/img/icons/location.svg",
+      value: availableRoomsCount > 0 ? `${availableRoomsCount}` : "14 dana",
+      title: availableRoomsCount > 0 ? "sobe trenutno slobodne" : "javni pregled dostupnosti",
+      text:
+        availableRoomsCount > 0
+          ? "Aktuelan status soba izdvojen je odmah na sajtu."
+          : "Kalendar dostupnosti je odmah vidljiv i na mobilnom telefonu."
+    }
+  ];
 
   return (
     <>
       <section
         className="cs_hero cs_style_1 cs_bg_filed cs_hobble position-relative"
+        id="rezervacija"
         style={{ backgroundImage: "url('/images/legacy/jagdschloessl-5.jpg')" }}
       >
         <div className="container position-relative z-2">
-          <div className="cs_hero_content text-center">
-            <h1 className="cs_hero_title cs_fs_180 cs_white_color cs_mb_28">
-              Dobrodosli u
-              <span className="cs_accent_color cs_ternary_font cs_hover_layer_2">
-                {" "}
-                Jagdschlossl
-              </span>
-              Eichenried
-            </h1>
-            <p className="cs_fs_20 cs_light cs_white_color mb-0 legacy-hero-note">
-              Udoban i pristupacan smestaj u blizini Minhena za goste iz Srbije,
-              Bosne, Hrvatske, Crne Gore i regiona.
-            </p>
-            <div className="cs_form cs_style_1 cs_fs_16 cs_white_bg position-relative text-start">
-              <div className="cs_form_item">
-                <label className="cs_normal">Aktivni dolasci</label>
-                <div className="cs_fs_24">{arrivalsToday} gostiju danas</div>
+          <div className="landing-hero-layout">
+            <div className="landing-hero-copy">
+              <div className="cs_hero_content text-start">
+                <h1 className="cs_hero_title cs_fs_180 cs_white_color cs_mb_28">
+                  Dobrodosli u
+                  <span className="cs_accent_color cs_ternary_font cs_hover_layer_2">
+                    {" "}
+                    Jagdschlossl
+                  </span>
+                  Eichenried
+                </h1>
+                <p className="cs_fs_20 cs_light cs_white_color mb-0 legacy-hero-note">
+                  Udoban i pristupacan smestaj u blizini Minhena za goste iz Srbije,
+                  Bosne, Hrvatske, Crne Gore i regiona.
+                </p>
               </div>
-              <div className="cs_form_item">
-                <label className="cs_normal">Lokacija</label>
-                <div className="cs_fs_24">Eichenried / Minhen</div>
+
+              <div className="landing-hero-metrics">
+                <article className="landing-hero-metric">
+                  <span>Aktivni dolasci</span>
+                  <strong>{arrivalsToday} gostiju danas</strong>
+                </article>
+                <article className="landing-hero-metric">
+                  <span>Lokacija</span>
+                  <strong>Eichenried / Minhen</strong>
+                </article>
+                <article className="landing-hero-metric">
+                  <span>Kontakt</span>
+                  <strong>+49 1772078868</strong>
+                </article>
               </div>
-              <div className="cs_form_item">
-                <label className="cs_normal">Kontakt</label>
-                <div className="cs_fs_24">+49 1772078868</div>
+
+              <div className="landing-hero-points">
+                {bookingHighlights.map((item) => (
+                  <div key={item} className="landing-booking-point landing-booking-point--hero">
+                    <strong>{item}</strong>
+                  </div>
+                ))}
               </div>
-              <div className="cs_form_item_btn">
+
+              <div className="cta-row">
                 <a
-                  className="cs_btn cs_style_1 cs_heading_bg cs_white_color cs_fs_20 cs_medium"
+                  className="primary-button"
                   href="https://wa.me/491772078868"
                   rel="noreferrer"
                   target="_blank"
                 >
-                  <span>POSALJI PORUKU</span>
+                  WhatsApp upit
                 </a>
+                <Link className="secondary-button" href="/signin?callbackUrl=%2Faccount">
+                  Prijava klijenta
+                </Link>
               </div>
             </div>
+
+            {rooms.length > 0 ? (
+              <BookingExperiencePanel
+                bookings={bookings}
+                dailyFormSubtitle="Izabrani dnevni termin se odmah prenosi u formu za potvrdu rezervacije ili upit."
+                defaultRoomSlug={rooms[0]?.slug}
+                headingEyebrow="Booking u hero sekciji"
+                headingNote="Na pocetku birate dnevni ili mesecni boravak, zatim sobu i klikom na kalendar unosite tacan period."
+                headingTitle="Proverite slobodne dane i odmah rezervisite"
+                monthlyFormSubtitle="Izabrani mesecni raspon se automatski prenosi u upit za duzi boravak."
+                roomBlocks={roomBlocks}
+                rooms={rooms}
+              />
+            ) : null}
           </div>
         </div>
       </section>
@@ -212,6 +322,37 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
+          </div>
+        </div>
+        <div className="cs_height_120 cs_height_lg_80" />
+      </section>
+
+      <section className="landing-trust-section">
+        <div className="cs_height_120 cs_height_lg_80" />
+        <div className="container">
+          <div className="section-heading landing-section-heading">
+            <div>
+              <p className="eyebrow">Novo Sa Landing Strane</p>
+              <h2>Jasnije sekcije za brzu odluku gosta</h2>
+            </div>
+            <div>
+              <p className="landing-section-heading__text">
+                Iz novog template-a preuzet je moderniji raspored sekcija, ali je sadrzaj
+                prilagodjen stvarnom smestaju, stvarnim sobama i nasem nacinu rezervacije.
+              </p>
+            </div>
+          </div>
+          <div className="landing-trust-grid">
+            {trustHighlights.map((item) => (
+              <article key={item.title} className="landing-trust-card">
+                <div className="landing-trust-card__icon">
+                  <img src={item.icon} alt="" />
+                </div>
+                <strong className="landing-trust-card__value">{item.value}</strong>
+                <span className="landing-trust-card__label">{item.title}</span>
+                <p>{item.text}</p>
+              </article>
+            ))}
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
@@ -351,6 +492,69 @@ export default async function HomePage() {
         <div className="cs_height_120 cs_height_lg_80" />
       </section>
 
+      <section className="landing-process-section cs_cream_bg">
+        <div className="cs_height_120 cs_height_lg_80" />
+        <div className="container">
+          <div className="landing-process-layout">
+            <div>
+              <div className="section-heading landing-section-heading">
+                <div>
+                  <p className="eyebrow">Kako Rezervacija Funkcionise</p>
+                  <h2>Pregledan put od prve posete do dolaska</h2>
+                </div>
+              </div>
+              <div className="landing-process-list">
+                {bookingProcess.map((item) => (
+                  <article key={item.step} className="landing-process-card">
+                    <div className="landing-process-card__step">{item.step}</div>
+                    <div className="landing-process-card__body">
+                      <strong>{item.title}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <article className="landing-process-spotlight">
+              <div className="landing-process-spotlight__media">
+                <img
+                  alt={landingGallery.showcaseImages[0]?.alt ?? "Fotografija smestaja"}
+                  className="landing-process-spotlight__image"
+                  src={landingGallery.showcaseImages[0]?.src ?? landingGallery.detailImage}
+                />
+              </div>
+              <div className="landing-process-spotlight__content">
+                <p className="eyebrow">Direktan Kontakt</p>
+                <h3>Booking flow sada odmah vodi ka pravom koraku</h3>
+                <p>
+                  Umesto da gost luta kroz vise stranica, najvaznije informacije su skupljene
+                  na jednom mestu: tip sobe, cene, kalendar i direktan kontakt za potvrdu.
+                </p>
+                <div className="landing-process-spotlight__meta">
+                  <span>WhatsApp / Viber</span>
+                  <span>Kalendar 14 dana</span>
+                  <span>Stranica za svaku sobu</span>
+                </div>
+                <div className="cta-row">
+                  <a
+                    className="primary-button"
+                    href="https://wa.me/491772078868"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Posalji poruku
+                  </a>
+                  <Link className="secondary-button" href="/rooms">
+                    Otvori sobe
+                  </Link>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div className="cs_height_120 cs_height_lg_80" />
+      </section>
+
       <section className="cs_heading_bg">
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
@@ -385,53 +589,112 @@ export default async function HomePage() {
         <div className="cs_height_120 cs_height_lg_80" />
       </section>
 
-      <section className="cs_cream_bg" id="rezervacija">
+      <section className="cs_cream_bg">
         <div className="cs_height_120 cs_height_lg_80" />
         <div className="container">
-          <div className="landing-booking-layout">
+          <div className="landing-booking-layout landing-booking-layout--compact">
             <div className="landing-booking-copy">
               <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">REZERVACIJA</p>
               <h2 className="cs_section_title cs_fs_64 mb-0">
-                Izaberi sobu, proveri kalendar i posalji upit bez dodatnih koraka
+                Booking tok je sada odmah u hero sekciji
               </h2>
               <p className="landing-booking-copy__text">
-                Landing sada odmah prikazuje dostupnost izabrane sobe, tako da gost na telefonu
-                moze brzo da vidi termine i da otvori zasebnu stranicu te sobe ako zeli vise detalja.
+                Gost odmah na vrhu strane bira tip boravka, sobu i slobodne dane. Ostatak ove
+                sekcije sada samo objasnjava tok i ostavlja brz ulaz za klijente koji zele da
+                nastave preko Google naloga.
               </p>
               <div className="landing-booking-points">
-                {bookingHighlights.map((item) => (
-                  <div key={item} className="landing-booking-point">
-                    <strong>{item}</strong>
+                {bookingProcess.map((item) => (
+                  <div key={item.step} className="landing-booking-point">
+                    <strong>
+                      {item.step}. {item.title}
+                    </strong>
+                    <span>{item.text}</span>
                   </div>
                 ))}
               </div>
-              <div className="landing-booking-contact-card">
-                <span className="landing-booking-contact-card__label">Brzi kontakt</span>
-                <strong>Viber / WhatsApp: +49 1772078868</strong>
-                <div className="cta-row">
-                  <a
-                    className="primary-button"
-                    href="https://wa.me/491772078868"
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    WhatsApp upit
-                  </a>
-                  <Link className="secondary-button" href="/rooms">
-                    Pogledaj sve sobe
-                  </Link>
-                </div>
+            </div>
+            <div className="landing-booking-contact-card">
+              <span className="landing-booking-contact-card__label">Brzi kontakt i prijava</span>
+              <strong>Viber / WhatsApp: +49 1772078868</strong>
+              <p>
+                Klijenti mogu da koriste Google prijavu kao obican guest nalog, dok cemo owner i
+                staff role dodeliti cim stignu mejl adrese za pristup.
+              </p>
+              <div className="cta-row">
+                <a
+                  className="primary-button"
+                  href="https://wa.me/491772078868"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  WhatsApp upit
+                </a>
+                <Link className="secondary-button" href="/signin?callbackUrl=%2Faccount">
+                  Prijava klijenta
+                </Link>
               </div>
             </div>
-            {rooms.length > 0 ? (
-              <PublicBookingForm
-                bookings={bookings}
-                roomBlocks={roomBlocks}
-                rooms={rooms}
-                subtitle="Na telefonu ili desktopu mozes odmah da vidis sledecih 14 dana za izabranu sobu."
-                title="Direktna rezervacija"
-              />
-            ) : null}
+          </div>
+        </div>
+        <div className="cs_height_120 cs_height_lg_80" />
+      </section>
+
+      <section className="landing-testimonial-section">
+        <div className="cs_height_120 cs_height_lg_80" />
+        <div className="container">
+          <div className="section-heading landing-section-heading">
+            <div>
+              <p className="eyebrow">Utisak Koji Stranica Prenosi</p>
+              <h2>Topliji i ubedljiviji prikaz smestaja</h2>
+            </div>
+            <div>
+              <p className="landing-section-heading__text">
+                Nova struktura sekcija bolje istice poverenje, realne fotografije i jednostavan
+                kontakt, sto je posebno vazno gostima koji rezervisu na brzinu.
+              </p>
+            </div>
+          </div>
+          <div className="landing-testimonial-grid">
+            {testimonialCards.map((item) => (
+              <article key={item.name} className="landing-testimonial-card">
+                <div className="landing-testimonial-card__media">
+                  <img alt={item.name} src={item.image} />
+                </div>
+                <div className="landing-testimonial-card__body">
+                  <p className="landing-testimonial-card__quote">
+                    &ldquo;{item.quote}&rdquo;
+                  </p>
+                  <div className="landing-testimonial-card__person">
+                    <strong>{item.name}</strong>
+                    <span>{item.role}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="landing-final-cta">
+            <div>
+              <p className="eyebrow">Spremno Za Upit</p>
+              <h2>Treba vam smestaj blizu Minhena bez komplikacije?</h2>
+              <p>
+                Pogledajte sobe, proverite dostupnost i javite se direktno. To je sada
+                najjaci deo naslovne koji smo preuzeli i prilagodili iz novog template-a.
+              </p>
+            </div>
+            <div className="landing-final-cta__actions">
+              <a
+                className="primary-button"
+                href="https://wa.me/491772078868"
+                rel="noreferrer"
+                target="_blank"
+              >
+                WhatsApp kontakt
+              </a>
+              <Link className="secondary-button" href="/#rezervacija">
+                Idi na rezervaciju
+              </Link>
+            </div>
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />

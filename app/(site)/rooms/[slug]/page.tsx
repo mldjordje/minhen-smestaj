@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PublicBookingForm } from "@/components/public-booking-form";
-import { RoomAvailabilityCalendar } from "@/components/room-availability-calendar";
+import { RoomBookingPanel } from "@/components/room-booking-panel";
 import { getBookingsData, getRoomBlocksData, getRoomBySlug, getRoomsData } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
 
@@ -112,32 +111,8 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
                   ))}
                 </div>
               </div>
-
-              <div className="room-detail-calendar">
-                <div className="section-heading wide">
-                  <div>
-                    <p className="eyebrow">Dostupnost sobe</p>
-                    <h2>Kalendar za narednih 21 dan</h2>
-                  </div>
-                  <span className="inline-note">
-                    Dolazak, odlazak i zauzeti termini su prikazani posebno za ovu sobu.
-                  </span>
-                </div>
-                <RoomAvailabilityCalendar bookings={bookings} room={room} roomBlocks={roomBlocks} />
-              </div>
             </div>
-
-            <aside className="room-detail-sidebar" id="booking">
-              <PublicBookingForm
-                bookings={bookings}
-                defaultRoomSlug={room.slug}
-                roomBlocks={roomBlocks}
-                rooms={rooms}
-                showAvailabilityPreview={false}
-                title={`Posaljite upit bas za ${roomDisplayName}`}
-                subtitle="Ova soba vec ima prikazan kalendar ispod, pa ovde ostaje brz upit za rezervaciju."
-              />
-            </aside>
+            <RoomBookingPanel bookings={bookings} room={room} roomBlocks={roomBlocks} rooms={rooms} />
           </div>
         </div>
         <div className="cs_height_120 cs_height_lg_80" />
