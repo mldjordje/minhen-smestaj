@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { AdminRoomCalendar } from "@/components/admin-room-calendar";
+import { BookingExportField } from "@/components/booking-export-field";
 import type { AdminBookingSyncSummary } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
 import {
@@ -1362,21 +1363,15 @@ export function OwnerDashboard({
                     onChange={(event) =>
                       handleMappingFieldChange(room.id, "externalRoomId", event.target.value)
                     }
-                    placeholder="Booking.com room ID"
+                    placeholder="Booking.com room ID (opciono)"
                     value={draft.externalRoomId}
                   />
-                  <input
-                    onChange={(event) =>
-                      handleMappingFieldChange(room.id, "exportUrl", event.target.value)
-                    }
-                    placeholder="iCal export URL"
-                    value={draft.exportUrl}
-                  />
+                  <BookingExportField exportUrl={mapping?.exportUrl || draft.exportUrl} roomId={room.id} />
                   <input
                     onChange={(event) =>
                       handleMappingFieldChange(room.id, "importUrl", event.target.value)
                     }
-                    placeholder="iCal import URL"
+                    placeholder="Booking.com iCal import URL"
                     value={draft.importUrl}
                   />
                   <label className="admin-checkbox">
@@ -1389,6 +1384,10 @@ export function OwnerDashboard({
                     />
                     <span>Aktiviraj sync za ovu sobu</span>
                   </label>
+                  <p className="inline-note">
+                    Export URL iznad kopiras iz naseg admina i lepis u Booking.com `Import
+                    calendar`. U nase polje `importUrl` ide Booking.com `.ics` link za istu sobu.
+                  </p>
                   <button
                     className="primary-button"
                     onClick={() => void handleSaveMapping(room.id)}
@@ -1396,11 +1395,6 @@ export function OwnerDashboard({
                   >
                     Sacuvaj mapping
                   </button>
-                  {mapping?.exportUrl ? (
-                    <a className="text-link" href={mapping.exportUrl} rel="noreferrer" target="_blank">
-                      Otvori export feed
-                    </a>
-                  ) : null}
                   <p
                     className={`inline-note ${
                       mappingActionState[room.id]?.status === "error" ? "inline-note-error" : ""
@@ -1531,6 +1525,9 @@ export function OwnerDashboard({
               <p className="eyebrow">Inventar</p>
               <h2>Aktivne jedinice</h2>
             </div>
+            <Link className="text-link" href="/admin/owner/rooms">
+              Otvori room manager
+            </Link>
           </div>
           {localRooms.length === 0 ? (
             <div className="admin-empty-state">

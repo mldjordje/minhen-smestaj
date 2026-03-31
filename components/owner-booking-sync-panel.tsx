@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { BookingExportField } from "@/components/booking-export-field";
 import type { AdminBookingSyncSummary } from "@/lib/admin-data";
 import { getRoomDisplayName } from "@/lib/rooms";
 import { DEFAULT_ROOM_LOCATION } from "@/lib/site-config";
@@ -358,11 +359,7 @@ export function OwnerBookingSyncPanel({
                       placeholder="Booking.com room ID (opciono)"
                       value={draft.externalRoomId}
                     />
-                    <input
-                      onChange={(event) => handleMappingFieldChange(room.id, "exportUrl", event.target.value)}
-                      placeholder="iCal export URL"
-                      value={draft.exportUrl}
-                    />
+                    <BookingExportField exportUrl={mapping?.exportUrl || draft.exportUrl} roomId={room.id} />
                     <input
                       onChange={(event) => handleMappingFieldChange(room.id, "importUrl", event.target.value)}
                       placeholder="Booking.com iCal import URL"
@@ -380,7 +377,8 @@ export function OwnerBookingSyncPanel({
                     </label>
                     <p className="inline-note">
                       Za aktivan iCal sync dovoljni su tacan naziv sobe i Booking.com import URL.
-                      Room ID je koristan za internu proveru, ali nije obavezan.
+                      Room ID je koristan za internu proveru, ali nije obavezan. Export URL iznad
+                      kopiras iz nase aplikacije i lepis u Booking.com `Import calendar`.
                     </p>
                     <button
                       className="primary-button"
@@ -389,11 +387,6 @@ export function OwnerBookingSyncPanel({
                     >
                       Sacuvaj mapping
                     </button>
-                    {mapping?.exportUrl ? (
-                      <a className="text-link" href={mapping.exportUrl} rel="noreferrer" target="_blank">
-                        Otvori export feed
-                      </a>
-                    ) : null}
                     <p
                       className={`inline-note ${
                         mappingActionState[room.id]?.status === "error" ? "inline-note-error" : ""

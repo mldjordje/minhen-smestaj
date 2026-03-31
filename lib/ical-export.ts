@@ -1,5 +1,5 @@
 import { getRoomDisplayName } from "@/lib/rooms";
-import type { Booking, Room } from "@/lib/types";
+import type { Booking, Room, RoomBlock } from "@/lib/types";
 
 function escapeIcsValue(value: string) {
   return value
@@ -13,10 +13,10 @@ function formatIcsDate(value: Date) {
   return value.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 
-export function buildRoomCalendar(room: Room, bookings: Booking[]) {
+export function buildRoomCalendar(room: Room, bookings: Booking[], roomBlocks: RoomBlock[] = []) {
   const nowStamp = formatIcsDate(new Date());
   const roomName = escapeIcsValue(getRoomDisplayName(room));
-  const eventBlocks = bookings.map((booking) => {
+  const bookingEventBlocks = bookings.map((booking) => {
     const summary = escapeIcsValue(`${getRoomDisplayName(room)} - ${booking.guestName}`);
     const description = escapeIcsValue(booking.notes || `Booking source: ${booking.source}`);
 
@@ -33,6 +33,23 @@ export function buildRoomCalendar(room: Room, bookings: Booking[]) {
       "END:VEVENT"
     ].join("\r\n");
   });
+  const manualBlockEvents = roomBlocks.map((roomBlock) => {
+    const summary = escapeIcsValue(`${getRoomDisplayName(room)} - Blocked`);
+    const description = escapeIcsValue(roomBlock.reason || "Manual room block");
+
+    return [
+      "BEGIN:VEVENT",
+      `UID:${escapeIcsValue(roomBlock.id)}`,
+      `DTSTAMP:${nowStamp}`,
+      `DTSTART:${formatIcsDate(new Date(`${roomBlock.checkIn}T12:00:00.000Z`))}`,
+      `DTEND:${formatIcsDate(new Date(`${roomBlock.checkOut}T10:00:00.000Z`))}`,
+      `SUMMARY:${summary}`,
+      `DESCRIPTION:${description}`,
+      "STATUS:CONFIRMED",
+      "TRANSP:OPAQUE",
+      "END:VEVENT"
+    ].join("\r\n");
+  });
 
   return [
     "BEGIN:VCALENDAR",
@@ -42,7 +59,8 @@ export function buildRoomCalendar(room: Room, bookings: Booking[]) {
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${roomName} booking calendar`,
     "X-WR-TIMEZONE:Europe/Belgrade",
-    ...eventBlocks,
+    ...bookingEventBlocks,
+    ...manualBlockEvents,
     "END:VCALENDAR",
     ""
   ].join("\r\n");

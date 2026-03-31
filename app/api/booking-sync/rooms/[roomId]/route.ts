@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getBookingsData, getRoomsData } from "@/lib/admin-data";
+import { getBookingsData, getRoomBlocksData, getRoomsData } from "@/lib/admin-data";
 import { buildRoomCalendar } from "@/lib/ical-export";
 
 export const runtime = "nodejs";
@@ -12,9 +12,10 @@ type RouteContext = {
 
 export async function GET(_: Request, context: RouteContext) {
   const { roomId } = await context.params;
-  const [rooms, bookings] = await Promise.all([
+  const [rooms, bookings, roomBlocks] = await Promise.all([
     getRoomsData({ allowDemoFallback: false }),
-    getBookingsData({ allowDemoFallback: false })
+    getBookingsData({ allowDemoFallback: false }),
+    getRoomBlocksData({ allowDemoFallback: false })
   ]);
   const room = rooms.find((entry) => entry.id === roomId);
 
@@ -24,7 +25,8 @@ export async function GET(_: Request, context: RouteContext) {
 
   const calendar = buildRoomCalendar(
     room,
-    bookings.filter((booking) => booking.roomId === roomId)
+    bookings.filter((booking) => booking.roomId === roomId),
+    roomBlocks.filter((block) => block.roomId === roomId)
   );
 
   return new NextResponse(calendar, {
