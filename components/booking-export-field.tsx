@@ -7,7 +7,7 @@ type BookingExportFieldProps = {
   roomId: string;
 };
 
-function buildFallbackExportUrl(roomId: string) {
+function buildRoomExportUrlFromOrigin(roomId: string) {
   if (typeof window === "undefined") {
     return "";
   }
@@ -20,15 +20,10 @@ export function BookingExportField({ exportUrl, roomId }: BookingExportFieldProp
   const [copyFeedback, setCopyFeedback] = useState("");
 
   useEffect(() => {
-    if (exportUrl) {
-      setFallbackUrl(exportUrl);
-      return;
-    }
-
-    setFallbackUrl(buildFallbackExportUrl(roomId));
+    setFallbackUrl(buildRoomExportUrlFromOrigin(roomId) || exportUrl || "");
   }, [exportUrl, roomId]);
 
-  const resolvedExportUrl = exportUrl || fallbackUrl;
+  const resolvedExportUrl = fallbackUrl || exportUrl;
 
   async function handleCopy() {
     if (!resolvedExportUrl) {

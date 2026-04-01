@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildRoomExportUrl } from "@/lib/app-url";
+import { buildRoomExportUrlForRequest } from "@/lib/app-url";
 import { requireApiRole } from "@/lib/auth";
 import { db, ensureDatabaseSchema } from "@/lib/db";
 import { RoomChannelMapping } from "@/lib/types";
@@ -20,6 +20,10 @@ type MappingPayload = {
 
 function createMappingId(roomId: string) {
   return `map-${roomId}`;
+}
+
+function isBookingIcalUrl(value: string) {
+  return /^https:\/\/ical\.booking\.com\//i.test(value);
 }
 
 export async function POST(request: Request, context: RouteContext) {
@@ -44,6 +48,9 @@ export async function POST(request: Request, context: RouteContext) {
 
     const { id: roomId } = await context.params;
     const payload = (await request.json()) as MappingPayload;
+    const legacyExportUrl = payload.exportUrl?.trim() ?? "";
+    const importUrl =
+      payload.importUrl?.trim() || (isBookingIcalUrl(legacyExportUrl) ? legacyExportUrl : "");
 
     if (!roomId) {
       return NextResponse.json(
@@ -61,8 +68,8 @@ export async function POST(request: Request, context: RouteContext) {
       provider: "Booking.com",
       externalRoomId: payload.externalRoomId?.trim() ?? "",
       externalRoomName: payload.externalRoomName?.trim() ?? "",
-      exportUrl: payload.exportUrl?.trim() || buildRoomExportUrl(roomId),
-      importUrl: payload.importUrl?.trim() ?? "",
+      exportUrl: buildRoomExportUrlForRequest(request, roomId),
+      importUrl,
       syncEnabled: Boolean(payload.syncEnabled),
       lastSyncedAt: null,
       lastSyncError: null,
