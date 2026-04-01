@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   addDays,
   getCalendarCellStatus,
+  isImportedBookingBlock,
   isImportedClosedBooking,
   parseDate
 } from "@/lib/availability";
@@ -499,9 +500,12 @@ export function AdminRoomCalendar({
 
     return (
       <article key={roomBlock.id} className="calendar-entry-card">
-        <div><strong>{roomBlock.reason}</strong><span>{roomBlock.checkIn} - {roomBlock.checkOut}</span></div>
+        <div>
+          <strong>{isImportedBookingBlock(roomBlock) ? "Booking.com zatvoren termin" : roomBlock.reason}</strong>
+          <span>{roomBlock.checkIn} - {roomBlock.checkOut}</span>
+        </div>
         <div className="calendar-entry-meta">
-          <span>{roomBlock.createdBy}</span>
+          <span>{isImportedBookingBlock(roomBlock) ? "Booking.com import" : roomBlock.createdBy}</span>
           <span className={`status-pill status-${roomBlock.status}`}>{roomBlock.status}</span>
         </div>
         <div className="calendar-entry-actions">

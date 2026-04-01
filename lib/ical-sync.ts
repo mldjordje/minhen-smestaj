@@ -43,9 +43,15 @@ function resolveBookingStatus(checkIn: string, checkOut: string): Booking["statu
   return "confirmed";
 }
 
+function isClosedBookingEvent(summary: string) {
+  return /closed|not available/i.test(summary);
+}
+
 type SyncRoomResult = {
   imported: number;
+  importedBlocks: number;
   removed: number;
+  removedBlocks: number;
   roomId: string;
   success: boolean;
 };
@@ -60,7 +66,9 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
   if (!mapping.importUrl || !mapping.syncEnabled) {
     return {
       imported: 0,
+      importedBlocks: 0,
       removed: 0,
+      removedBlocks: 0,
       roomId: room.id,
       success: true
     } satisfies SyncRoomResult;
@@ -75,8 +83,10 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
 
       return accumulator;
     }, []);
-    const importedReferences = new Set<string>();
+    const importedReservationReferences = new Set<string>();
+    const importedBlockReferences = new Set<string>();
     let importedCount = 0;
+    let importedBlockCount = 0;
 
     for (const event of vevents) {
       const uid = event.uid || `${room.id}-${event.start.toISOString()}`;
@@ -95,7 +105,99 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
         continue;
       }
 
-      importedReferences.add(uid);
+      if (isClosedBookingEvent(guestName)) {
+        importedBlockReferences.add(uid);
+
+        const existingBlockRows = await db<{ id: string }[]>`
+          select id
+          from room_blocks
+          where room_id = ${room.id}
+            and channel_reference = ${uid}
+          limit 1
+        `;
+
+        if (existingBlockRows.length === 0) {
+          const hasConflict =
+            (await hasReservationConflict(room.id, checkIn, checkOut)) ||
+            (
+              await db<{ id: string }[]>`
+                select id
+                from room_blocks
+                where room_id = ${room.id}
+                  and daterange(check_in, check_out, '[)') && daterange(${checkIn}::date, ${checkOut}::date, '[)')
+                limit 1
+              `
+            ).length > 0;
+
+          if (hasConflict) {
+            await writeActivityLog({
+              action: "sync-conflict",
+              actor: "booking-sync",
+              entityId: room.id,
+              entityType: "room_block",
+              message: `Booking.com zatvoren termin je preskocio konflikt za ${getRoomDisplayName(room)}.`,
+              metadata: {
+                roomId: room.id,
+                channelReference: uid,
+                checkIn,
+                checkOut
+              }
+            });
+            continue;
+          }
+
+          await db`
+            insert into room_blocks (
+              id,
+              room_id,
+              check_in,
+              check_out,
+              reason,
+              created_by,
+              status,
+              source,
+              channel_reference,
+              updated_at
+            ) values (
+              ${`ical-block-${Date.now()}-${Math.floor(Math.random() * 1000)}`},
+              ${room.id},
+              ${checkIn},
+              ${checkOut},
+              ${guestName},
+              ${"booking-sync"},
+              ${"blocked"},
+              ${"Booking.com"},
+              ${uid},
+              now()
+            )
+          `;
+        } else {
+          await db`
+            update room_blocks
+            set
+              check_in = ${checkIn},
+              check_out = ${checkOut},
+              reason = ${guestName},
+              created_by = ${"booking-sync"},
+              status = ${"blocked"},
+              source = ${"Booking.com"},
+              updated_at = now()
+            where id = ${existingBlockRows[0].id}
+          `;
+        }
+
+        await db`
+          delete from reservations
+          where room_id = ${room.id}
+            and channel_reference = ${uid}
+            and source = ${"Booking.com"}
+        `;
+
+        importedBlockCount += 1;
+        continue;
+      }
+
+      importedReservationReferences.add(uid);
 
       const existingRows = await db<{ id: string; source: Booking["source"] }[]>`
         select id, source
@@ -180,7 +282,7 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
     `;
 
     const removableIds = staleRows
-      .filter((row) => row.channel_reference && !importedReferences.has(row.channel_reference))
+      .filter((row) => row.channel_reference && !importedReservationReferences.has(row.channel_reference))
       .map((row) => row.id);
 
     let removedCount = 0;
@@ -191,6 +293,28 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
         where id in ${db(removableIds)}
       `;
       removedCount = removableIds.length;
+    }
+
+    const staleBlockRows = await db<{ channel_reference: string | null; id: string }[]>`
+      select id, channel_reference
+      from room_blocks
+      where room_id = ${room.id}
+        and source = ${"Booking.com"}
+        and channel_reference is not null
+    `;
+
+    const removableBlockIds = staleBlockRows
+      .filter((row) => row.channel_reference && !importedBlockReferences.has(row.channel_reference))
+      .map((row) => row.id);
+
+    let removedBlockCount = 0;
+
+    if (removableBlockIds.length > 0) {
+      await db`
+        delete from room_blocks
+        where id in ${db(removableBlockIds)}
+      `;
+      removedBlockCount = removableBlockIds.length;
     }
 
     await db`
@@ -204,7 +328,9 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
 
     return {
       imported: importedCount,
+      importedBlocks: importedBlockCount,
       removed: removedCount,
+      removedBlocks: removedBlockCount,
       roomId: room.id,
       success: true
     } satisfies SyncRoomResult;

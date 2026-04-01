@@ -46,8 +46,21 @@ export async function ensureDatabaseSchema() {
       `;
 
       await db`
+        alter table room_blocks
+        add column if not exists source text not null default 'manual',
+        add column if not exists channel_reference text,
+        add column if not exists updated_at timestamptz not null default now()
+      `;
+
+      await db`
         create unique index if not exists reservations_room_channel_reference_idx
         on reservations (room_id, channel_reference)
+        where channel_reference is not null
+      `;
+
+      await db`
+        create unique index if not exists room_blocks_room_channel_reference_idx
+        on room_blocks (room_id, channel_reference)
         where channel_reference is not null
       `;
     })();

@@ -38,6 +38,9 @@ export type RoomBlock = {
   reason: string;
   createdBy: string;
   status: "blocked" | "maintenance";
+  source?: "manual" | "Booking.com";
+  channelReference?: string | null;
+  updatedAt?: string | null;
 };
 
 export type Booking = {

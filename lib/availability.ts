@@ -40,6 +40,10 @@ export function isImportedClosedBooking(booking: Pick<Booking, "guestName" | "so
   return booking.source === "Booking.com" && /closed|not available/i.test(booking.guestName);
 }
 
+export function isImportedBookingBlock(block: Pick<RoomBlock, "source" | "reason">) {
+  return block.source === "Booking.com" || /booking\.com|closed|not available/i.test(block.reason);
+}
+
 export function getCalendarCellStatus(
   room: Room,
   date: Date,
@@ -108,10 +112,17 @@ export function getCalendarCellStatus(
   });
 
   if (matchingBlock) {
+    const importedBookingBlock = isImportedBookingBlock(matchingBlock);
+
     return {
       tone: matchingBlock.status === "maintenance" ? "maintenance" : ("blocked" as AvailabilityTone),
-      shortLabel: matchingBlock.status === "maintenance" ? "Serv." : "Blok.",
-      detail: matchingBlock.reason
+      shortLabel:
+        matchingBlock.status === "maintenance"
+          ? "Serv."
+          : importedBookingBlock
+            ? "Zatv."
+            : "Blok.",
+      detail: importedBookingBlock ? "Booking.com zatvoren termin" : matchingBlock.reason
     };
   }
 

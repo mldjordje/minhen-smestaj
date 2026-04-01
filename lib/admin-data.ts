@@ -108,12 +108,15 @@ type ReservationRow = {
 type RoomBlockRow = {
   check_in: Date | string;
   check_out: Date | string;
+  channel_reference: string | null;
   created_at: string;
   created_by: string;
   id: string;
   reason: string;
   room_id: string;
+  source: RoomBlock["source"];
   status: RoomBlock["status"];
+  updated_at: Date | string | null;
 };
 
 type InquiryRow = {
@@ -345,7 +348,7 @@ export async function getRoomBlocksData(options?: DataOptions) {
 
   try {
     const roomBlockRows = await db<RoomBlockRow[]>`
-      select id, room_id, check_in, check_out, reason, created_by, status, created_at
+      select id, room_id, check_in, check_out, reason, created_by, status, source, channel_reference, created_at, updated_at
       from room_blocks
       order by check_in asc
     `;
@@ -361,7 +364,10 @@ export async function getRoomBlocksData(options?: DataOptions) {
       checkOut: normalizeDateValue(block.check_out),
       reason: block.reason,
       createdBy: block.created_by,
-      status: block.status
+      status: block.status,
+      source: block.source,
+      channelReference: block.channel_reference,
+      updatedAt: normalizeDateTimeValue(block.updated_at)
     }));
   } catch (error) {
     if (
