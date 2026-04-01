@@ -194,33 +194,34 @@ export function OwnerBookingSyncPanel({
       message: "Povlacim Booking.com iCal rezervacije i osvezavam status..."
     });
 
-    const response = await fetch("/api/booking-sync", {
-      method: "POST"
-    });
-
-    const result = (await response.json()) as
-      | { ok: true; message: string; syncedRooms: number }
-      | { ok: false; message: string };
-
-    if (!response.ok || !result.ok) {
-      setSyncActionState({
-        status: "error",
-        message: result.message
-      });
-      return;
-    }
-
-    setSyncActionState({
-      status: "success",
-      message: `${result.message} Obradjene sobe: ${result.syncedRooms}.`
-    });
-
     try {
+      const response = await fetch("/api/booking-sync", {
+        method: "POST"
+      });
+
+      const result = (await response.json()) as
+        | { ok: true; message: string; syncedRooms: number }
+        | { ok: false; message: string };
+
+      if (!response.ok || !result.ok) {
+        setSyncActionState({
+          status: "error",
+          message: result.message
+        });
+        return;
+      }
+
+      setSyncActionState({
+        status: "success",
+        message: `${result.message} Obradjene sobe: ${result.syncedRooms}.`
+      });
+
       await refreshSyncStatus();
     } catch (error) {
       setSyncActionState({
         status: "error",
-        message: error instanceof Error ? error.message : "Status sync-a nije osvezen."
+        message:
+          error instanceof Error ? error.message : "Sync nije uspeo ili status nije osvezen."
       });
     }
   }

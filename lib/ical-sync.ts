@@ -75,7 +75,25 @@ export async function runRoomImportSync(room: Room, mapping: RoomChannelMapping)
   }
 
   try {
-    const events = await ical.async.fromURL(mapping.importUrl);
+    const response = await fetch(mapping.importUrl, {
+      headers: {
+        accept: "text/calendar,text/plain,*/*",
+        "user-agent": "Mozilla/5.0"
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `Booking.com iCal fetch failed (${response.status} ${response.statusText})${
+          errorBody ? `: ${errorBody.slice(0, 160)}` : ""
+        }`
+      );
+    }
+
+    const rawCalendar = await response.text();
+    const events = ical.sync.parseICS(rawCalendar);
     const vevents = Object.values(events).reduce<VEvent[]>((accumulator, entry) => {
       if (entry && entry.type === "VEVENT") {
         accumulator.push(entry);

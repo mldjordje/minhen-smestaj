@@ -811,34 +811,43 @@ export function OwnerDashboard({
       message: "Povlacim Booking.com iCal rezervacije i osvezavam health status..."
     });
 
-    const response = await fetch("/api/booking-sync", {
-      method: "POST"
-    });
+    try {
+      const response = await fetch("/api/booking-sync", {
+        method: "POST"
+      });
 
-    const result = (await response.json()) as
-      | {
-          ok: true;
-          message: string;
-          syncedRooms: number;
-        }
-      | {
-          ok: false;
-          message: string;
-        };
+      const result = (await response.json()) as
+        | {
+            ok: true;
+            message: string;
+            syncedRooms: number;
+          }
+        | {
+            ok: false;
+            message: string;
+          };
 
-    if (!response.ok || !result.ok) {
+      if (!response.ok || !result.ok) {
+        setSyncActionState({
+          status: "error",
+          message: result.message
+        });
+        return;
+      }
+
+      setSyncActionState({
+        status: "success",
+        message: `${result.message} Obradjene sobe: ${result.syncedRooms}.`
+      });
+
+      await Promise.all([refreshOwnerFeed(), refreshSyncStatus()]);
+    } catch (error) {
       setSyncActionState({
         status: "error",
-        message: result.message
+        message:
+          error instanceof Error ? error.message : "Sync nije uspeo ili status nije osvezen."
       });
-      return;
     }
-
-    setSyncActionState({
-      status: "success",
-      message: `${result.message} Obradjene sobe: ${result.syncedRooms}.`
-    });
-    await Promise.all([refreshOwnerFeed(), refreshSyncStatus()]);
   }
 
   const occupiedCount = localRooms.filter((room) => room.status === "occupied").length;

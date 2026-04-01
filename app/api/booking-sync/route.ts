@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
   const activeMappings = mappings.filter((mapping) => mapping.syncEnabled && mapping.importUrl);
   const roomMap = new Map(rooms.map((room) => [room.id, room]));
   const results = [];
+  const errors = [];
 
   for (const mapping of activeMappings) {
     const room = roomMap.get(mapping.roomId);
@@ -64,7 +65,28 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    results.push(await runRoomImportSync(room, mapping));
+    try {
+      results.push(await runRoomImportSync(room, mapping));
+    } catch (error) {
+      errors.push({
+        roomId: mapping.roomId,
+        message: error instanceof Error ? error.message : "Unknown sync error"
+      });
+    }
+  }
+
+  if (errors.length > 0) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: `Sync nije uspeo za ${errors.map((entry) => entry.roomId).join(", ")}.`,
+        syncedRooms: results.length,
+        results,
+        errors,
+        bookingsKnown: bookings.length
+      },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({
