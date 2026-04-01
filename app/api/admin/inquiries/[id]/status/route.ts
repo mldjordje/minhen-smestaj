@@ -22,7 +22,7 @@ function getStatusMessage(status: InquiryStatus) {
     case "contacted":
       return "Upit je oznacen kao kontaktiran.";
     case "closed":
-      return "Upit je zatvoren.";
+      return "Upit je odbijen.";
     default:
       return "Upit je vracen u status novog.";
   }

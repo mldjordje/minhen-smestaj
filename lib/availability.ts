@@ -32,6 +32,14 @@ function isWithinStay(date: Date, checkIn: Date, checkOut: Date) {
   return isSameDate(checkIn, date) || isSameDate(checkOut, date) || (date > checkIn && date < checkOut);
 }
 
+function isWithinBlockRange(date: Date, checkIn: Date, checkOut: Date) {
+  return isSameDate(checkIn, date) || (date > checkIn && date < checkOut);
+}
+
+export function isImportedClosedBooking(booking: Pick<Booking, "guestName" | "source">) {
+  return booking.source === "Booking.com" && /closed|not available/i.test(booking.guestName);
+}
+
 export function getCalendarCellStatus(
   room: Room,
   date: Date,
@@ -46,12 +54,24 @@ export function getCalendarCellStatus(
     const checkIn = parseDate(booking.checkIn);
     const checkOut = parseDate(booking.checkOut);
 
+    if (isImportedClosedBooking(booking)) {
+      return isWithinBlockRange(date, checkIn, checkOut);
+    }
+
     return isWithinStay(date, checkIn, checkOut);
   });
 
   if (matchingBooking) {
     const checkIn = parseDate(matchingBooking.checkIn);
     const checkOut = parseDate(matchingBooking.checkOut);
+
+    if (isImportedClosedBooking(matchingBooking)) {
+      return {
+        tone: "blocked" as AvailabilityTone,
+        shortLabel: "Zatv.",
+        detail: "Booking.com zatvoren termin"
+      };
+    }
 
     if (isSameDate(checkIn, date)) {
       return {
@@ -84,7 +104,7 @@ export function getCalendarCellStatus(
     const checkIn = parseDate(block.checkIn);
     const checkOut = parseDate(block.checkOut);
 
-    return isWithinStay(date, checkIn, checkOut);
+    return isWithinBlockRange(date, checkIn, checkOut);
   });
 
   if (matchingBlock) {

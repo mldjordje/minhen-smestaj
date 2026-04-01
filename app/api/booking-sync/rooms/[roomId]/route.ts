@@ -25,7 +25,7 @@ export async function GET(_: Request, context: RouteContext) {
 
   const calendar = buildRoomCalendar(
     room,
-    bookings.filter((booking) => booking.roomId === roomId),
+    bookings.filter((booking) => booking.roomId === roomId && booking.source !== "Booking.com"),
     roomBlocks.filter((block) => block.roomId === roomId)
   );
 

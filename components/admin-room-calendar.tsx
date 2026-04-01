@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { addDays, getCalendarCellStatus, parseDate } from "@/lib/availability";
+import {
+  addDays,
+  getCalendarCellStatus,
+  isImportedClosedBooking,
+  parseDate
+} from "@/lib/availability";
 import { getRoomDisplayName } from "@/lib/rooms";
 import { Booking, Room, RoomBlock } from "@/lib/types";
 
@@ -57,6 +62,29 @@ const roomBlockStatuses: RoomBlock["status"][] = ["blocked", "maintenance"];
 
 const dayLabelFormatter = new Intl.DateTimeFormat("sr-RS", { day: "2-digit", month: "2-digit" });
 const weekdayFormatter = new Intl.DateTimeFormat("sr-RS", { weekday: "short" });
+const monthLabelFormatter = new Intl.DateTimeFormat("sr-RS", { month: "long", year: "numeric" });
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addMonths(date: Date, amount: number) {
+  return new Date(date.getFullYear(), date.getMonth() + amount, 1);
+}
+
+function getMonthDays(date: Date) {
+  const monthStart = startOfMonth(date);
+  const nextMonthStart = addMonths(monthStart, 1);
+  const days: Date[] = [];
+  let cursor = new Date(monthStart);
+
+  while (cursor < nextMonthStart) {
+    days.push(new Date(cursor));
+    cursor = addDays(cursor, 1);
+  }
+
+  return days;
+}
 
 function formatDateInput(date: Date) {
   return date.toISOString().slice(0, 10);
@@ -140,8 +168,8 @@ export function AdminRoomCalendar({
   const [rangeDrafts, setRangeDrafts] = useState<Record<string, RangeDraftState>>({});
   const [rangeFeedback, setRangeFeedback] = useState<Record<string, string>>({});
   const [roomSearch, setRoomSearch] = useState("");
-  const startDate = new Date();
-  const calendarDays = Array.from({ length: 21 }, (_, index) => addDays(startDate, index));
+  const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
+  const calendarDays = getMonthDays(calendarMonth);
 
   function handleDraftChange(roomId: string, field: keyof CalendarEntryDraft, value: string) {
     setDrafts((current) => ({ ...current, [roomId]: { ...(current[roomId] ?? createInitialDraft()), [field]: value } }));
@@ -419,9 +447,12 @@ export function AdminRoomCalendar({
 
     return (
       <article key={booking.id} className="calendar-entry-card">
-        <div><strong>{booking.guestName}</strong><span>{booking.checkIn} - {booking.checkOut}</span></div>
+        <div>
+          <strong>{isImportedClosedBooking(booking) ? "Booking.com zatvoren termin" : booking.guestName}</strong>
+          <span>{booking.checkIn} - {booking.checkOut}</span>
+        </div>
         <div className="calendar-entry-meta">
-          <span>{booking.guests} gosta</span>
+          <span>{isImportedClosedBooking(booking) ? "Booking.com import" : `${booking.guests} gosta`}</span>
           <span className={`status-pill status-${booking.status}`}>{booking.status}</span>
         </div>
         <div className="calendar-entry-actions">
@@ -516,6 +547,23 @@ export function AdminRoomCalendar({
           type="search"
           value={roomSearch}
         />
+        <div className="interactive-room-calendar__month-nav">
+          <button
+            className="secondary-button"
+            onClick={() => setCalendarMonth((current) => addMonths(current, -1))}
+            type="button"
+          >
+            Prethodni mesec
+          </button>
+          <strong>{monthLabelFormatter.format(calendarMonth)}</strong>
+          <button
+            className="secondary-button"
+            onClick={() => setCalendarMonth((current) => addMonths(current, 1))}
+            type="button"
+          >
+            Sledeci mesec
+          </button>
+        </div>
         <div className="interactive-room-calendar__quick-links">
           {filteredRooms.map((room) => (
             <a key={room.id} className="secondary-button" href={`#room-calendar-${room.id}`}>

@@ -5,8 +5,24 @@ import { db, ensureDatabaseSchema } from "@/lib/db";
 import { getRoomDisplayName } from "@/lib/rooms";
 import type { Booking, Room, RoomChannelMapping } from "@/lib/types";
 
+const bookingTimeZoneFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Belgrade",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+});
+
 function normalizeDate(value: Date) {
-  return value.toISOString().slice(0, 10);
+  const parts = bookingTimeZoneFormatter.formatToParts(value);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  return `${year}-${month}-${day}`;
 }
 
 function resolveBookingStatus(checkIn: string, checkOut: string): Booking["status"] {

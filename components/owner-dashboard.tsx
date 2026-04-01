@@ -141,7 +141,7 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
       case "contacted":
         return "Belezim da je gost kontaktiran...";
       case "closed":
-        return "Zatvaram upit...";
+        return "Odbijam upit...";
       default:
         return "Potvrdjujem rezervaciju...";
     }
@@ -151,10 +151,18 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
     case "contacted":
       return "Upit je oznacen kao kontaktiran.";
     case "closed":
-      return "Upit je zatvoren.";
+      return "Upit je odbijen.";
     default:
       return "Upit je uspesno pretvoren u rezervaciju.";
   }
+}
+
+function getInquiryStatusLabel(status: InquiryStatus) {
+  if (status === "closed") {
+    return "odbijen";
+  }
+
+  return status;
 }
 
 export function OwnerDashboard({
@@ -1026,7 +1034,7 @@ export function OwnerDashboard({
                   </div>
                   <div className="admin-inline-actions">
                     <span className={`status-pill status-inquiry-${inquiry.status}`}>
-                      {inquiry.status}
+                      {getInquiryStatusLabel(inquiry.status)}
                     </span>
                     <button
                       className="secondary-button"
@@ -1045,7 +1053,7 @@ export function OwnerDashboard({
                       onClick={() => void handleInquiryStatusUpdate(inquiry.id, "closed")}
                       type="button"
                     >
-                      Zatvori upit
+                      Odbij upit
                     </button>
                     <button
                       className="secondary-button"
@@ -1099,7 +1107,7 @@ export function OwnerDashboard({
                   </div>
                   <div className="admin-inline-actions">
                     <span className={`status-pill status-inquiry-${inquiry.status}`}>
-                      {inquiry.status}
+                      {getInquiryStatusLabel(inquiry.status)}
                     </span>
                     <span className="inline-note">{inquiry.message}</span>
                   </div>

@@ -40,7 +40,7 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
       case "contacted":
         return "Belezim da je gost kontaktiran...";
       case "closed":
-        return "Zatvaram upit...";
+        return "Odbijam upit...";
       default:
         return "Potvrdjujem rezervaciju...";
     }
@@ -50,10 +50,18 @@ function getInquiryActionMessage(action: InquiryAction, status: "submitting" | "
     case "contacted":
       return "Upit je oznacen kao kontaktiran.";
     case "closed":
-      return "Upit je zatvoren.";
+      return "Upit je odbijen.";
     default:
       return "Upit je uspesno pretvoren u rezervaciju.";
   }
+}
+
+function getInquiryStatusLabel(status: InquiryStatus) {
+  if (status === "closed") {
+    return "odbijen";
+  }
+
+  return status;
 }
 
 export function OwnerInquiriesPanel({ initialInquiries, rooms }: OwnerInquiriesPanelProps) {
@@ -212,7 +220,9 @@ export function OwnerInquiriesPanel({ initialInquiries, rooms }: OwnerInquiriesP
                 </div>
                 <div>{inquiry.guests} gosta</div>
                 <div className="admin-inline-stack">
-                  <span className={`status-pill status-inquiry-${inquiry.status}`}>{inquiry.status}</span>
+                  <span className={`status-pill status-inquiry-${inquiry.status}`}>
+                    {getInquiryStatusLabel(inquiry.status)}
+                  </span>
                   <span className="inline-note">{inquiry.requestedRoomType}</span>
                 </div>
                 <div className="admin-inline-stack">
@@ -254,7 +264,7 @@ export function OwnerInquiriesPanel({ initialInquiries, rooms }: OwnerInquiriesP
                     onClick={() => void handleInquiryStatusUpdate(inquiry.id, "closed")}
                     type="button"
                   >
-                    Zatvori
+                    Odbij upit
                   </button>
                 </div>
                 <p className={`inline-note ${inquiryActionState[inquiry.id]?.status === "error" ? "inline-note-error" : ""}`}>
@@ -291,7 +301,9 @@ export function OwnerInquiriesPanel({ initialInquiries, rooms }: OwnerInquiriesP
                 </div>
                 <div>{inquiry.guests} gosta</div>
                 <div className="admin-inline-actions">
-                  <span className={`status-pill status-inquiry-${inquiry.status}`}>{inquiry.status}</span>
+                  <span className={`status-pill status-inquiry-${inquiry.status}`}>
+                    {getInquiryStatusLabel(inquiry.status)}
+                  </span>
                   <span className="inline-note">{inquiry.requestedRoomType}</span>
                 </div>
               </div>

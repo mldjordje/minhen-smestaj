@@ -445,8 +445,8 @@ textarea {
 
 .status-checked-out,
 .status-inquiry-closed {
-  background: rgba(71, 159, 118, 0.14);
-  color: #205941;
+  background: rgba(177, 75, 75, 0.16);
+  color: #8b2f2f;
 }
 
 .status-mapped {
@@ -1220,6 +1220,17 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.interactive-room-calendar__month-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.interactive-room-calendar__month-nav strong {
+  text-transform: capitalize;
 }
 
 .interactive-room-calendar__quick-links .secondary-button {
