@@ -21,12 +21,12 @@ export default async function RoomsPage() {
             <ol className="breadcrumb cs_mb_30">
               <li className="breadcrumb-item">
                 <Link aria-label="Back to home page link" href="/">
-                  Početna
+                  Pocetna
                 </Link>
               </li>
               <li className="breadcrumb-item active">Sobe</li>
             </ol>
-            <h2 className="cs_fs_180 cs_white_color text-center mb-0">SMEŠTAJ</h2>
+            <h2 className="cs_fs_180 cs_white_color text-center mb-0">SMESTAJ</h2>
           </div>
         </div>
       </section>
@@ -36,12 +36,12 @@ export default async function RoomsPage() {
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              SOBE I SMEŠTAJ
+              SOBE I SMESTAJ
             </p>
             <h2 className="cs_section_title cs_fs_64 mb-0">
               Jednokrevetne, dvokrevetne
               <br />
-              i sobe za više osoba
+              i sobe za vise osoba
             </h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />
@@ -96,10 +96,10 @@ export default async function RoomsPage() {
         <div className="container">
           <div className="cs_section_heading cs_style_1 text-center">
             <p className="cs_section_subtitle cs_fs_24 cs_accent_color cs_mb_12">
-              GALERIJA SMEŠTAJA
+              GALERIJA SMESTAJA
             </p>
             <h2 className="cs_section_title cs_fs_64 mb-0">
-              Više fotografija objekta i soba
+              Vise fotografija objekta i soba
             </h2>
           </div>
           <div className="cs_height_70 cs_height_lg_45" />

@@ -73,13 +73,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const isOwnerRoute = pathname.startsWith("/admin/owner");
   const isStaffRoute = pathname.startsWith("/admin/staff");
   const navGroups = isOwnerRoute ? ownerGroups : isStaffRoute ? staffGroups : [];
+  const panelTitle = isOwnerRoute ? "Owner panel" : isStaffRoute ? "Staff panel" : "Operativni panel";
+  const activeArea = pathname
+    .split("/")
+    .filter(Boolean)
+    .slice(1)
+    .map((item) => item.replace(/-/g, " "))
+    .join(" / ");
 
   return (
     <main className="admin-wrap">
       <aside className="admin-sidebar">
         <div>
           <p className="eyebrow">Minhen Smestaj</p>
-          <h2>{isOwnerRoute ? "Owner panel" : isStaffRoute ? "Staff panel" : "Operativni panel"}</h2>
+          <h2>{panelTitle}</h2>
           <p className="sidebar-copy">
             {isOwnerRoute
               ? "Funkcije su rasporedjene po celinama da se do kalendara, upita i integracija stize bez trazenja po dugackim stranicama."
@@ -120,7 +127,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           ))}
         </nav>
       </aside>
-      <section className="admin-content">{children}</section>
+      <section className="admin-content">
+        <div className="admin-topbar">
+          <div>
+            <span>Aktivna zona</span>
+            <strong>{activeArea || "admin"}</strong>
+          </div>
+          <div className="admin-topbar__actions">
+            <Link className="secondary-button" href="/admin/owner/calendar">
+              Kalendar
+            </Link>
+            <Link className="primary-button" href="/#rezervacija">
+              Javni booking
+            </Link>
+          </div>
+        </div>
+        {children}
+      </section>
     </main>
   );
 }
