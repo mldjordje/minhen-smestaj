@@ -17,6 +17,31 @@ npm run dev
 
 Ako povezujemo Booking.com i Vercel Blob, treba dodati `.env.local` na osnovu vrednosti iz `.env.example`.
 
+## Google Sign-In setup
+
+1. U Google Cloud Console napraviti OAuth Client za `Web application`.
+2. Dodati Authorized JavaScript origin:
+   - `http://localhost:3000`
+   - produkcioni domen, npr. `https://vas-domen.com`
+3. Dodati Authorized redirect URI:
+   - `http://localhost:3000/api/auth/callback/google`
+   - `https://vas-domen.com/api/auth/callback/google`
+4. U `.env.local` upisati:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `NEXTAUTH_SECRET`
+   - `NEXTAUTH_URL`
+5. U `OWNER_EMAILS` upisati Google email vlasnika/admina.
+6. U `STAFF_EMAILS` upisati Google email-ove radnika/staff korisnika.
+7. Svi ostali Google korisnici automatski dobijaju `guest` rolu.
+
+Rute za prijavu:
+
+- `/signin` izbor prijave za gosta, staff i owner korisnika
+- `/account` guest dashboard
+- `/admin/staff` staff dashboard
+- `/admin/owner` owner dashboard
+
 ## Produkcijski utility skriptovi
 
 ```bash
