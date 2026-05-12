@@ -17,6 +17,73 @@ export function PublicTemplateHeadLinks() {
       <link rel="stylesheet" href="/hotel-template/assets/css/lightgallery.min.css" />
       <link rel="stylesheet" href="/hotel-template/assets/css/odometer.min.css" />
       <link rel="stylesheet" href="/hotel-template/assets/css/style.css" />
+      <style>{`
+        .site-template-shell .container {
+          width: min(100% - 32px, 1320px) !important;
+          max-width: 1320px !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+        }
+
+        .site-template-shell .landing-hero-layout {
+          width: 100% !important;
+          max-width: 100% !important;
+          grid-template-columns: minmax(0, 0.95fr) minmax(390px, 0.78fr) !important;
+          gap: clamp(28px, 4vw, 56px) !important;
+          padding: clamp(62px, 6vw, 96px) 0 clamp(48px, 6vw, 84px) !important;
+        }
+
+        .site-template-shell .cs_hero.cs_style_1 .cs_hero_content {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding: 0 !important;
+        }
+
+        .site-template-shell .cs_hero_title {
+          max-width: 12.8ch !important;
+          font-size: clamp(4rem, 6.8vw, 7.25rem) !important;
+          line-height: 0.9 !important;
+          text-wrap: balance;
+        }
+
+        .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .landing-hero-title-line {
+          display: block !important;
+          font-size: 1em !important;
+          line-height: 0.9 !important;
+          overflow-wrap: normal !important;
+          white-space: nowrap !important;
+        }
+
+        .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .cs_ternary_font {
+          display: block !important;
+          font-size: 0.58em !important;
+          line-height: 0.86 !important;
+          max-width: 100% !important;
+          overflow-wrap: anywhere !important;
+        }
+
+        @media (max-width: 760px) {
+          .site-template-shell .container {
+            width: min(100% - 28px, 100%) !important;
+            max-width: calc(100% - 28px) !important;
+          }
+
+          .site-template-shell .landing-hero-layout {
+            grid-template-columns: 1fr !important;
+            padding: 92px 0 54px !important;
+          }
+
+          .site-template-shell .cs_hero_title {
+            max-width: 8ch !important;
+            font-size: clamp(2.45rem, 13vw, 3.45rem) !important;
+          }
+
+          .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .cs_ternary_font {
+            font-size: 0.52em !important;
+            line-height: 0.9 !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

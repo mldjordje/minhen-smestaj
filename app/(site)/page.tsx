@@ -172,12 +172,11 @@ export default async function HomePage() {
             <div className="landing-hero-copy">
               <div className="cs_hero_content text-start">
                 <h1 className="cs_hero_title cs_fs_180 cs_white_color cs_mb_28">
-                  Dobrodosli u
+                  <span className="landing-hero-title-line">Dobrodosli u</span>
                   <span className="cs_accent_color cs_ternary_font cs_hover_layer_2">
-                    {" "}
                     Jagdschlossl
                   </span>
-                  Eichenried
+                  <span className="landing-hero-title-line">Eichenried</span>
                 </h1>
                 <p className="cs_fs_20 cs_light cs_white_color mb-0 legacy-hero-note">
                   Udoban i pristupacan smestaj u blizini Minhena za goste iz Srbije,
