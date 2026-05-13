@@ -44,6 +44,7 @@ export default async function HomePage() {
     src: item.src,
     title: item.title
   }));
+  const heroStackItems = landingGallery.showcaseImages.slice(0, 2);
   const featuredRooms = rooms.slice(0, 3);
 
   return (
@@ -69,11 +70,7 @@ export default async function HomePage() {
                 Pogledaj sobe
               </Link>
             </div>
-            <div className="landing-floating-proof">
-              <article>
-                <span>Dolasci</span>
-                <strong>{arrivalsToday} danas</strong>
-              </article>
+            <div className="landing-availability-strip">
               <article>
                 <span>Dostupno</span>
                 <strong>{availableRooms} sobe</strong>
@@ -82,44 +79,62 @@ export default async function HomePage() {
                 <span>Cena</span>
                 <strong>{startingPrice ? `od ${startingPrice} EUR` : "Na upit"}</strong>
               </article>
+              <article>
+                <span>Danas</span>
+                <strong>{arrivalsToday} dolazaka</strong>
+              </article>
             </div>
           </div>
 
           <div className="landing-cinematic-showcase">
             <img
               alt={landingGallery.detailImage ? "Enterijer smestaja" : "Smestaj blizu Minhena"}
-              className="landing-parallax-media"
+              className="landing-parallax-media landing-showcase-main-media"
               src={landingGallery.detailImage}
             />
-            <div>
+            {heroStackItems[0] ? (
+              <figure className="landing-showcase-card landing-showcase-card--top">
+                <img alt={heroStackItems[0].alt} src={heroStackItems[0].src} />
+              </figure>
+            ) : null}
+            {heroStackItems[1] ? (
+              <figure className="landing-showcase-card landing-showcase-card--bottom">
+                <img alt={heroStackItems[1].alt} src={heroStackItems[1].src} />
+              </figure>
+            ) : null}
+            <div className="landing-showcase-note">
               <span>Dostupnost uzivo</span>
               <strong>{availableRooms} sobe slobodne</strong>
-              <p>Booking pregled je odmah ispod hero sekcije.</p>
+              <p>Brz pregled termina bez dodatnog klika.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="landing-immersive-strip landing-reveal">
-        <div className="container">
-          <LandingMediaRail items={mediaRailItems} />
-        </div>
-      </section>
-
       {rooms.length > 0 ? (
-        <section className="landing-booking-stage landing-reveal">
-          <div className="container">
-            <BookingExperiencePanel
-              bookings={bookings}
-              dailyFormSubtitle="Izaberi dane i odmah posalji upit."
-              defaultRoomSlug={rooms[0]?.slug}
-              headingEyebrow="Dostupnost"
-              headingNote="Jedan pogled: soba, kalendar, rezervacija."
-              headingTitle="Rezervisi bez cekanja"
-              monthlyFormSubtitle="Izaberi duzi boravak i posalji upit."
-              roomBlocks={roomBlocks}
-              rooms={rooms}
-            />
+        <section className="landing-hospitality-stage landing-reveal">
+          <div className="container landing-hospitality-stage__grid">
+            <div className="landing-hospitality-stage__intro">
+              <h2>Prostor za miran dolazak.</h2>
+              <p>
+                Fotografije, termini i upit na jednom mestu. Bez suvisnog teksta,
+                bez lutanja kroz stranice.
+              </p>
+              <LandingMediaRail items={mediaRailItems} />
+            </div>
+            <div className="landing-booking-stage">
+              <BookingExperiencePanel
+                bookings={bookings}
+                dailyFormSubtitle="Izaberi dane i odmah posalji upit."
+                defaultRoomSlug={rooms[0]?.slug}
+                headingEyebrow="Dostupnost"
+                headingNote="Jedan pogled: soba, kalendar, rezervacija."
+                headingTitle="Rezervisi bez cekanja"
+                monthlyFormSubtitle="Izaberi duzi boravak i posalji upit."
+                roomBlocks={roomBlocks}
+                rooms={rooms}
+              />
+            </div>
           </div>
         </section>
       ) : null}

@@ -47,7 +47,7 @@ export function LandingMotionOrchestrator() {
             stagger: 0.12
           })
           .from(
-            ".landing-cinematic-booking",
+            ".landing-cinematic-showcase",
             {
               x: desktop ? 36 : 0,
               y: desktop ? 0 : 24
@@ -55,7 +55,16 @@ export function LandingMotionOrchestrator() {
             "-=0.45"
           )
           .from(
-            ".landing-floating-proof",
+            ".landing-showcase-card",
+            {
+              y: 18,
+              scale: 0.96,
+              stagger: 0.08
+            },
+            "-=0.3"
+          )
+          .from(
+            ".landing-availability-strip article",
             {
               y: 18,
               stagger: 0.08
