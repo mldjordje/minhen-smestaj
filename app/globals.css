@@ -13,7 +13,7 @@
 /* Cinematic landing v2 */
 .landing-cinematic-hero {
   position: relative;
-  min-height: calc(100vh - 76px);
+  min-height: min(820px, calc(100vh - 76px));
   overflow: hidden;
   background-position: center;
   background-size: cover;
@@ -35,8 +35,8 @@
   grid-template-columns: minmax(0, 0.92fr) minmax(500px, 0.9fr);
   gap: clamp(34px, 4vw, 64px);
   align-items: start;
-  min-height: calc(100vh - 76px);
-  padding: 84px 0 84px;
+  min-height: min(820px, calc(100vh - 76px));
+  padding: 68px 0 72px;
 }
 
 .landing-cinematic-hero__grid > * {
@@ -61,8 +61,8 @@
 
 .landing-cinematic-hero__copy h1 {
   color: #fff;
-  font-size: clamp(4.35rem, 7vw, 7.6rem);
-  line-height: 0.9;
+  font-size: clamp(3.8rem, 6vw, 6.35rem);
+  line-height: 0.94;
   max-width: 7ch;
 }
 
@@ -141,13 +141,13 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  min-height: 690px;
+  min-height: 610px;
   overflow: visible;
 }
 
 .landing-showcase-main-media {
   position: absolute;
-  inset: 38px 0 84px 86px;
+  inset: 26px 0 76px 76px;
   width: auto;
   height: auto;
   min-height: 0;
@@ -211,7 +211,7 @@
 }
 
 .landing-showcase-card--top {
-  top: 0;
+  top: 2px;
   right: 24px;
   width: min(268px, 40%);
   height: 194px;
@@ -219,7 +219,7 @@
 
 .landing-showcase-card--bottom {
   right: 42px;
-  bottom: 198px;
+  bottom: 182px;
   width: min(240px, 36%);
   height: 172px;
 }
@@ -242,14 +242,16 @@
 
 .landing-hospitality-stage__grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.86fr) minmax(520px, 1fr);
-  gap: clamp(28px, 4vw, 56px);
+  grid-template-columns: 1fr;
+  gap: clamp(30px, 4vw, 48px);
   align-items: start;
 }
 
 .landing-hospitality-stage__intro {
   display: grid;
   gap: 28px;
+  grid-template-columns: minmax(0, 0.58fr) minmax(0, 1fr);
+  align-items: end;
 }
 
 .landing-hospitality-stage__intro h2 {
@@ -272,7 +274,8 @@
 
 .landing-media-rail {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -359,6 +362,7 @@
 }
 
 .landing-room-story {
+  position: relative;
   display: grid;
   align-content: end;
   min-height: 560px;
@@ -369,12 +373,13 @@
 }
 
 .landing-room-story > a {
-  grid-row: 1;
+  position: absolute;
+  inset: 0;
   min-height: 100%;
 }
 
 .landing-room-story > div {
-  grid-row: 1;
+  position: relative;
   align-self: flex-end;
   z-index: 1;
   display: grid;
@@ -454,6 +459,11 @@
   box-shadow: var(--shadow);
 }
 
+.landing-spotlight h2,
+.landing-final-push h2 {
+  color: #fff;
+}
+
 @media (max-width: 1180px) {
   .landing-cinematic-hero__grid,
   .landing-spotlight__grid,
@@ -474,19 +484,43 @@
 
   .landing-cinematic-showcase,
   .landing-showcase-main-media {
-    min-height: 560px;
+    min-height: 520px;
+  }
+
+  .landing-hospitality-stage__intro {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 760px) {
   .landing-cinematic-hero__grid {
     min-height: auto;
-    padding: 42px 0 64px;
+    padding: 30px 0 48px;
+  }
+
+  .landing-cinematic-hero__copy {
+    gap: 18px;
   }
 
   .landing-cinematic-hero__copy h1 {
     max-width: 7ch;
-    font-size: clamp(3.25rem, 16vw, 4.6rem);
+    font-size: clamp(2.7rem, 12vw, 3.45rem);
+    line-height: 0.96;
+  }
+
+  .landing-cinematic-hero__copy p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .landing-cinematic-actions {
+    gap: 12px;
+  }
+
+  .landing-cinematic-actions .primary-button,
+  .landing-cinematic-actions .secondary-button {
+    min-height: 52px;
+    padding-inline: 20px;
   }
 
   .landing-availability-strip,
@@ -498,6 +532,7 @@
   }
 
   .landing-availability-strip article {
+    min-height: 92px;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   }
@@ -516,7 +551,7 @@
 
   .landing-cinematic-showcase,
   .landing-showcase-main-media {
-    min-height: 460px;
+    min-height: 400px;
   }
 
   .landing-showcase-card--top {
