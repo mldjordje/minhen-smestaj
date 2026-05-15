@@ -18,6 +18,155 @@ export function PublicTemplateHeadLinks() {
       <link rel="stylesheet" href="/hotel-template/assets/css/odometer.min.css" />
       <link rel="stylesheet" href="/hotel-template/assets/css/style.css" />
       <style>{`
+        /* ── Dark Alpine Luxury — cascade override (loaded after hotel-template CSS) ── */
+
+        html, body {
+          background: #0c0d0f !important;
+          color: #f2ead8 !important;
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+        }
+
+        .site-template-shell {
+          background: #0c0d0f !important;
+          color: #f2ead8 !important;
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+        }
+
+        /* Heading font and color */
+        .site-template-shell h1,
+        .site-template-shell h2,
+        .site-template-shell h3 {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          color: #f2ead8 !important;
+        }
+
+        /* Hero h1 stays white */
+        .site-template-shell .landing-cinematic-hero__copy h1 {
+          color: #ffffff !important;
+          font-weight: 300 !important;
+        }
+
+        /* Room story h3 — white on dark image */
+        .site-template-shell .landing-room-story h3 {
+          color: #ffffff !important;
+          font-weight: 300 !important;
+        }
+
+        /* Showcase note strong */
+        .site-template-shell .landing-cinematic-showcase strong {
+          color: #ffffff !important;
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+        }
+
+        /* Gold primary button */
+        .site-template-shell .primary-button,
+        .site-template-shell a.primary-button {
+          background: linear-gradient(135deg, #c89a28, #deb848) !important;
+          background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+          color: #0c0d0f !important;
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+          font-size: 1rem !important;
+          font-weight: 600 !important;
+          letter-spacing: 0.01em !important;
+          box-shadow: 0 12px 36px rgba(200, 154, 40, 0.3) !important;
+          text-shadow: none !important;
+          border-radius: 999px !important;
+          padding: 0 22px !important;
+        }
+
+        /* Outlined secondary button */
+        .site-template-shell .secondary-button,
+        .site-template-shell a.secondary-button {
+          background: rgba(200, 154, 40, 0.06) !important;
+          background-image: none !important;
+          border: 1px solid rgba(200, 154, 40, 0.3) !important;
+          color: #f2ead8 !important;
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+          font-size: 1rem !important;
+          font-weight: 500 !important;
+          text-shadow: none !important;
+          border-radius: 999px !important;
+          padding: 0 22px !important;
+        }
+
+        /* Header brand subtitle */
+        .site-template-shell .public-site-header__brand small {
+          color: #c89a28 !important;
+          letter-spacing: 0.26em !important;
+          font-size: 0.68rem !important;
+        }
+
+        /* Header brand name */
+        .site-template-shell .public-site-header__brand span {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          font-weight: 400 !important;
+          letter-spacing: 0.1em !important;
+        }
+
+        /* Availability strip labels */
+        .site-template-shell .landing-availability-strip span {
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+        }
+
+        /* Cormorant for big numbers in strip */
+        .site-template-shell .landing-availability-strip strong {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          font-size: 1.65rem !important;
+          font-weight: 400 !important;
+        }
+
+        /* Stats section numbers */
+        .site-template-shell .landing-spotlight__stats strong {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          color: #c89a28 !important;
+          font-weight: 300 !important;
+        }
+
+        /* Process band number style */
+        .site-template-shell .landing-process-band span {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          font-size: 3.4rem !important;
+          font-weight: 300 !important;
+          color: #c89a28 !important;
+        }
+
+        /* Muted text */
+        .site-template-shell .landing-cinematic-hero__copy p,
+        .site-template-shell .landing-final-push p,
+        .site-template-shell .landing-spotlight p,
+        .site-template-shell .landing-hospitality-stage__intro p,
+        .site-template-shell .landing-process-band p {
+          color: rgba(242, 234, 216, 0.66) !important;
+          font-family: 'DM Sans', Georgia, sans-serif !important;
+          font-weight: 300 !important;
+        }
+
+        /* Room card text */
+        .site-template-shell .landing-room-story h3 {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+          font-weight: 300 !important;
+        }
+
+        /* Form submit button */
+        .site-template-shell .public-booking-form__submit {
+          background: linear-gradient(135deg, #c89a28, #deb848) !important;
+          background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+          color: #0c0d0f !important;
+          font-weight: 600 !important;
+        }
+
+        /* Mode switch active */
+        .site-template-shell .room-booking-mode-switch button.is-active {
+          background: linear-gradient(135deg, #c89a28, #deb848) !important;
+          background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+          color: #0c0d0f !important;
+        }
+
+        /* text-link */
+        .site-template-shell .text-link {
+          color: #c89a28 !important;
+        }
+
         .site-template-shell .container {
           width: min(100% - 32px, 1320px) !important;
           max-width: 1320px !important;
@@ -25,62 +174,10 @@ export function PublicTemplateHeadLinks() {
           padding-right: 0 !important;
         }
 
-        .site-template-shell .landing-hero-layout {
-          width: 100% !important;
-          max-width: 100% !important;
-          grid-template-columns: minmax(0, 0.95fr) minmax(390px, 0.78fr) !important;
-          gap: clamp(28px, 4vw, 56px) !important;
-          padding: clamp(62px, 6vw, 96px) 0 clamp(48px, 6vw, 84px) !important;
-        }
-
-        .site-template-shell .cs_hero.cs_style_1 .cs_hero_content {
-          width: 100% !important;
-          max-width: 100% !important;
-          padding: 0 !important;
-        }
-
-        .site-template-shell .cs_hero_title {
-          max-width: 12.8ch !important;
-          font-size: clamp(4rem, 6.8vw, 7.25rem) !important;
-          line-height: 0.9 !important;
-          text-wrap: balance;
-        }
-
-        .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .landing-hero-title-line {
-          display: block !important;
-          font-size: 1em !important;
-          line-height: 0.9 !important;
-          overflow-wrap: normal !important;
-          white-space: nowrap !important;
-        }
-
-        .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .cs_ternary_font {
-          display: block !important;
-          font-size: 0.58em !important;
-          line-height: 0.86 !important;
-          max-width: 100% !important;
-          overflow-wrap: anywhere !important;
-        }
-
         @media (max-width: 760px) {
           .site-template-shell .container {
             width: min(100% - 28px, 100%) !important;
             max-width: calc(100% - 28px) !important;
-          }
-
-          .site-template-shell .landing-hero-layout {
-            grid-template-columns: 1fr !important;
-            padding: 92px 0 54px !important;
-          }
-
-          .site-template-shell .cs_hero_title {
-            max-width: 8ch !important;
-            font-size: clamp(2.45rem, 13vw, 3.45rem) !important;
-          }
-
-          .site-template-shell .cs_hero.cs_style_1 .cs_hero_title .cs_ternary_font {
-            font-size: 0.52em !important;
-            line-height: 0.9 !important;
           }
         }
       `}</style>

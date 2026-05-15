@@ -1,19 +1,20 @@
 :root {
-  --bg: #f4efe7;
-  --surface: rgba(255, 255, 255, 0.8);
-  --ink: #1f2a1f;
-  --muted: #5f645d;
-  --line: rgba(31, 42, 31, 0.12);
-  --accent: #bd7b3b;
-  --accent-strong: #8d5520;
-  --green: #385344;
-  --shadow: 0 20px 60px rgba(28, 34, 26, 0.12);
+  --bg: #0c0d0f;
+  --surface: rgba(18, 20, 24, 0.95);
+  --ink: #f2ead8;
+  --muted: #7a7060;
+  --line: rgba(242, 234, 216, 0.1);
+  --accent: #c89a28;
+  --accent-strong: #a57820;
+  --green: #1b3524;
+  --shadow: 0 24px 72px rgba(0, 0, 0, 0.55);
+  --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
-/* Cinematic landing v2 */
+/* Dark Alpine Luxury — Landing v3 */
 .landing-cinematic-hero {
   position: relative;
-  min-height: min(820px, calc(100vh - 76px));
+  min-height: min(900px, calc(100vh - 80px));
   overflow: hidden;
   background-position: center;
   background-size: cover;
@@ -26,17 +27,17 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(7, 17, 12, 0.96) 0%, rgba(7, 17, 12, 0.78) 42%, rgba(7, 17, 12, 0.28) 100%),
-    linear-gradient(180deg, rgba(7, 17, 12, 0.18), rgba(7, 17, 12, 0.9));
+    linear-gradient(108deg, rgba(8, 10, 12, 0.97) 0%, rgba(8, 10, 12, 0.80) 42%, rgba(8, 10, 12, 0.35) 100%),
+    linear-gradient(180deg, rgba(8, 10, 12, 0.22), rgba(8, 10, 12, 0.90));
 }
 
 .landing-cinematic-hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(500px, 0.9fr);
-  gap: clamp(34px, 4vw, 64px);
-  align-items: start;
-  min-height: min(820px, calc(100vh - 76px));
-  padding: 68px 0 72px;
+  grid-template-columns: minmax(0, 1fr) minmax(480px, 0.82fr);
+  gap: clamp(32px, 4vw, 60px);
+  align-items: center;
+  min-height: min(900px, calc(100vh - 80px));
+  padding: 80px 0;
 }
 
 .landing-cinematic-hero__grid > * {
@@ -45,9 +46,10 @@
 
 .landing-cinematic-hero__copy {
   display: grid;
-  gap: 26px;
-  max-width: 720px;
+  gap: 28px;
+  max-width: 760px;
   min-width: 0;
+  align-self: center;
 }
 
 .landing-cinematic-hero__copy h1,
@@ -55,25 +57,27 @@
 .landing-section-heading h2,
 .landing-final-push h2 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  letter-spacing: -0.04em;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -0.02em;
 }
 
 .landing-cinematic-hero__copy h1 {
+  font-weight: 300;
   color: #fff;
-  font-size: clamp(3.8rem, 6vw, 6.35rem);
-  line-height: 0.94;
-  max-width: 7ch;
+  font-size: clamp(3.8rem, 6.5vw, 8rem);
+  line-height: 0.91;
+  max-width: 8ch;
 }
 
 .landing-cinematic-hero__copy p,
 .landing-final-push p,
 .landing-spotlight p {
   margin: 0;
-  max-width: min(520px, 100%);
-  color: rgba(255, 255, 255, 0.86);
-  font-size: clamp(1.1rem, 1rem + 0.35vw, 1.35rem);
-  line-height: 1.6;
+  max-width: min(480px, 100%);
+  color: rgba(242, 234, 216, 0.66);
+  font-size: clamp(1rem, 0.9rem + 0.28vw, 1.18rem);
+  line-height: 1.72;
+  font-weight: 300;
 }
 
 .landing-cinematic-actions {
@@ -88,18 +92,18 @@
   gap: 0;
   margin-top: 8px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
+  border: 1px solid rgba(200, 154, 40, 0.22);
+  border-radius: 20px;
+  background: rgba(10, 11, 14, 0.78);
+  backdrop-filter: blur(24px);
 }
 
 .landing-availability-strip article {
   display: grid;
-  gap: 8px;
-  min-height: 106px;
-  padding: 18px 20px;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 10px;
+  min-height: 108px;
+  padding: 22px 24px;
+  border-right: 1px solid rgba(200, 154, 40, 0.14);
 }
 
 .landing-availability-strip article:last-child {
@@ -109,23 +113,26 @@
 .landing-availability-strip span,
 .landing-spotlight__stats span,
 .landing-room-story span {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .landing-availability-strip strong {
   color: #fff;
-  font-size: 1.35rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.65rem;
 }
 
 .landing-cinematic-booking .room-booking-experience {
   margin: 0;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+  background: rgba(12, 14, 17, 0.96);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(200, 154, 40, 0.16);
 }
 
 .landing-cinematic-booking .room-booking-experience__planner,
@@ -141,7 +148,7 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  min-height: 610px;
+  min-height: 620px;
   overflow: visible;
 }
 
@@ -154,9 +161,9 @@
   display: block;
   object-fit: cover;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 34px;
-  box-shadow: 0 36px 110px rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(200, 154, 40, 0.2);
+  border-radius: 28px;
+  box-shadow: 0 48px 120px rgba(0, 0, 0, 0.65);
 }
 
 .landing-showcase-note {
@@ -167,29 +174,32 @@
   z-index: 2;
   display: grid;
   gap: 8px;
-  padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 24px;
+  padding: 22px 24px;
+  border: 1px solid rgba(200, 154, 40, 0.22);
+  border-radius: 20px;
   color: #fff;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(18px);
+  background: rgba(10, 11, 14, 0.88);
+  backdrop-filter: blur(24px);
 }
 
 .landing-cinematic-showcase span {
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .landing-cinematic-showcase strong {
-  font-size: clamp(1.5rem, 1.4rem + 0.4vw, 2rem);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 1.3rem + 0.45vw, 2rem);
 }
 
 .landing-cinematic-showcase p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(242, 234, 216, 0.62);
+  font-size: 0.88rem;
 }
 
 .landing-showcase-card {
@@ -197,9 +207,9 @@
   z-index: 2;
   margin: 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.34);
+  border: 1px solid rgba(200, 154, 40, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.55);
 }
 
 .landing-showcase-card img {
@@ -229,28 +239,35 @@
 }
 
 .landing-booking-stage .room-booking-experience {
-  border-radius: 34px;
-  box-shadow: 0 26px 90px rgba(21, 29, 23, 0.16);
+  border-radius: 28px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(200, 154, 40, 0.16);
 }
 
 .landing-hospitality-stage,
 .landing-featured-rooms,
 .landing-spotlight,
 .landing-final-push {
-  padding: clamp(72px, 8vw, 110px) 0;
+  padding: clamp(80px, 9vw, 124px) 0;
+}
+
+.landing-hospitality-stage {
+  background: #0e1013;
+  border-top: 1px solid rgba(200, 154, 40, 0.1);
+  border-bottom: 1px solid rgba(200, 154, 40, 0.1);
 }
 
 .landing-hospitality-stage__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(30px, 4vw, 48px);
+  gap: clamp(36px, 5vw, 56px);
   align-items: start;
 }
 
 .landing-hospitality-stage__intro {
   display: grid;
   gap: 28px;
-  grid-template-columns: minmax(0, 0.58fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.54fr) minmax(0, 1fr);
   align-items: end;
 }
 
@@ -258,18 +275,20 @@
   margin: 0;
   max-width: 8ch;
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.8rem, 4vw, 4.6rem);
-  line-height: 0.96;
-  letter-spacing: -0.04em;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(2.9rem, 4vw, 5rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
 }
 
 .landing-hospitality-stage__intro p {
   margin: 0;
   max-width: 520px;
   color: var(--muted);
-  font-size: 1.12rem;
-  line-height: 1.7;
+  font-size: 1.05rem;
+  line-height: 1.72;
+  font-weight: 300;
 }
 
 .landing-media-rail {
@@ -281,10 +300,11 @@
 
 .landing-media-rail__item {
   position: relative;
-  min-height: 280px;
+  min-height: 270px;
   overflow: hidden;
-  border-radius: 24px;
-  box-shadow: var(--shadow);
+  border-radius: 20px;
+  border: 1px solid rgba(200, 154, 40, 0.14);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 .landing-media-rail__item img,
@@ -297,20 +317,22 @@
 
 .landing-media-rail__item span {
   position: absolute;
-  right: 18px;
-  bottom: 18px;
-  left: 18px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 800;
-  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  color: rgba(242, 234, 216, 0.9);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }
 
 .landing-spotlight {
-  color: #fff;
+  color: var(--ink);
   background:
-    radial-gradient(circle at 18% 18%, rgba(185, 130, 67, 0.22), transparent 28%),
-    linear-gradient(135deg, #0c1711 0%, #173d2c 54%, #0b1510 100%);
+    radial-gradient(circle at 20% 40%, rgba(200, 154, 40, 0.06), transparent 40%),
+    #080a0c;
+  border-top: 1px solid rgba(200, 154, 40, 0.1);
+  border-bottom: 1px solid rgba(200, 154, 40, 0.1);
 }
 
 .landing-spotlight__grid {
@@ -323,28 +345,32 @@
 .landing-spotlight h2,
 .landing-final-push h2,
 .landing-section-heading h2 {
-  font-size: clamp(2.5rem, 3.6vw, 4.4rem);
-  line-height: 0.96;
+  font-weight: 300;
+  font-size: clamp(2.6rem, 3.8vw, 5rem);
+  line-height: 0.94;
 }
 
 .landing-spotlight__stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(150px, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .landing-spotlight__stats article {
   display: grid;
-  gap: 10px;
-  min-height: 132px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
+  gap: 14px;
+  min-height: 140px;
+  padding: 24px;
+  border: 1px solid rgba(200, 154, 40, 0.18);
+  border-radius: 18px;
+  background: rgba(200, 154, 40, 0.04);
 }
 
 .landing-spotlight__stats strong {
-  font-size: clamp(2rem, 2vw, 3rem);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(2.4rem, 2.6vw, 3.8rem);
+  color: var(--accent);
 }
 
 .landing-section-heading {
@@ -357,19 +383,20 @@
 
 .landing-featured-rooms__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) repeat(2, minmax(0, 0.82fr));
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.22fr) repeat(2, minmax(0, 0.78fr));
+  gap: 18px;
 }
 
 .landing-room-story {
   position: relative;
   display: grid;
   align-content: end;
-  min-height: 560px;
+  min-height: 580px;
   overflow: hidden;
-  border-radius: 26px;
-  background: #102319;
-  box-shadow: var(--shadow);
+  border-radius: 22px;
+  background: #0e1013;
+  border: 1px solid rgba(200, 154, 40, 0.12);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.45);
 }
 
 .landing-room-story > a {
@@ -384,61 +411,68 @@
   z-index: 1;
   display: grid;
   gap: 10px;
-  padding: 24px;
+  padding: 28px;
   color: #fff;
-  background: linear-gradient(180deg, transparent, rgba(7, 17, 12, 0.92));
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 8, 0.97));
 }
 
 .landing-room-story h3 {
   margin: 0;
   color: #fff;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.8rem, 2vw, 2.6rem);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 2vw, 2.7rem);
 }
 
 .landing-room-story p {
   margin: 0 0 8px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(242, 234, 216, 0.55);
+  font-size: 0.88rem;
 }
 
 .landing-process-band {
-  padding: 0 0 clamp(72px, 8vw, 110px);
+  padding: 0 0 clamp(80px, 9vw, 124px);
 }
 
 .landing-process-band__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
 .landing-process-band article {
   min-height: 220px;
-  padding: 24px;
-  border-radius: 24px;
-  background: #fff;
-  border: 1px solid rgba(23, 35, 27, 0.1);
-  box-shadow: var(--shadow-soft);
+  padding: 32px;
+  border-radius: 20px;
+  background: rgba(14, 16, 20, 0.95);
+  border: 1px solid rgba(200, 154, 40, 0.14);
 }
 
 .landing-process-band span {
-  display: inline-flex;
-  margin-bottom: 18px;
-  color: var(--accent-strong);
-  font-size: 0.82rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  display: block;
+  margin-bottom: 16px;
+  color: var(--accent);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3.4rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .landing-process-band h3 {
-  margin: 0 0 10px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2rem;
+  margin: 0 0 12px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.9rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
 .landing-process-band p {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
+  font-size: 0.95rem;
 }
 
 .landing-final-push {
@@ -450,18 +484,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: clamp(28px, 4vw, 42px);
-  border-radius: 28px;
-  color: #fff;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(185, 130, 67, 0.22), transparent 28%),
-    linear-gradient(135deg, #102319 0%, #173d2c 100%);
-  box-shadow: var(--shadow);
+  padding: clamp(36px, 5vw, 52px) clamp(36px, 5vw, 56px);
+  border-radius: 22px;
+  color: var(--ink);
+  background: rgba(14, 16, 20, 0.95);
+  border: 1px solid rgba(200, 154, 40, 0.22);
+  box-shadow: 0 0 0 1px rgba(200, 154, 40, 0.05), 0 32px 80px rgba(0, 0, 0, 0.45);
 }
 
 .landing-spotlight h2,
 .landing-final-push h2 {
-  color: #fff;
+  color: var(--ink);
 }
 
 @media (max-width: 1180px) {
@@ -495,22 +528,22 @@
 @media (max-width: 760px) {
   .landing-cinematic-hero__grid {
     min-height: auto;
-    padding: 30px 0 48px;
+    padding: 32px 0 48px;
   }
 
   .landing-cinematic-hero__copy {
-    gap: 18px;
+    gap: 20px;
   }
 
   .landing-cinematic-hero__copy h1 {
     max-width: 7ch;
-    font-size: clamp(2.7rem, 12vw, 3.45rem);
-    line-height: 0.96;
+    font-size: clamp(2.9rem, 13vw, 3.6rem);
+    line-height: 0.93;
   }
 
   .landing-cinematic-hero__copy p {
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .landing-cinematic-actions {
@@ -534,7 +567,7 @@
   .landing-availability-strip article {
     min-height: 92px;
     border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(200, 154, 40, 0.14);
   }
 
   .landing-availability-strip article:last-child {
@@ -601,12 +634,9 @@ html {
 
 body {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: 'DM Sans', Georgia, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(189, 123, 59, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(56, 83, 68, 0.18), transparent 30%),
-    linear-gradient(180deg, #f8f4ed 0%, #efe7db 100%);
+  background: var(--bg);
 }
 
 a {
@@ -762,14 +792,85 @@ textarea {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, var(--accent), #d89d62);
-  color: #fff;
-  box-shadow: 0 14px 36px rgba(141, 85, 32, 0.25);
+  background: linear-gradient(135deg, #c89a28, #deb848);
+  color: #0c0d0f;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 12px 36px rgba(200, 154, 40, 0.3);
 }
 
 .secondary-button {
-  border-color: var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(200, 154, 40, 0.3);
+  background: rgba(200, 154, 40, 0.06);
+  color: var(--ink);
+}
+
+/* Override hotel template CSS which loads after globals.css and wins specificity */
+.site-template-shell,
+.site-template-shell * {
+  font-family: 'DM Sans', Georgia, sans-serif;
+}
+
+.site-template-shell h1,
+.site-template-shell h2,
+.site-template-shell h3,
+.site-template-shell .landing-cinematic-hero__copy h1,
+.site-template-shell .landing-spotlight h2,
+.site-template-shell .landing-section-heading h2,
+.site-template-shell .landing-final-push h2,
+.site-template-shell .landing-hospitality-stage__intro h2,
+.site-template-shell .landing-room-story h3,
+.site-template-shell .landing-process-band h3,
+.site-template-shell .landing-process-band span,
+.site-template-shell .landing-availability-strip strong,
+.site-template-shell .landing-cinematic-showcase strong,
+.site-template-shell .landing-spotlight__stats strong {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+}
+
+.site-template-shell {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+.site-template-shell .primary-button {
+  background: linear-gradient(135deg, #c89a28, #deb848) !important;
+  background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+  color: #0c0d0f !important;
+  font-family: 'DM Sans', Georgia, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  box-shadow: 0 12px 36px rgba(200, 154, 40, 0.3) !important;
+}
+
+.site-template-shell .secondary-button {
+  border-color: rgba(200, 154, 40, 0.3) !important;
+  background: rgba(200, 154, 40, 0.06) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  font-family: 'DM Sans', Georgia, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+
+.site-template-shell .public-booking-form__submit {
+  background: linear-gradient(135deg, #c89a28, #deb848) !important;
+  background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+  color: #0c0d0f !important;
+  font-weight: 600 !important;
+}
+
+.site-template-shell .room-booking-mode-switch button.is-active {
+  background: linear-gradient(135deg, #c89a28, #deb848) !important;
+  background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+  color: #0c0d0f !important;
+}
+
+.site-template-shell .public-site-header__cta {
+  background: linear-gradient(135deg, #c89a28, #deb848) !important;
+  background-image: linear-gradient(135deg, #c89a28, #deb848) !important;
+  color: #0c0d0f !important;
 }
 
 .primary-button:hover,
@@ -958,8 +1059,8 @@ textarea {
 .gallery-card {
   overflow: hidden;
   border-radius: 28px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: rgba(14, 16, 20, 0.95);
+  border: 1px solid rgba(200, 154, 40, 0.12);
   box-shadow: var(--shadow);
 }
 
@@ -1096,7 +1197,8 @@ textarea {
 .tag-row span {
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(56, 83, 68, 0.08);
+  background: rgba(200, 154, 40, 0.08);
+  border: 1px solid rgba(200, 154, 40, 0.12);
   font-size: 0.86rem;
 }
 
@@ -1357,8 +1459,8 @@ textarea {
 
 .room-booking-section {
   background:
-    radial-gradient(circle at top left, rgba(56, 83, 68, 0.1), transparent 24%),
-    linear-gradient(180deg, rgba(255, 249, 241, 0.86), rgba(255, 255, 255, 0));
+    radial-gradient(circle at top left, rgba(200, 154, 40, 0.06), transparent 24%),
+    linear-gradient(180deg, rgba(14, 16, 20, 0.9), rgba(12, 13, 15, 0));
 }
 
 .booking-mapping-grid {
@@ -1433,8 +1535,8 @@ textarea {
 .public-booking-card {
   padding: 28px;
   border-radius: 30px;
-  background: rgba(255, 250, 244, 0.94);
-  border: 1px solid var(--line);
+  background: rgba(14, 16, 20, 0.96);
+  border: 1px solid rgba(200, 154, 40, 0.14);
   box-shadow: var(--shadow);
 }
 
@@ -1469,8 +1571,8 @@ textarea {
 .public-booking-form textarea {
   width: 100%;
   border-radius: 18px;
-  border: 1px solid var(--line);
-  background: #fff;
+  border: 1px solid rgba(200, 154, 40, 0.16);
+  background: rgba(8, 10, 12, 0.85);
   padding: 15px 16px;
   color: var(--ink);
 }
@@ -1582,10 +1684,11 @@ textarea {
   min-height: 52px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), #d89d62);
-  color: #fff;
+  background: linear-gradient(135deg, #c89a28, #deb848);
+  color: #0c0d0f;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 14px 36px rgba(141, 85, 32, 0.25);
+  box-shadow: 0 12px 36px rgba(200, 154, 40, 0.3);
 }
 
 .availability-calendar {
@@ -1695,13 +1798,14 @@ textarea {
 }
 
 .room-availability__cell {
+  color: var(--ink);
   display: grid;
   gap: 6px;
   min-height: 110px;
   padding: 16px;
   border-radius: 22px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(200, 154, 40, 0.1);
+  background: rgba(14, 16, 20, 0.8);
 }
 
 .room-availability__cell strong {
@@ -1831,21 +1935,22 @@ textarea {
   min-height: 92px;
   padding: 12px;
   border-radius: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(200, 154, 40, 0.1);
+  background: rgba(14, 16, 20, 0.8);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  color: var(--ink);
 }
 
 .interactive-room-calendar__cell.is-selected-start,
 .interactive-room-calendar__cell.is-selected-end {
-  border-color: rgba(141, 85, 32, 0.42);
-  box-shadow: 0 16px 32px rgba(141, 85, 32, 0.14);
+  border-color: rgba(200, 154, 40, 0.5);
+  box-shadow: 0 16px 32px rgba(200, 154, 40, 0.14);
 }
 
 .interactive-room-calendar__cell.is-selected-range {
-  background: rgba(189, 123, 59, 0.12);
+  background: rgba(200, 154, 40, 0.1);
 }
 
 .interactive-room-calendar__cell strong {
@@ -1983,8 +2088,8 @@ textarea {
 
 .room-detail-section {
   background:
-    radial-gradient(circle at top right, rgba(216, 157, 98, 0.12), transparent 25%),
-    linear-gradient(180deg, rgba(255, 249, 241, 0.6), rgba(255, 255, 255, 0));
+    radial-gradient(circle at top right, rgba(200, 154, 40, 0.07), transparent 25%),
+    linear-gradient(180deg, rgba(14, 16, 20, 0.7), rgba(12, 13, 15, 0));
 }
 
 .room-detail-main {
@@ -2030,8 +2135,8 @@ textarea {
 .room-detail-calendar {
   padding: 28px;
   border-radius: 30px;
-  background: rgba(255, 250, 244, 0.8);
-  border: 1px solid var(--line);
+  background: rgba(14, 16, 20, 0.95);
+  border: 1px solid rgba(200, 154, 40, 0.14);
   box-shadow: var(--shadow);
 }
 
@@ -2101,8 +2206,8 @@ textarea {
 .room-detail-related__card {
   overflow: hidden;
   border-radius: 28px;
-  background: rgba(255, 250, 244, 0.86);
-  border: 1px solid var(--line);
+  background: rgba(14, 16, 20, 0.95);
+  border: 1px solid rgba(200, 154, 40, 0.12);
   box-shadow: var(--shadow);
 }
 
@@ -2135,8 +2240,8 @@ textarea {
 .room-booking-experience__form {
   padding: 28px;
   border-radius: 30px;
-  background: rgba(255, 250, 244, 0.84);
-  border: 1px solid var(--line);
+  background: rgba(14, 16, 20, 0.96);
+  border: 1px solid rgba(200, 154, 40, 0.14);
   box-shadow: var(--shadow);
 }
 
@@ -2152,8 +2257,8 @@ textarea {
   gap: 10px;
   padding: 8px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid var(--line);
+  background: rgba(8, 10, 12, 0.8);
+  border: 1px solid rgba(200, 154, 40, 0.16);
 }
 
 .room-booking-mode-switch button,
@@ -2177,8 +2282,8 @@ textarea {
 }
 
 .room-booking-mode-switch button.is-active {
-  background: linear-gradient(135deg, var(--green), #1f2a1f);
-  color: #fff;
+  background: linear-gradient(135deg, #c89a28, #deb848);
+  color: #0c0d0f;
 }
 
 .room-booking-mode-switch button:hover,
@@ -2203,9 +2308,10 @@ textarea {
 .room-booking-room-picker select {
   width: 100%;
   border-radius: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(200, 154, 40, 0.18);
+  background: rgba(10, 11, 14, 0.9);
   padding: 14px 16px;
+  color: var(--ink);
 }
 
 .room-booking-room-summary {
@@ -2216,8 +2322,8 @@ textarea {
   margin-top: 22px;
   padding: 18px 20px;
   border-radius: 24px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(200, 154, 40, 0.14);
+  background: rgba(10, 11, 14, 0.7);
 }
 
 .room-booking-room-summary strong,
@@ -2250,8 +2356,8 @@ textarea {
   min-height: 112px;
   padding: 16px;
   border-radius: 24px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(200, 154, 40, 0.12);
+  background: rgba(14, 16, 20, 0.8);
   text-align: left;
 }
 
@@ -2298,18 +2404,18 @@ textarea {
 .room-stay-planner__day.is-selected-end,
 .room-monthly-planner__card.is-selected-start,
 .room-monthly-planner__card.is-selected-end {
-  border-color: rgba(141, 85, 32, 0.45);
-  box-shadow: 0 18px 36px rgba(141, 85, 32, 0.16);
+  border-color: rgba(200, 154, 40, 0.5);
+  box-shadow: 0 18px 36px rgba(200, 154, 40, 0.18);
 }
 
 .room-stay-planner__day.is-selected-start,
 .room-stay-planner__day.is-selected-end {
-  background: linear-gradient(135deg, rgba(189, 123, 59, 0.2), rgba(255, 249, 241, 0.92));
+  background: linear-gradient(135deg, rgba(200, 154, 40, 0.24), rgba(14, 16, 20, 0.95));
 }
 
 .room-stay-planner__day.is-selected-range,
 .room-monthly-planner__card.is-selected-range {
-  background: rgba(189, 123, 59, 0.12);
+  background: rgba(200, 154, 40, 0.1);
 }
 
 .room-monthly-planner__intro,
@@ -2320,8 +2426,8 @@ textarea {
   gap: 18px;
   padding: 18px 20px;
   border-radius: 24px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(200, 154, 40, 0.14);
+  background: rgba(10, 11, 14, 0.7);
 }
 
 .room-monthly-planner__intro strong,
@@ -2342,21 +2448,21 @@ textarea {
   min-height: 170px;
   padding: 20px;
   border-radius: 26px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(200, 154, 40, 0.12);
+  background: rgba(14, 16, 20, 0.8);
   text-align: left;
 }
 
 .room-monthly-planner__card.is-free {
-  background: rgba(71, 159, 118, 0.1);
+  background: rgba(40, 100, 70, 0.18);
 }
 
 .room-monthly-planner__card.is-partial {
-  background: rgba(255, 204, 102, 0.18);
+  background: rgba(180, 130, 40, 0.14);
 }
 
 .room-monthly-planner__card.is-busy {
-  background: rgba(177, 75, 75, 0.12);
+  background: rgba(140, 50, 50, 0.18);
 }
 
 .room-booking-selection-card {
@@ -2374,7 +2480,7 @@ textarea {
 }
 
 .site-template-shell {
-  background: #fefbf6;
+  background: var(--bg);
 }
 
 .public-site-header {
@@ -2382,9 +2488,9 @@ textarea {
   top: 0;
   z-index: 200;
   color: #fff;
-  background: rgba(15, 22, 17, 0.88);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(14px);
+  background: rgba(10, 11, 14, 0.92);
+  border-bottom: 1px solid rgba(200, 154, 40, 0.12);
+  backdrop-filter: blur(20px);
 }
 
 .public-site-header__inner {
@@ -2392,7 +2498,7 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  min-height: 86px;
+  min-height: 82px;
 }
 
 .site-template-shell .public-site-header__brand {
@@ -2400,13 +2506,16 @@ textarea {
 }
 
 .site-template-shell .public-site-header__brand span {
-  font-size: clamp(1.45rem, 1.2rem + 1vw, 1.8rem);
-  letter-spacing: 0.08em;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 1.9rem);
+  letter-spacing: 0.1em;
 }
 
 .site-template-shell .public-site-header__brand small {
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
+  font-size: 0.68rem;
+  letter-spacing: 0.26em;
+  color: var(--accent);
 }
 
 .public-site-header__nav-shell {
@@ -2490,13 +2599,14 @@ textarea {
 }
 
 .public-site-header__link:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(200, 154, 40, 0.1);
+  color: var(--accent);
 }
 
 .public-site-header__cta {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
+  background: linear-gradient(135deg, #c89a28, #deb848);
+  color: #0c0d0f;
+  font-weight: 600;
 }
 
 .public-site-header__toggle {
@@ -2507,9 +2617,9 @@ textarea {
   width: 46px;
   height: 46px;
   padding: 0;
-  border: 0;
+  border: 1px solid rgba(200, 154, 40, 0.2);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(200, 154, 40, 0.06);
   color: inherit;
   cursor: pointer;
 }
